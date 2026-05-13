@@ -164,6 +164,18 @@ async function dbSaveFranchiseCheck(key, checked) {
   if (error) console.error('dbSaveFranchiseCheck:', error);
 }
 
+async function dbLoadOpeningsForCoach() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await supabase
+    .from('openings')
+    .select('id, store_name, coach_name, start_date, current_day, status, updated_at')
+    .eq('coach_id', user.id)
+    .order('updated_at', { ascending: false });
+  if (error) { console.error('dbLoadOpeningsForCoach:', error); return []; }
+  return data || [];
+}
+
 async function dbLoadAllOpenings() {
   const { data, error } = await supabase
     .from('openings')

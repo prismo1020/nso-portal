@@ -548,9 +548,8 @@ function navigate(view) {
   if (view === 'knowledge') renderKBNav();
   if (view === 'team') renderTeamRoster();
   if (view === 'recap') loadRecapFields(state.currentRecapDay);
-  if (view === 'admin') {
-    renderAdminPage();
-  }
+  if (view === 'franchise') renderFranchiseChecks();
+  if (view === 'admin') renderAdminPage();
 }
 
 // ============================================================
@@ -724,7 +723,7 @@ function renderCompetencyTable(day) {
 
     html += `<tr>
       <td><div class="trainee-name">${trainee.name}</div></td>
-      <td><span class="badge badge-gray" style="font-size:10px">${trainee.role === 'Guest Experience Guide (GEG)' ? 'GEG' : trainee.role === 'ASM (Assistant Store Manager)' ? 'ASM' : 'SM'}</span></td>
+      <td><span class="badge badge-gray" style="font-size:10px">${trainee.role}</span></td>
       ${traineeComps.join('')}
       <td style="text-align:center">
         <div style="font-size:11px;font-weight:600;color:${pct === 100 ? 'var(--success)' : 'var(--text-secondary)'}; margin-bottom:4px">${pct}%</div>
@@ -996,14 +995,14 @@ function renderTeamRoster() {
 
 function editTraineeRole(id, newRole) {
   const t = state.trainees.find(t => t.id === id);
-  if (t) { t.role = newRole; saveState(); updateDashboardStats(); }
+  if (t) { t.role = newRole; renderTeamRoster(); updateDashboardStats(); dbSaveTrainee(t); }
 }
 
 function removeTrainee(id) {
   state.trainees = state.trainees.filter(t => t.id !== id);
+  dbDeleteTrainee(id);
   renderTeamRoster();
   updateDashboardStats();
-  saveState();
   showToast('Trainee removed', 'info');
 }
 
@@ -1110,7 +1109,9 @@ async function onSignedIn() {
     refreshAfterLoad();
   }
   document.getElementById('userEmail').textContent = state.userEmail || '';
-  document.getElementById('nav-admin').style.display = state.userRole === 'admin' ? 'flex' : 'none';
+  // Admin nav is always visible; renderAdminPage() handles access control messaging
+  document.getElementById('nav-admin').style.display = 'flex';
+  renderOpeningSwitcherList(); // populate switcher in background
 }
 
 function showLoginScreen() {
@@ -1194,10 +1195,23 @@ function saveState() { /* no-op — replaced by targeted db calls */ }
 // ============================================================
 // SETUP MODAL
 // ============================================================
-function openSetupModal() {
+function openSetupModal(forceNew = false) {
+  // When forceNew is true, we always create a brand-new opening.
+  // Otherwise, pre-populate with current opening data for editing.
   document.getElementById('setupModal').classList.add('open');
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('setup-date').value = today;
+  const isNew = forceNew || !state.openingId;
+  document.getElementById('setup-modal-mode').textContent = isNew ? 'Start New Opening' : 'Edit Current Opening';
+  document.getElementById('setup-store').value = isNew ? '' : (state.opening?.store || '');
+  document.getElementById('setup-coach').value = isNew ? '' : (state.opening?.coach || '');
+  document.getElementById('setup-date').value = isNew ? today : (state.opening?.date || today);
+  document.getElementById('setup-day').value = isNew ? 1 : (state.currentDay || 1);
+  document.getElementById('setup-new-flag').value = isNew ? 'new' : 'edit';
+  if (!isNew && state.openingId) {
+    document.getElementById('setup-new-hint').style.display = 'block';
+  } else {
+    document.getElementById('setup-new-hint').style.display = 'none';
+  }
 }
 
 function closeModal(id) {
@@ -1209,8 +1223,18 @@ function saveSetup() {
   const coach = document.getElementById('setup-coach').value.trim();
   const date = document.getElementById('setup-date').value;
   const day = parseInt(document.getElementById('setup-day').value);
+  const isNew = document.getElementById('setup-new-flag').value === 'new';
 
   if (!store || !coach) { showToast('Please fill in store name and coach name', 'info'); return; }
+
+  if (isNew) {
+    // Clear all state to start fresh opening
+    state.openingId = null;
+    state.trainees = [];
+    state.signoffs = {};
+    state.recaps = {};
+    state.franchiseChecks = {};
+  }
 
   state.opening = { store, coach, date };
   state.currentDay = day;
@@ -1233,8 +1257,11 @@ function saveSetup() {
   updateTopbarDayLabel();
   closeModal('setupModal');
   document.getElementById('dashSetupPrompt').style.display = 'none';
-  dbSaveOpening().then(() => showToast(`Opening set up for ${store}!`, 'success'));
-  showToast(`Setting up ${store}…`, 'info');
+  dbSaveOpening().then(() => {
+    showToast(`${isNew ? 'New opening started' : 'Opening updated'}: ${store}!`, 'success');
+    renderOpeningSwitcherList();
+  });
+  if (isNew) renderTeamRoster();
 }
 
 // ============================================================
@@ -1495,11 +1522,172 @@ async function exportAllAdmin() {
 }
 
 // ============================================================
-// FRANCHISE CHECKS
+// FRANCHISE CHECKS / DAY 0
 // ============================================================
+const FRANCHISE_CHECK_GROUPS = [
+  {
+    group: 'Partnership & Planning',
+    desc: 'Complete these conversations with the Franchise Owner or Store Manager before Day 1 begins.',
+    checks: [
+      { key: 'f-agenda-review', label: 'All 5-day agenda items reviewed with Franchise Store Manager/Owner' },
+      { key: 'f-guest-policies', label: 'Guest policies discussed — late arrivals, refunds, waivers, recovery model — and how each will be trained on' },
+      { key: 'f-team-policies', label: 'Team policies discussed — dress code, clock-in/out procedures, late policy, conduct standards — and how each will be trained on' },
+    ]
+  },
+  {
+    group: 'Staff iPads Ready',
+    desc: 'Verify all staff iPads are configured and logged in before training begins.',
+    checks: [
+      { key: 'f-learning-plan', label: 'NSO GEG Learning Plan uploaded to all staff iPads' },
+      { key: 'f-tracker-guide', label: 'Guide to Building Trackers downloaded to all staff iPads' },
+      { key: 'f-tracker-charts', label: 'Tracker build charts downloaded to all store iPads' },
+      { key: 'f-server-cheatsheets', label: 'Room Server Rack Cheat Sheets downloaded to all staff iPads' },
+      { key: 'f-delightree', label: 'Delightree bookmarked on all staff iPads' },
+      { key: 'f-slack', label: 'Staff Slack logged in on all staff iPads' },
+      { key: 'f-checkfront-staff', label: 'Checkfront logged in on all staff iPads' },
+      { key: 'f-checkfront-manager', label: 'Manager account logged in to Checkfront on the manager\'s iPad' },
+    ]
+  },
+  {
+    group: 'Technical Readiness',
+    desc: 'All technical systems must be confirmed operational before Day 1.',
+    checks: [
+      { key: 'f-trackers-built', label: 'At least one full set of limb trackers built for the Guest Journey role-play' },
+      { key: 'f-holodecks-calibrated', label: 'All holodecks calibrated and mock sessions run to confirm readiness' },
+    ]
+  },
+  {
+    group: 'Store Physical Setup',
+    desc: 'The store must be physically ready for a training environment.',
+    checks: [
+      { key: 'f-boxes-unpacked', label: 'Boxes unpacked; shelves labeled; work surfaces clear' },
+      { key: 'f-tracker-supplies', label: 'Tracker supplies sorted into labeled drawers; par levels set' },
+      { key: 'f-charging', label: 'Charging station set; cables routed; spare batteries charging' },
+      { key: 'f-cleaning-tools', label: 'Tools and cleaning supplies stocked; non-alcohol wipes per SOP' },
+      { key: 'f-printers', label: 'Label printer and backroom printer online; paper, ink, and labels ready' },
+      { key: 'f-props', label: 'Props and accessories binned and labeled' },
+      { key: 'f-waste', label: 'Waste and recycling emptied; floor clear; drawer/bin index posted' },
+    ]
+  }
+];
+
+function renderFranchiseChecks() {
+  const container = document.getElementById('franchiseContent');
+  if (!container) return;
+
+  if (!state.openingId) {
+    container.innerHTML = `<div class="card" style="padding:32px;text-align:center;border:2px dashed var(--border)">
+      <div style="font-size:13px;color:var(--text-muted)">Set up an opening first to track Day 0 checks.</div>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="openSetupModal(true)">Set Up Opening</button>
+    </div>`;
+    return;
+  }
+
+  const totalChecks = FRANCHISE_CHECK_GROUPS.reduce((sum, g) => sum + g.checks.length, 0);
+  const completedChecks = FRANCHISE_CHECK_GROUPS.reduce((sum, g) =>
+    sum + g.checks.filter(c => state.franchiseChecks[c.key]).length, 0);
+  const pct = totalChecks > 0 ? Math.round((completedChecks / totalChecks) * 100) : 0;
+
+  let html = `<div class="card mb-20">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Day 0 Readiness</div>
+        <div class="card-subtitle">${completedChecks} of ${totalChecks} checks complete</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:14px;font-weight:700;color:${pct===100?'var(--success)':'var(--hb)'}">${pct}%</div>
+        <div style="width:120px"><div class="progress-bar-wrap"><div class="progress-bar-fill ${pct===100?'green':'blue'}" style="width:${pct}%"></div></div></div>
+      </div>
+    </div>
+  </div>`;
+
+  FRANCHISE_CHECK_GROUPS.forEach(group => {
+    const groupDone = group.checks.filter(c => state.franchiseChecks[c.key]).length;
+    html += `<div class="card mb-20">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${group.group}</div>
+          <div class="card-subtitle">${group.desc}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary)">${groupDone}/${group.checks.length}</div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:0">`;
+    group.checks.forEach(check => {
+      const checked = !!state.franchiseChecks[check.key];
+      html += `<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-light);cursor:pointer">
+        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${check.key}', this.checked); renderFranchiseChecks()"
+          style="margin-top:2px;width:16px;height:16px;accent-color:var(--trigger);flex-shrink:0">
+        <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${check.label}</span>
+      </label>`;
+    });
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
 function toggleFranchiseCheck(key, checked) {
   state.franchiseChecks[key] = checked;
   dbSaveFranchiseCheck(key, checked);
+}
+
+// ============================================================
+// OPENING SWITCHER
+// ============================================================
+async function renderOpeningSwitcherList() {
+  const list = document.getElementById('openingSwitcherList');
+  if (!list) return;
+  list.innerHTML = '<div style="padding:8px 0;font-size:12px;color:var(--text-muted)">Loading…</div>';
+  const openings = await dbLoadOpeningsForCoach();
+  if (openings.length === 0) {
+    list.innerHTML = '<div style="padding:8px 0;font-size:12px;color:var(--text-muted)">No openings yet.</div>';
+    return;
+  }
+  list.innerHTML = openings.map(o => {
+    const isCurrent = o.id === state.openingId;
+    const dateStr = o.start_date ? new Date(o.start_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'No date';
+    return `<button onclick="switchToOpening('${o.id}')" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:10px 12px;border-radius:var(--radius-md);border:1px solid ${isCurrent?'var(--trigger)':'var(--border-light)'};background:${isCurrent?'var(--trigger-light)':'var(--white)'};margin-bottom:8px;cursor:pointer;transition:all 0.15s" ${isCurrent?'disabled':''}>
+      <div style="font-size:13px;font-weight:600;color:var(--hb)">${o.store_name}</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">${dateStr} · Day ${o.current_day || 1} of 5${isCurrent?' · <strong>Current</strong>':''}</div>
+    </button>`;
+  }).join('');
+}
+
+async function switchToOpening(openingId) {
+  closeModal('openingSwitcherModal');
+  showToast('Loading opening…', 'info');
+  // Reset state
+  state.openingId = openingId;
+  state.trainees = [];
+  state.signoffs = {};
+  state.recaps = {};
+  state.franchiseChecks = {};
+  // Load via dbLoadState which picks most-recently-updated — we need to load by specific ID
+  const { data: o } = await supabase.from('openings').select('*').eq('id', openingId).single();
+  if (!o) { showToast('Could not load opening', 'info'); return; }
+  state.opening = { store: o.store_name, coach: o.coach_name, date: o.start_date };
+  state.currentDay = o.current_day || 1;
+
+  const [{ data: trainees }, { data: signoffs }, { data: recaps }, { data: fchecks }] = await Promise.all([
+    supabase.from('trainees').select('*').eq('opening_id', openingId).order('created_at'),
+    supabase.from('signoffs').select('*').eq('opening_id', openingId),
+    supabase.from('recaps').select('*').eq('opening_id', openingId),
+    supabase.from('franchise_checks').select('*').eq('opening_id', openingId)
+  ]);
+
+  state.trainees = (trainees || []).map(t => ({ id: t.id, name: t.name, role: t.role }));
+  state.signoffs = {};
+  (signoffs || []).forEach(s => { state.signoffs[s.trainee_id + '_' + s.competency_id] = s.status; });
+  state.recaps = {};
+  (recaps || []).forEach(r => {
+    state.recaps[r.day_num] = { 'ld-topics': r.ld_topics||'', 'ld-team': r.ld_team||'', 'tech': r.tech||'', 'ops': r.ops||'', 'sm': r.sm_notes||'', 'tomorrow': r.tomorrow||'', 'actions': r.actions||'' };
+  });
+  state.franchiseChecks = {};
+  (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; });
+
+  refreshAfterLoad();
+  navigate('dashboard');
+  showToast(`Switched to: ${o.store_name}`, 'success');
 }
 
 // ============================================================
