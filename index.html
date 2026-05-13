@@ -45,31 +45,38 @@
     <div id="paneSignIn">
       <div class="form-row">
         <label class="form-label">Email</label>
-        <input class="input" id="loginEmail" type="email" placeholder="you@sandboxvr.com" onkeydown="if(event.key==='Enter')signIn()">
+        <input class="input" id="loginEmail" type="email" placeholder="you@sandboxvr.com"
+          autocomplete="username" data-lpignore="true" data-form-type="other"
+          onkeydown="if(event.key==='Enter')signIn()">
       </div>
       <div class="form-row">
         <label class="form-label">Password</label>
-        <input class="input" id="loginPassword" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')signIn()">
+        <input class="input" id="loginPassword" type="password" placeholder="Password"
+          autocomplete="current-password" data-lpignore="true" data-form-type="other"
+          onkeydown="if(event.key==='Enter')signIn()">
       </div>
       <div id="loginError" style="display:none;color:var(--danger);font-size:12px;margin-bottom:12px"></div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="signIn()">Sign In</button>
+      <button class="btn btn-primary" id="signInBtn" style="width:100%;justify-content:center" onclick="signIn()">Sign In</button>
     </div>
 
     <div id="paneSignUp" style="display:none">
       <div class="form-row">
         <label class="form-label">Your Name</label>
-        <input class="input" id="loginName" type="text" placeholder="Full name">
+        <input class="input" id="loginName" type="text" placeholder="Full name"
+          autocomplete="name" data-lpignore="true" data-form-type="other">
       </div>
       <div class="form-row">
         <label class="form-label">Email</label>
-        <input class="input" id="loginEmailSignUp" type="email" placeholder="you@sandboxvr.com">
+        <input class="input" id="loginEmailSignUp" type="email" placeholder="you@sandboxvr.com"
+          autocomplete="username" data-lpignore="true" data-form-type="other">
       </div>
       <div class="form-row">
         <label class="form-label">Password</label>
-        <input class="input" id="loginPasswordSignUp" type="password" placeholder="Min 6 characters">
+        <input class="input" id="loginPasswordSignUp" type="password" placeholder="Min 6 characters"
+          autocomplete="new-password" data-lpignore="true" data-form-type="other">
       </div>
       <div id="signupError" style="display:none;font-size:12px;margin-bottom:12px"></div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="signUp()">Create Account</button>
+      <button class="btn btn-primary" id="signUpBtn" style="width:100%;justify-content:center" onclick="signUp()">Create Account</button>
     </div>
   </div>
 </div>

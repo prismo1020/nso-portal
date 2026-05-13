@@ -1131,14 +1131,22 @@ async function signIn() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('signInBtn');
   errEl.style.display = 'none';
   if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
+  btn.textContent = 'Signing in…'; btn.disabled = true;
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Request timed out — check your connection and try again.')), 12000));
+    const { error } = await Promise.race([
+      supabase.auth.signInWithPassword({ email, password }),
+      timeout
+    ]);
     if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
   } catch (e) {
-    errEl.textContent = 'Connection error: ' + e.message;
+    errEl.textContent = e.message || 'Connection error. Try again.';
     errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Sign In'; btn.disabled = false;
   }
 }
 
@@ -1147,11 +1155,13 @@ async function signUp() {
   const email = document.getElementById('loginEmailSignUp').value.trim();
   const password = document.getElementById('loginPasswordSignUp').value;
   const errEl = document.getElementById('signupError');
+  const btn = document.getElementById('signUpBtn');
   errEl.style.color = 'var(--danger)';
   errEl.style.display = 'none';
   if (!name) { errEl.textContent = 'Please enter your name.'; errEl.style.display = 'block'; return; }
   if (!email) { errEl.textContent = 'Please enter your email.'; errEl.style.display = 'block'; return; }
   if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
+  btn.textContent = 'Creating account…'; btn.disabled = true;
   try {
     const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
     if (error) {
@@ -1159,12 +1169,14 @@ async function signUp() {
       errEl.style.display = 'block';
     } else {
       errEl.style.color = 'var(--success)';
-      errEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+      errEl.textContent = '✓ Account created! You can sign in now.';
       errEl.style.display = 'block';
     }
   } catch (e) {
     errEl.textContent = 'Connection error: ' + e.message;
     errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Create Account'; btn.disabled = false;
   }
 }
 
