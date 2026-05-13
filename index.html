@@ -284,23 +284,36 @@
 
     <!-- ROSTER VIEW -->
     <div id="view-team" class="view page-content">
-      <div class="page-header">
-        <div class="eyebrow">TEAM MANAGEMENT</div>
-        <div class="page-title">Team Roster</div>
-        <div class="page-subtitle">Manage your trainees and track their overall progress.</div>
+      <div class="page-header flex-between">
+        <div>
+          <div class="eyebrow">TEAM ROSTER</div>
+          <div class="page-title">Opening Team</div>
+          <div class="page-subtitle">Manage your trainee roster for this opening.</div>
+        </div>
+        <div class="flex gap-8">
+          <button class="btn btn-secondary" onclick="openAddTraineeModal()">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v13M1 7.5h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Add Trainee
+          </button>
+          <button class="btn btn-primary" onclick="openAddTraineeModal();switchAddTab('bulk')">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M1 4h13M1 8h10M1 12h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Bulk Add
+          </button>
+        </div>
       </div>
       <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Trainees <span id="traineeCount" style="font-size:12px;color:var(--text-muted);font-weight:400;margin-left:6px">0</span></div>
-            <div class="card-subtitle">Up to 12 trainees per opening</div>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="exportSignoffCSV()">Export CSV</button>
-            <button class="btn btn-primary" onclick="openAddTraineeModal()">+ Add Trainee</button>
+        <div class="card-header flex-between">
+          <div class="card-title">Trainees (<span id="traineeCount">0</span> / 12)</div>
+          <div class="text-xs" id="traineeCapacityNote">Up to 12 trainees per opening</div>
+        </div>
+        <div class="card-body" id="traineeListBody">
+          <div class="empty-state">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="14" r="7"/><path d="M6 36a14 14 0 0128 0"/></svg>
+            <div style="font-weight:600;color:var(--text-secondary);margin-bottom:4px">No trainees yet</div>
+            <div style="font-size:12px">Add your team to start tracking competencies</div>
+            <button class="btn btn-primary" style="margin-top:12px" onclick="openAddTraineeModal()">Add First Trainee</button>
           </div>
         </div>
-        <div class="card-body" id="traineeListBody"></div>
       </div>
     </div>
 
@@ -309,50 +322,282 @@
       <div class="page-header">
         <div class="eyebrow">DAILY AGENDA</div>
         <div class="page-title">Training Schedule</div>
-        <div class="page-subtitle">Day-by-day agenda with coaching tips, scripts, and resources.</div>
+        <div class="page-subtitle">Structured agendas for all 5 days, with coach guidance embedded at every step.</div>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:24px">
-        <button class="tab active" id="agendaTab1" onclick="selectDayAgenda(1)">Day 1</button>
-        <button class="tab" id="agendaTab2" onclick="selectDayAgenda(2)">Day 2</button>
-        <button class="tab" id="agendaTab3" onclick="selectDayAgenda(3)">Day 3</button>
-        <button class="tab" id="agendaTab4" onclick="selectDayAgenda(4)">Day 4</button>
-        <button class="tab" id="agendaTab5" onclick="selectDayAgenda(5)">Day 5</button>
+
+      <div class="day-selector mb-24" id="agendaDaySelector">
+        <div class="day-card" id="agendacard-1" onclick="selectDayAgenda(1)">
+          <div class="day-card-number">Day 1</div>
+          <div class="day-card-title">Guest Experience</div>
+        </div>
+        <div class="day-card" id="agendacard-2" onclick="selectDayAgenda(2)">
+          <div class="day-card-number">Day 2</div>
+          <div class="day-card-title">Service &amp; Tech</div>
+        </div>
+        <div class="day-card" id="agendacard-3" onclick="selectDayAgenda(3)">
+          <div class="day-card-number">Day 3</div>
+          <div class="day-card-title">Role-Play &amp; Ops</div>
+        </div>
+        <div class="day-card" id="agendacard-4" onclick="selectDayAgenda(4)">
+          <div class="day-card-number">Day 4</div>
+          <div class="day-card-title">Full Roleplay</div>
+        </div>
+        <div class="day-card" id="agendacard-5" onclick="selectDayAgenda(5)">
+          <div class="day-card-number">Day 5</div>
+          <div class="day-card-title">Friends &amp; Family</div>
+        </div>
       </div>
+
       <div id="agendaContent"></div>
     </div>
 
     <!-- COMPETENCIES VIEW -->
     <div id="view-competencies" class="view page-content">
-      <div class="page-header">
-        <div class="eyebrow">COMPETENCY TRACKING</div>
-        <div class="page-title">Sign-offs</div>
-        <div class="page-subtitle">Track each trainee's demonstrated competencies by day.</div>
+      <div class="page-header flex-between">
+        <div>
+          <div class="eyebrow">COMPETENCY TRACKER</div>
+          <div class="page-title">Sign-Off Roster</div>
+          <div class="page-subtitle">Track every trainee's demonstrated competencies. Click any circle to sign off.</div>
+        </div>
+        <div class="flex gap-8">
+          <button class="btn btn-secondary" onclick="exportSignoffs()">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export
+          </button>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:24px">
-        <button class="tab active" id="compTab1" onclick="selectDayComp(1)">Day 1</button>
-        <button class="tab" id="compTab2" onclick="selectDayComp(2)">Day 2</button>
-        <button class="tab" id="compTab3" onclick="selectDayComp(3)">Day 3</button>
-        <button class="tab" id="compTab4" onclick="selectDayComp(4)">Day 4</button>
-        <button class="tab" id="compTab5" onclick="selectDayComp(5)">Day 5</button>
+
+      <div class="tabs" id="competencyDayTabs">
+        <button class="tab active" onclick="selectCompDay(1)">Day 1</button>
+        <button class="tab" onclick="selectCompDay(2)">Day 2</button>
+        <button class="tab" onclick="selectCompDay(3)">Day 3</button>
+        <button class="tab" onclick="selectCompDay(4)">Day 4</button>
+        <button class="tab" onclick="selectCompDay(5)">Day 5</button>
       </div>
-      <div id="competenciesContent"></div>
+
+      <div class="card mb-20" id="competencyCard">
+        <div class="card-header">
+          <div>
+            <div class="card-title" id="compDayTitle">Day 1 Competencies</div>
+            <div class="card-subtitle" id="compDayDesc">Guest Experience &amp; Orientation</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="font-size:12px;color:var(--text-secondary)">
+              <span id="compSignedCount">0</span> / <span id="compTotalCount">0</span> signed off
+            </div>
+            <div style="width:100px">
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill blue" id="compProgressBar" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="trainee-roster">
+          <div id="competencyTableWrap"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Sign-Off Key</div>
+        </div>
+        <div class="card-body flex gap-20">
+          <div class="flex gap-8 align-items:center">
+            <div class="signoff-btn signed" style="pointer-events:none">✓</div>
+            <span style="font-size:13px;color:var(--text-secondary)">Demonstrated — competency met</span>
+          </div>
+          <div class="flex gap-8">
+            <div class="signoff-btn needs-work" style="pointer-events:none">~</div>
+            <span style="font-size:13px;color:var(--text-secondary)">Needs work — revisit before close</span>
+          </div>
+          <div class="flex gap-8">
+            <div class="signoff-btn not-met" style="pointer-events:none">✕</div>
+            <span style="font-size:13px;color:var(--text-secondary)">Not met — follow-up required</span>
+          </div>
+          <div class="flex gap-8">
+            <div class="signoff-btn" style="pointer-events:none"></div>
+            <span style="font-size:13px;color:var(--text-secondary)">Pending assessment</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- RECAP VIEW -->
     <div id="view-recap" class="view page-content">
       <div class="page-header">
-        <div class="eyebrow">DAILY DOCUMENTATION</div>
-        <div class="page-title">Daily Recap Builder</div>
-        <div class="page-subtitle">Document each day's training for the opening record.</div>
+        <div class="eyebrow">DAILY RECAP</div>
+        <div class="page-title">Write Today's Recap</div>
+        <div class="page-subtitle">Structured recap for Ops &amp; L&amp;D. Copy to Slack when complete.</div>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:24px">
-        <button class="tab active" id="recapTab1" onclick="selectDayRecap(1)">Day 1</button>
-        <button class="tab" id="recapTab2" onclick="selectDayRecap(2)">Day 2</button>
-        <button class="tab" id="recapTab3" onclick="selectDayRecap(3)">Day 3</button>
-        <button class="tab" id="recapTab4" onclick="selectDayRecap(4)">Day 4</button>
-        <button class="tab" id="recapTab5" onclick="selectDayRecap(5)">Day 5</button>
+
+      <div class="tabs" id="recapDayTabs">
+        <button class="tab active" onclick="selectRecapDay(1)">Day 1</button>
+        <button class="tab" onclick="selectRecapDay(2)">Day 2</button>
+        <button class="tab" onclick="selectRecapDay(3)">Day 3</button>
+        <button class="tab" onclick="selectRecapDay(4)">Day 4</button>
+        <button class="tab" onclick="selectRecapDay(5)">Day 5</button>
       </div>
-      <div id="recapContent"></div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📋 L&amp;D Summary</div>
+                <div class="card-subtitle">What was covered, how the team absorbed it</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">Topics Covered</div>
+                <textarea class="recap-textarea" id="recap-ld-topics" placeholder="What content was delivered today? Note any videos watched, discussions held, practice activities completed..." oninput="updateRecapPreview()"></textarea>
+                <div class="recap-chips">
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Reviewed mission, core values & vocabulary.')">Mission &amp; Values</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Guest Journey walkthrough completed.')">Guest Journey</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Technology essentials covered (trackers, vests, props).')">Tech Essentials</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Policies & procedures reviewed.')">Policies</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Role-play scenarios completed.')">Role-Play</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Opening & closing checklists practiced.')">Checklists</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Checkfront and Silica software walkthrough completed.')">Checkfront/Silica</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Tracker build completed — all rooms.')">Tracker Build</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Repeatability and conversion selling practice completed.')">Sales Practice</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'T1 ticket workflow practiced.')">T1 Workflow</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Room calibration completed for all rooms.')">Calibration</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Experience overviews and trailer videos watched.')">Experiences</button>
+                </div>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Team Observations</div>
+                <textarea class="recap-textarea" id="recap-ld-team" placeholder="Energy level, engagement, standout moments, individuals showing leadership potential, anyone who needs extra support..." oninput="updateRecapPreview()"></textarea>
+                <div class="recap-chips">
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team energy is excellent — highly engaged throughout.')">High energy</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Leadership identified — ASM/SM showing strong initiative.')">Leadership noted</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', '100% e-learning completion confirmed on Delightree.')">E-learnings done</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'A few team members need additional support with tech procedures.')">Support needed</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team is absorbing content well and retaining key concepts.')">Strong retention</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team is embodying core values — egoless, collaborative, motivated.')">Core values present</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Guest Journey scripts feel natural — good confidence at touchpoints.')">Scripts natural</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Tech confidence is building — team is less hesitant with equipment.')">Tech confidence up</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Repeatability pitch needs more reps — team is hesitant on the ask.')">Repeatability weak</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team pace is good — no one falling significantly behind.')">Good pace</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🔧 Tech &amp; Ops Issues</div>
+                <div class="card-subtitle">Issues logged, tickets created, outstanding items</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">Tech Issues</div>
+                <textarea class="recap-textarea" id="recap-tech" placeholder="Hardware issues, T1 tickets opened, software bugs, items escalated to T2..." oninput="updateRecapPreview()"></textarea>
+                <div class="recap-chips">
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'No tech issues to report today.')">No issues</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'T1 ticket created — ')">T1 ticket</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Latency issues observed in Room ')">Latency</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Vest pairing issues encountered and resolved.')">Vest pairing</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Tracker calibration required in Room ')">Calibration</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Prop not tracking in Room — resolved with re-pair.')">Prop tracking</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'HTC headset swapped out in Room  — T1 notified.')">Headset swap</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'KVM switch issue in Room  — resolved.')">KVM switch</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Silica session creation error — resolved with T1.')">Silica error</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Audio issue in Room  — resolved.')">Audio issue</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'ATH red LED status on headset  — resolved via Kiosk Mode restart.')">ATH issue</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Evoke tracker assets missing — reloaded Vicon profile.')">Evoke assets</button>
+                </div>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Building / Ops</div>
+                <textarea class="recap-textarea" id="recap-ops" style="min-height:70px" placeholder="CO status, inspections, replen needs, cleaning, outstanding build items..." oninput="updateRecapPreview()"></textarea>
+                <div class="recap-chips">
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'CO received — store cleared for operations.')">CO received</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Health & safety inspection pending.')">H&amp;S pending</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Replen items needed: ')">Replen needed</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Cleaning crew confirmed for ')">Cleaning</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Store is clean and guest-ready.')">Store ready</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Fire inspection completed.')">Fire inspection</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Build still in progress — polywall/fixtures outstanding.')">Build incomplete</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'All holodecks operational and calibrated.')">All rooms ready</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🏪 Store Manager Notes</div>
+                <div class="card-subtitle">SM readiness, coaching moments, development notes</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">SM Observations</div>
+                <textarea class="recap-textarea" id="recap-sm" placeholder="SM's ability to run training independently, delivery quality, team management, areas of strength, areas for coaching..." oninput="updateRecapPreview()"></textarea>
+                <div class="recap-chips">
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM ran training independently with minimal coaching needed.')">Independent delivery</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needed support with training video sequencing — now corrected.')">Video sequencing</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is highly motivated and leading the team well.')">Strong leadership</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needs reminders to stay on plan — improving with coaching.')">Needs reminders</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is building strong rapport with the team.')">Good rapport</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is developing their coaching voice — growing each day.')">Coach voice developing</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'ASM is standing out as a strong operational leader.')">ASM standout</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is solid on guest journey delivery — tech confidence still building.')">GJ strong, tech developing</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM ran the Day 4 rotation brief independently — excellent.')">Day 4 brief owned</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🎯 Tomorrow's Focus &amp; Action Items</div>
+                <div class="card-subtitle">What to prioritize, coach's notes for next session</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">Tomorrow's Focus</div>
+                <textarea class="recap-textarea" id="recap-tomorrow" style="min-height:70px" placeholder="What needs extra attention tomorrow? Anything to revisit or reinforce?" oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Coach Action Items</div>
+                <textarea class="recap-textarea" id="recap-actions" style="min-height:70px" placeholder="Tasks for the coach to follow up on (escalations, calls with Ops/L&D, prep work for tomorrow)..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="saveRecap()">
+                Save Recap for Day <span id="saveBtnDay">1</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="position:sticky;top:80px">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Slack Preview</div>
+                  <div class="card-subtitle">Auto-formatted for your daily update</div>
+                </div>
+                <button class="btn btn-secondary" onclick="copyRecap()" style="font-size:12px">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 10V2a1 1 0 011-1h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy to Slack
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="recap-preview-label">FORMATTED RECAP</div>
+                <div class="recap-preview" id="recapPreview">Start filling in the fields to see your formatted recap appear here...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- KNOWLEDGE BASE VIEW -->

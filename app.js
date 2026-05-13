@@ -579,7 +579,8 @@ function selectDayAgenda(day) {
 
 function updateTopbarDayLabel() {
   const dayNames = ['', 'Day 1 — Fri', 'Day 2 — Sat', 'Day 3 — Sun', 'Day 4 — Mon', 'Day 5 — Tue'];
-  document.getElementById('currentDayLabel').textContent = state.opening ? dayNames[state.currentDay] : '';
+  const el = document.getElementById('topbarDayLabel');
+  if (el) el.textContent = state.opening ? dayNames[state.currentDay] : '';
 }
 
 function updateDayPips() {
