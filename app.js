@@ -129,14 +129,14 @@ const COMPETENCIES = [
   { day: 4, id: 'c4-1', name: 'Performs all roles in Guest Journey rotation' },
   { day: 4, id: 'c4-2', name: 'Handles live tech issue without coach support' },
   { day: 4, id: 'c4-3', name: 'Executes guest recovery in a live scenario' },
-  { day: 4, id: 'c4-4', name: 'SM/ASM explains today\'s Daily Budgeted Goal' },
-  { day: 4, id: 'c4-5', name: 'SM/ASM describes labor decisions based on bookings' },
+  { day: 4, id: 'c4-4', name: 'SM/ASM explains today\'s Daily Budgeted Goal', smOnly: true },
+  { day: 4, id: 'c4-5', name: 'SM/ASM describes labor decisions based on bookings', smOnly: true },
 
   // Day 5 — Friends & Family & Operational Readiness
   { day: 5, id: 'c5-1', name: 'Runs full F&F session without coaching' },
   { day: 5, id: 'c5-2', name: 'Maintains guest experience standard for 5+ hrs' },
-  { day: 5, id: 'c5-3', name: 'SM/ASM reviews 14-day bookings & flags risk days' },
-  { day: 5, id: 'c5-4', name: 'ASM can run the store without operational decline' },
+  { day: 5, id: 'c5-3', name: 'SM/ASM reviews 14-day bookings & flags risk days', smOnly: true },
+  { day: 5, id: 'c5-4', name: 'ASM can run the store without operational decline', smOnly: true },
   { day: 5, id: 'c5-5', name: 'Team supports training without dip in guest experience' },
 ];
 
@@ -547,19 +547,31 @@ function navigate(view) {
 
   const titles = {
     dashboard: 'Dashboard',
+    team: 'Team Roster',
     schedule: 'Daily Agenda',
     competencies: 'Competency Tracker',
     recap: 'Daily Recap',
     knowledge: 'Knowledge Base',
-    team: 'Team Roster',
+    franchise: 'Day 0 Checks',
+    leadership: 'Leadership Lens',
     admin: 'All Openings'
   };
   document.getElementById('topbarTitle').textContent = titles[view] || view;
   state.currentView = view;
 
-  const navMap = { dashboard: 0, schedule: 1, competencies: 2, recap: 3, knowledge: 4, team: 5, admin: 7 };
-  const navItems = document.querySelectorAll('.nav-item');
-  if (navMap[view] !== undefined && navItems[navMap[view]]) navItems[navMap[view]].classList.add('active');
+  const navIdMap = {
+    dashboard: 'nav-dashboard',
+    team: 'nav-roster',
+    schedule: 'nav-schedule',
+    competencies: 'nav-competencies',
+    recap: 'nav-recap',
+    knowledge: 'nav-kb',
+    franchise: 'nav-franchise',
+    leadership: 'nav-leadership',
+    admin: 'nav-admin'
+  };
+  const navEl = document.getElementById(navIdMap[view]);
+  if (navEl) navEl.classList.add('active');
 
   if (view === 'schedule') renderAgenda(state.currentAgendaDay);
   if (view === 'competencies') renderCompetencyTable(state.currentCompDay);
@@ -585,6 +597,7 @@ function selectDay(day) {
   updateDayPips();
   updateDashboardFocus();
   updateTopbarDayLabel();
+  dbUpdateCurrentDay(); // persist to Supabase
 }
 
 function selectDayAgenda(day) {
@@ -727,7 +740,14 @@ function renderCompetencyTable(day) {
     <tbody>`;
 
   state.trainees.forEach(trainee => {
+    const isLeader = trainee.role === 'SM' || trainee.role === 'ASM';
     const traineeComps = comps.map(c => {
+      // Leadership-only comps are N/A for GEG trainees
+      if (c.smOnly && !isLeader) {
+        return `<td class="competency-cell">
+          <span style="font-size:10px;font-weight:600;color:var(--text-muted);letter-spacing:0.05em">N/A</span>
+        </td>`;
+      }
       const key = trainee.id + '_' + c.id;
       const status = state.signoffs[key] || 'pending';
       const icons = { pending: '', signed: '✓', 'needs-work': '~', 'not-met': '✕' };
@@ -737,8 +757,10 @@ function renderCompetencyTable(day) {
       </td>`;
     });
 
-    const signedCount = comps.filter(c => state.signoffs[trainee.id + '_' + c.id] === 'signed').length;
-    const pct = comps.length > 0 ? Math.round((signedCount / comps.length) * 100) : 0;
+    // Exclude smOnly comps from GEG progress (they're N/A)
+    const applicableComps = comps.filter(c => !c.smOnly || isLeader);
+    const signedCount = applicableComps.filter(c => state.signoffs[trainee.id + '_' + c.id] === 'signed').length;
+    const pct = applicableComps.length > 0 ? Math.round((signedCount / applicableComps.length) * 100) : 0;
 
     html += `<tr>
       <td><div class="trainee-name">${trainee.name}</div></td>
@@ -760,11 +782,17 @@ function renderCompetencyTable(day) {
 
 function updateCompProgress(day) {
   const comps = COMPETENCIES.filter(c => c.day === day);
-  const total = state.trainees.length * comps.length;
-  const signed = Object.entries(state.signoffs).filter(([k, v]) => {
-    const compId = k.split('_')[1];
-    return comps.find(c => c.id === compId) && v === 'signed';
-  }).length;
+  // Count only applicable sign-offs (exclude N/A cells for GEG trainees)
+  let total = 0;
+  let signed = 0;
+  state.trainees.forEach(trainee => {
+    const isLeader = trainee.role === 'SM' || trainee.role === 'ASM';
+    comps.forEach(c => {
+      if (c.smOnly && !isLeader) return; // N/A — skip
+      total++;
+      if (state.signoffs[trainee.id + '_' + c.id] === 'signed') signed++;
+    });
+  });
 
   document.getElementById('compSignedCount').textContent = signed;
   document.getElementById('compTotalCount').textContent = total;
@@ -1058,7 +1086,12 @@ function updateDashboardStats() {
   document.getElementById('statDaysLeft').textContent = state.opening ? (5 - state.currentDay + 1) : 5;
 
   const allSigned = Object.values(state.signoffs).filter(v => v === 'signed').length;
-  const allTotal = COMPETENCIES.length * state.trainees.length;
+  // Exclude N/A cells (smOnly comps for non-SM/ASM trainees) from the total
+  let allTotal = 0;
+  state.trainees.forEach(trainee => {
+    const isLeader = trainee.role === 'SM' || trainee.role === 'ASM';
+    COMPETENCIES.forEach(c => { if (!c.smOnly || isLeader) allTotal++; });
+  });
   document.getElementById('statSignoffs').textContent = allSigned;
   document.getElementById('statSignoffsDetail').textContent = `of ${allTotal} total`;
   document.getElementById('navSignoffBadge').textContent = allSigned;
