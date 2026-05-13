@@ -100,26 +100,44 @@ const DAYS = [
 // COMPETENCIES DATA
 // ============================================================
 const COMPETENCIES = [
-  { day: 1, id: 'c1-1', name: 'Names all store areas' },
+  // Day 1 — Guest Experience & Orientation
+  { day: 1, id: 'c1-1', name: 'Names all store areas correctly' },
   { day: 1, id: 'c1-2', name: 'Recites Mission & Core Values' },
-  { day: 1, id: 'c1-3', name: 'Delivers Guest Journey intro' },
-  { day: 1, id: 'c1-4', name: 'Applies Guest Recovery model' },
-  { day: 1, id: 'c1-5', name: 'Builds tracker independently' },
-  { day: 2, id: 'c2-1', name: 'Completes Checkfront booking' },
+  { day: 1, id: 'c1-3', name: 'Delivers Guest Journey intro script' },
+  { day: 1, id: 'c1-4', name: 'Applies Guest Recovery model (A-E-R)' },
+  { day: 1, id: 'c1-5', name: 'Builds limb tracker independently' },
+
+  // Day 2 — Service, Sales, Tech & Equipment Care
+  { day: 2, id: 'c2-1', name: 'Completes Checkfront booking end-to-end' },
   { day: 2, id: 'c2-2', name: 'Delivers repeatability pitch ×3' },
   { day: 2, id: 'c2-3', name: 'Pairs haptic vest independently' },
-  { day: 2, id: 'c2-4', name: 'Pairs props (Gun, Wand, Pistol)' },
-  { day: 2, id: 'c2-5', name: 'Completes wireless reset' },
-  { day: 3, id: 'c3-1', name: 'Leads opening procedures' },
-  { day: 3, id: 'c3-2', name: 'Submits T1 ticket correctly' },
-  { day: 3, id: 'c3-3', name: 'Full Guest Journey run' },
-  { day: 3, id: 'c3-4', name: 'Tracks up a full group' },
-  { day: 3, id: 'c3-5', name: 'Leads closing procedures' },
-  { day: 4, id: 'c4-1', name: 'All roles in Guest Journey' },
-  { day: 4, id: 'c4-2', name: 'Handles tech issue under pressure' },
-  { day: 4, id: 'c4-3', name: 'Executes guest recovery live' },
-  { day: 5, id: 'c5-1', name: 'Full F&F session — no coaching' },
-  { day: 5, id: 'c5-2', name: 'Maintains standard for 5+ hrs' },
+  { day: 2, id: 'c2-4', name: 'Pairs all prop types (Gun, Wand, Pistol)' },
+  { day: 2, id: 'c2-5', name: 'Completes full wireless reset' },
+  { day: 2, id: 'c2-6', name: 'Stores all equipment correctly post-session' },
+  { day: 2, id: 'c2-7', name: 'Handles gear carefully — no drops or rough use' },
+
+  // Day 3 — Role-Play, Ops & Facility Standards
+  { day: 3, id: 'c3-1', name: 'Leads opening procedures independently' },
+  { day: 3, id: 'c3-2', name: 'Submits T1 ticket with correct detail' },
+  { day: 3, id: 'c3-3', name: 'Runs full Guest Journey without prompting' },
+  { day: 3, id: 'c3-4', name: 'Tracks up a full group correctly' },
+  { day: 3, id: 'c3-5', name: 'Leads closing procedures independently' },
+  { day: 3, id: 'c3-6', name: 'BOH, server room & storage clean and tour-ready' },
+  { day: 3, id: 'c3-7', name: 'Faulty gear identified, logged & escalated correctly' },
+
+  // Day 4 — Full Roleplay & Leadership Habits
+  { day: 4, id: 'c4-1', name: 'Performs all roles in Guest Journey rotation' },
+  { day: 4, id: 'c4-2', name: 'Handles live tech issue without coach support' },
+  { day: 4, id: 'c4-3', name: 'Executes guest recovery in a live scenario' },
+  { day: 4, id: 'c4-4', name: 'SM/ASM explains today\'s Daily Budgeted Goal' },
+  { day: 4, id: 'c4-5', name: 'SM/ASM describes labor decisions based on bookings' },
+
+  // Day 5 — Friends & Family & Operational Readiness
+  { day: 5, id: 'c5-1', name: 'Runs full F&F session without coaching' },
+  { day: 5, id: 'c5-2', name: 'Maintains guest experience standard for 5+ hrs' },
+  { day: 5, id: 'c5-3', name: 'SM/ASM reviews 14-day bookings & flags risk days' },
+  { day: 5, id: 'c5-4', name: 'ASM can run the store without operational decline' },
+  { day: 5, id: 'c5-5', name: 'Team supports training without dip in guest experience' },
 ];
 
 // ============================================================
@@ -549,6 +567,7 @@ function navigate(view) {
   if (view === 'team') renderTeamRoster();
   if (view === 'recap') loadRecapFields(state.currentRecapDay);
   if (view === 'franchise') renderFranchiseChecks();
+  if (view === 'leadership') renderLeadershipLens();
   if (view === 'admin') renderAdminPage();
 }
 
@@ -797,10 +816,12 @@ function selectRecapDay(day) {
   loadRecapFields(day);
 }
 
+const RECAP_FIELDS = ['ld-topics', 'ld-team', 'tech', 'ops', 'sm', 'tomorrow', 'actions',
+  'biz-goal', 'biz-vs-goal', 'biz-ly', 'biz-labor', 'biz-staffing', 'biz-14day', 'biz-risks', 'biz-leader'];
+
 function loadRecapFields(day) {
   const r = state.recaps[day] || {};
-  const fields = ['ld-topics', 'ld-team', 'tech', 'ops', 'sm', 'tomorrow', 'actions'];
-  fields.forEach(f => {
+  RECAP_FIELDS.forEach(f => {
     const el = document.getElementById('recap-' + f);
     if (el) el.value = r[f] || '';
   });
@@ -850,6 +871,27 @@ function updateRecapPreview() {
     preview += `🏪 SM NOTES\n${sm}\n\n`;
   }
 
+  const bizGoal = get('biz-goal');
+  const bizVsGoal = get('biz-vs-goal');
+  const bizLy = get('biz-ly');
+  const bizLabor = get('biz-labor');
+  const bizStaffing = get('biz-staffing');
+  const biz14day = get('biz-14day');
+  const bizRisks = get('biz-risks');
+  const bizLeader = get('biz-leader');
+  if (bizGoal || bizVsGoal || bizLy || bizLabor || bizStaffing || biz14day || bizRisks || bizLeader) {
+    preview += `💼 BUSINESS READINESS\n`;
+    if (bizGoal) preview += `Goal: ${bizGoal}\n`;
+    if (bizVsGoal) preview += `Performance: ${bizVsGoal}\n`;
+    if (bizLy) preview += `LY: ${bizLy}\n`;
+    if (bizLabor) preview += `Labor/Booking Trends: ${bizLabor}\n`;
+    if (bizStaffing) preview += `Staffing: ${bizStaffing}\n`;
+    if (biz14day) preview += `14-Day Outlook: ${biz14day}\n`;
+    if (bizRisks) preview += `Risks/Peaks: ${bizRisks}\n`;
+    if (bizLeader) preview += `Leader Focus Tomorrow: ${bizLeader}\n`;
+    preview += '\n';
+  }
+
   const tomorrow = get('tomorrow');
   const actions = get('actions');
   if (tomorrow || actions) {
@@ -867,9 +909,8 @@ function updateRecapPreview() {
 
 function saveRecap() {
   const day = state.currentRecapDay;
-  const fields = ['ld-topics', 'ld-team', 'tech', 'ops', 'sm', 'tomorrow', 'actions'];
   state.recaps[day] = {};
-  fields.forEach(f => {
+  RECAP_FIELDS.forEach(f => {
     const el = document.getElementById('recap-' + f);
     if (el) state.recaps[day][f] = el.value;
   });
@@ -1526,6 +1567,153 @@ async function exportAllAdmin() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download='nso_admin_export.csv'; a.click();
   showToast('Admin data exported!', 'success');
+}
+
+// ============================================================
+// LEADERSHIP LENS
+// ============================================================
+function renderLeadershipLens() {
+  const container = document.getElementById('leadershipContent');
+  if (!container) return;
+
+  container.innerHTML = `
+  <div class="card mb-20" style="border-left:3px solid var(--trigger);background:var(--trigger-light)">
+    <div class="card-body" style="padding:20px 24px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--trigger);font-weight:700;margin-bottom:8px">Opening Support Coach Role</div>
+      <div style="font-size:14px;line-height:1.7;color:var(--hb)">Opening Support Coaches are responsible for more than helping a store get through opening week. They model the operating habits new leaders need after support leaves: <strong>financial awareness, labor discipline, equipment care, facility readiness, guest-first execution, and leadership ownership.</strong></div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:24px">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div style="font-size:20px;margin-bottom:6px">📊</div>
+          <div class="card-title">Know the Numbers</div>
+          <div class="card-subtitle">Coach leaders to understand the business, not just run it</div>
+        </div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">Strong store leaders know their Daily Budgeted Goal before the first guest walks in. They know what LY did. And they know what today's performance means for the week.</div>
+        <div style="border-top:1px solid var(--border-light);padding-top:10px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--trigger);margin-bottom:8px">Coach Them On</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>What is today's Daily Budgeted Goal and where does it come from?</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>What did Last Year (LY) do on this day — and why does the comparison matter?</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>How do leaders explain business performance to their team in a motivating way?</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>What does it mean to be "above goal" vs. "below goal" in real operational terms?</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border-radius:var(--radius-md);padding:10px 12px;font-size:12px;color:var(--text-secondary);border:1px solid var(--border-light)"><strong>Coaching prompt:</strong> Ask the SM to brief you on today's numbers as if you were a new team member at the morning huddle. Coach the delivery, not just the accuracy.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div style="font-size:20px;margin-bottom:6px">⚖️</div>
+          <div class="card-title">Protect the Margin</div>
+          <div class="card-subtitle">Labor discipline is a leadership habit, not a finance task</div>
+        </div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">New leaders often staff for comfort instead of demand. Opening Support Coaches help them build the habit of reading real-time bookings and heat maps to make staffing decisions that protect margin without hurting the guest experience.</div>
+        <div style="border-top:1px solid var(--border-light);padding-top:10px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--trigger);margin-bottom:8px">Coach Them On</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Reading real-time booking trends — when to add hours, when to pull back</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Using future heat maps to anticipate peak and quiet periods</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Making staffing adjustments proactively — not reactively</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>The line between protecting margin and damaging the guest experience</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border-radius:var(--radius-md);padding:10px 12px;font-size:12px;color:var(--text-secondary);border:1px solid var(--border-light)"><strong>Coaching prompt:</strong> Pull up today's booking view together. Ask the SM: "Given what you see here, what staffing decision would you make and why?"</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div style="font-size:20px;margin-bottom:6px">📅</div>
+          <div class="card-title">Plan Ahead</div>
+          <div class="card-subtitle">Strong stores are never surprised by their own calendar</div>
+        </div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">A leader who only knows today is always reacting. Opening Support Coaches build the habit of reviewing the next 14 days — identifying peaks, training blocks, risk days, and operational challenges before they arrive.</div>
+        <div style="border-top:1px solid var(--border-light);padding-top:10px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--trigger);margin-bottom:8px">Coach Them On</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>The 14-day booking review — what to look for and how often to do it</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Identifying upcoming peak periods and staffing to meet them</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Blocking time for specialized training without operational risk</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>What tomorrow's leader needs to know before they walk in</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border-radius:var(--radius-md);padding:10px 12px;font-size:12px;color:var(--text-secondary);border:1px solid var(--border-light)"><strong>Coaching prompt:</strong> Have the SM walk you through the next two weekends on the booking calendar. Are they staffed correctly? Do they know which days are high-risk?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-20">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Equipment Longevity & Facility Standards</div>
+        <div class="card-subtitle">The store must look and perform at day-one standard at all times</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="grid-2" style="gap:24px">
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--trigger);margin-bottom:10px">Equipment Care</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>High-touch gear (vests, headsets, props) cleaned and maintained to day-one standard between every session</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Equipment stored correctly — vests hung by sleeve, trackers in labeled drawers, props binned</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Faulty equipment identified, flagged in the daily log, and escalated through the correct T1/RMA path — not left in rotation</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>No rough handling, no dropping, no skipping cleaning steps under time pressure</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--trigger);margin-bottom:10px">Facility Readiness</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Server room, storage, and BOH areas clean, organized, and ready for a franchise or leadership walkthrough at any time</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Lobby and barracks held to guest-ready standard throughout the day — not just at open and close</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>Supplies stocked, labeled, and at par — the team knows the par levels and owns them</div>
+            <div style="font-size:13px;color:var(--hb);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--trigger);flex-shrink:0">→</span>The store can receive a franchise partner visit without any scrambling or embarrassment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Leadership Depth Coaching</div>
+        <div class="card-subtitle">The SM and ASM must be able to run the store before you leave</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">By the end of opening week, the SM and ASM should be able to run a full day without the Opening Support Coach in the building — not just executing tasks, but making decisions, coaching their team, and holding standards.</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:12px 16px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--hb);margin-bottom:6px">The question to ask yourself each day:</div>
+          <div style="font-size:14px;color:var(--trigger);font-style:italic">"If I didn't come in tomorrow, would this store still open cleanly, serve guests well, and make good decisions?"</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:12px 16px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--hb);margin-bottom:6px">Signs the SM is ready:</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+            <div style="font-size:13px;color:var(--text-secondary)">✓ Briefs the team before the day starts without being asked</div>
+            <div style="font-size:13px;color:var(--text-secondary)">✓ Knows the day's goal and communicates it with energy</div>
+            <div style="font-size:13px;color:var(--text-secondary)">✓ Makes staffing and labor decisions proactively</div>
+            <div style="font-size:13px;color:var(--text-secondary)">✓ Catches equipment issues before the coach does</div>
+            <div style="font-size:13px;color:var(--text-secondary)">✓ Coaches GEGs in real time — not just manages tasks</div>
+            <div style="font-size:13px;color:var(--text-secondary)">✓ Debrief at end of day is detailed, honest, and action-oriented</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 // ============================================================

@@ -143,7 +143,11 @@
       </button>
       <button class="nav-item" id="nav-franchise" onclick="navigate('franchise')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4h4l-3 3 1 5-4-2-4 2 1-5-3-3h4z"/></svg>
-        Franchise Checks
+        Day 0 Checks
+      </button>
+      <button class="nav-item" id="nav-leadership" onclick="navigate('leadership')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14a6 6 0 0112 0"/><path d="M8 10v4M6 12h4"/></svg>
+        Leadership Lens
       </button>
       <button class="nav-item" id="nav-admin" onclick="navigate('admin')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M1 14s1-4 7-4 7 4 7 4"/><path d="M12 1l1 1-5 5-2-2 5-5 1 1z"/></svg>
@@ -198,6 +202,11 @@
         <div class="eyebrow">NSO COACH PORTAL</div>
         <div class="page-title" id="dashTitle">Welcome to the NSO Portal.</div>
         <div class="page-subtitle" id="dashSubtitle">Set up your opening to get started. Use the button in the sidebar or below.</div>
+      </div>
+
+      <div style="margin-bottom:20px;padding:16px 20px;background:var(--trigger-light);border:1px solid rgba(0,118,255,0.15);border-left:3px solid var(--trigger);border-radius:var(--radius-md)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--trigger);font-weight:700;margin-bottom:6px">Opening Support Coach</div>
+        <div style="font-size:13px;color:var(--hb);line-height:1.6">Opening Support Coaches help new store leaders understand how strong stores operate day to day — knowing the numbers, reading demand, protecting labor, caring for equipment, and keeping the store ready for Guests, leaders, and franchise partners at any time. <button onclick="navigate('leadership')" style="background:none;border:none;color:var(--trigger);font-size:13px;cursor:pointer;padding:0;font-family:var(--font);text-decoration:underline">Leadership Lens →</button></div>
       </div>
 
       <div id="dashSetupPrompt" style="margin-bottom:24px">
@@ -571,6 +580,49 @@
             </div>
           </div>
 
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">💼 Business Readiness Recap</div>
+                <div class="card-subtitle">Build the habit of knowing the numbers — every day, not just the good ones</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">What was today's Daily Budgeted Goal?</div>
+                <textarea class="recap-textarea" id="recap-biz-goal" style="min-height:56px" placeholder="e.g. $4,200 — based on LY + seasonal adjustment..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">How did the store perform against goal?</div>
+                <textarea class="recap-textarea" id="recap-biz-vs-goal" style="min-height:56px" placeholder="e.g. Finished at $3,950 — 94% to goal. Two no-shows in the afternoon pulled us under..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">What was LY Performance for this day?</div>
+                <textarea class="recap-textarea" id="recap-biz-ly" style="min-height:56px" placeholder="e.g. LY was $3,600 — we outperformed LY by $350 despite the no-shows..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">What booking or labor trends stood out today?</div>
+                <textarea class="recap-textarea" id="recap-biz-labor" style="min-height:64px" placeholder="e.g. Walk-in traffic was stronger than expected mid-afternoon. Friday evening slots are nearly full for the next two weeks..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Were staffing adjustments made? Why?</div>
+                <textarea class="recap-textarea" id="recap-biz-staffing" style="min-height:64px" placeholder="e.g. Called in an extra GEG for the 3pm–7pm window based on booking density. SM made the call independently — good instinct..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">What does the next 14 days of bookings suggest?</div>
+                <textarea class="recap-textarea" id="recap-biz-14day" style="min-height:64px" placeholder="e.g. Two high-volume weekends ahead. July 4th weekend is nearly sold out. Mid-week is light — opportunity to run training blocks..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Upcoming peak periods, training blocks, or operational risks?</div>
+                <textarea class="recap-textarea" id="recap-biz-risks" style="min-height:64px" placeholder="e.g. School group booked for Tuesday — 24 guests across 3 consecutive sessions. SM needs to plan staffing and gear rotation in advance..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">What should tomorrow's leader pay attention to?</div>
+                <textarea class="recap-textarea" id="recap-biz-leader" style="min-height:64px" placeholder="e.g. Friday open is heavy — first session at 10am. ASM is opening. Make sure they've reviewed the booking count and planned gear rotation before team arrives..." oninput="updateRecapPreview()"></textarea>
+              </div>
+            </div>
+          </div>
+
           <div class="card">
             <div class="card-header">
               <div>
@@ -638,6 +690,16 @@
           <div style="color:var(--text-muted);font-size:13px">Select an article from the left to start reading.</div>
         </div>
       </div>
+    </div>
+
+    <!-- LEADERSHIP LENS VIEW -->
+    <div id="view-leadership" class="view page-content">
+      <div class="page-header">
+        <div class="eyebrow">OPENING SUPPORT COACH</div>
+        <div class="page-title">Leadership Lens: Running the Business</div>
+        <div class="page-subtitle">Opening Support Coaches help new store leaders understand how strong stores operate day to day — knowing the numbers, reading demand, protecting labor, caring for equipment, and keeping the store ready for Guests, leaders, and franchise partners at any time.</div>
+      </div>
+      <div id="leadershipContent"></div>
     </div>
 
     <!-- FRANCHISE / DAY 0 CHECKS VIEW -->

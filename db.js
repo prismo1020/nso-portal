@@ -52,13 +52,21 @@ async function dbLoadState() {
   state.recaps = {};
   (recaps || []).forEach(r => {
     state.recaps[r.day_num] = {
-      'ld-topics': r.ld_topics || '',
-      'ld-team':   r.ld_team   || '',
-      'tech':      r.tech      || '',
-      'ops':       r.ops       || '',
-      'sm':        r.sm_notes  || '',
-      'tomorrow':  r.tomorrow  || '',
-      'actions':   r.actions   || ''
+      'ld-topics':    r.ld_topics    || '',
+      'ld-team':      r.ld_team      || '',
+      'tech':         r.tech         || '',
+      'ops':          r.ops          || '',
+      'sm':           r.sm_notes     || '',
+      'tomorrow':     r.tomorrow     || '',
+      'actions':      r.actions      || '',
+      'biz-goal':     r.biz_goal     || '',
+      'biz-vs-goal':  r.biz_vs_goal  || '',
+      'biz-ly':       r.biz_ly       || '',
+      'biz-labor':    r.biz_labor    || '',
+      'biz-staffing': r.biz_staffing || '',
+      'biz-14day':    r.biz_14day    || '',
+      'biz-risks':    r.biz_risks    || '',
+      'biz-leader':   r.biz_leader   || '',
     };
   });
 
@@ -139,16 +147,24 @@ async function dbSaveRecap(day) {
   if (!state.openingId) return;
   const r = state.recaps[day] || {};
   const { error } = await supabase.from('recaps').upsert({
-    opening_id: state.openingId,
-    day_num:    day,
-    ld_topics:  r['ld-topics'] || null,
-    ld_team:    r['ld-team']   || null,
-    tech:       r['tech']      || null,
-    ops:        r['ops']       || null,
-    sm_notes:   r['sm']        || null,
-    tomorrow:   r['tomorrow']  || null,
-    actions:    r['actions']   || null,
-    updated_at: new Date().toISOString()
+    opening_id:   state.openingId,
+    day_num:      day,
+    ld_topics:    r['ld-topics']    || null,
+    ld_team:      r['ld-team']      || null,
+    tech:         r['tech']         || null,
+    ops:          r['ops']          || null,
+    sm_notes:     r['sm']           || null,
+    tomorrow:     r['tomorrow']     || null,
+    actions:      r['actions']      || null,
+    biz_goal:     r['biz-goal']     || null,
+    biz_vs_goal:  r['biz-vs-goal']  || null,
+    biz_ly:       r['biz-ly']       || null,
+    biz_labor:    r['biz-labor']    || null,
+    biz_staffing: r['biz-staffing'] || null,
+    biz_14day:    r['biz-14day']    || null,
+    biz_risks:    r['biz-risks']    || null,
+    biz_leader:   r['biz-leader']   || null,
+    updated_at:   new Date().toISOString()
   }, { onConflict: 'opening_id,day_num' });
   if (error) console.error('dbSaveRecap:', error);
 }
