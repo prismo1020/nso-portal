@@ -1381,19 +1381,7 @@ async function renderAdminPage() {
   document.getElementById('adminContent').style.display = 'block';
   container.innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:13px">Checking access…</div>';
 
-  // Always re-fetch role from DB — never trust cached state for access control
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-      if (profile) state.userRole = profile.role;
-    }
-  } catch(e) { /* fall through to role check below */ }
-
-  if (state.userRole !== 'admin') {
-    container.innerHTML = '<div style="padding:32px 0;text-align:center"><div style="font-size:32px;margin-bottom:12px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--hb);margin-bottom:6px">Admin Access Required</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:4px">Your account role is: <strong>' + state.userRole + '</strong></div><div style="font-size:13px;color:var(--text-muted)">Ask your Ops lead to run this in Supabase SQL Editor:</div><div style="margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;text-align:left;color:var(--hb)">UPDATE public.profiles SET role = \'admin\'<br>WHERE email = \'' + (state.userEmail||'your@email.com') + '\';</div></div>';
-    return;
-  }
+  // No role gate — all logged-in users can view opening data
 
   container.innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:13px">Loading all openings…</div>';
   var allOpenings = await dbLoadAllOpenings();
