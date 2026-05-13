@@ -177,18 +177,36 @@ async function dbLoadOpeningsForCoach() {
 }
 
 async function dbLoadAllOpenings() {
-  const { data, error } = await supabase
+  // Fetch openings first, then related data per opening separately.
+  // Avoids nested-join RLS issues that can silently return empty.
+  const { data: openings, error } = await supabase
     .from('openings')
-    .select(`
-      *,
-      profiles ( full_name, email ),
-      trainees ( * ),
-      signoffs ( * ),
-      recaps ( * ),
-      franchise_checks ( * )
-    `)
+    .select('*')
     .order('updated_at', { ascending: false });
 
-  if (error) { console.error('dbLoadAllOpenings:', error); return []; }
-  return data || [];
+  if (error) { console.error('dbLoadAllOpenings openings:', error); return []; }
+  if (!openings || openings.length === 0) return [];
+
+  const results = await Promise.all(openings.map(async (o) => {
+    const [
+      { data: trainees },
+      { data: signoffs },
+      { data: recaps },
+      { data: fchecks }
+    ] = await Promise.all([
+      supabase.from('trainees').select('*').eq('opening_id', o.id),
+      supabase.from('signoffs').select('*').eq('opening_id', o.id),
+      supabase.from('recaps').select('*').eq('opening_id', o.id),
+      supabase.from('franchise_checks').select('*').eq('opening_id', o.id)
+    ]);
+    return {
+      ...o,
+      trainees:         trainees        || [],
+      signoffs:         signoffs        || [],
+      recaps:           recaps          || [],
+      franchise_checks: fchecks         || []
+    };
+  }));
+
+  return results;
 }
