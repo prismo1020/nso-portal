@@ -7,8 +7,72 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gordita:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  #loginOverlay {
+    position: fixed; inset: 0; background: var(--hb);
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+  }
+  .login-box {
+    background: var(--white); border-radius: var(--radius-xl);
+    padding: 40px; width: 420px; box-shadow: var(--shadow-lg);
+  }
+  #signupError { color: var(--danger); }
+  #signupError.success-msg { color: var(--success); }
+</style>
 </head>
 <body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" style="display:none">
+  <div class="login-box">
+    <div style="margin-bottom:28px">
+      <div class="logo-mark" style="margin-bottom:8px">
+        <svg class="logo-diamond" viewBox="0 0 28 28" fill="none">
+          <polygon points="14,2 26,14 14,26 2,14" fill="#0076FF" opacity="0.15"/>
+          <polygon points="14,2 26,14 14,26 2,14" fill="none" stroke="#0076FF" stroke-width="1.5"/>
+          <polygon points="14,7 21,14 14,21 7,14" fill="#0076FF"/>
+        </svg>
+        <div class="logo-text" style="color:var(--hb)">SANDBOX VR<sup>®</sup></div>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary)">NSO Coach Portal</div>
+    </div>
+
+    <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:4px;margin-bottom:24px">
+      <button class="tab active" id="tabSignIn" onclick="showLoginTab('signin')" style="flex:1">Sign In</button>
+      <button class="tab" id="tabSignUp" onclick="showLoginTab('signup')" style="flex:1">Sign Up</button>
+    </div>
+
+    <div id="paneSignIn">
+      <div class="form-row">
+        <label class="form-label">Email</label>
+        <input class="input" id="loginEmail" type="email" placeholder="you@sandboxvr.com" onkeydown="if(event.key==='Enter')signIn()">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Password</label>
+        <input class="input" id="loginPassword" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')signIn()">
+      </div>
+      <div id="loginError" style="display:none;color:var(--danger);font-size:12px;margin-bottom:12px"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="signIn()">Sign In</button>
+    </div>
+
+    <div id="paneSignUp" style="display:none">
+      <div class="form-row">
+        <label class="form-label">Your Name</label>
+        <input class="input" id="loginName" type="text" placeholder="Full name">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Email</label>
+        <input class="input" id="loginEmailSignUp" type="email" placeholder="you@sandboxvr.com">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Password</label>
+        <input class="input" id="loginPasswordSignUp" type="password" placeholder="Min 6 characters">
+      </div>
+      <div id="signupError" style="display:none;font-size:12px;margin-bottom:12px"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="signUp()">Create Account</button>
+    </div>
+  </div>
+</div>
 
 <div class="app">
 
@@ -45,7 +109,7 @@
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
         Dashboard
       </button>
-      <button class="nav-item" id="nav-roster" onclick="navigate('roster')">
+      <button class="nav-item" id="nav-roster" onclick="navigate('team')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14a6 6 0 0112 0"/></svg>
         Team Roster
       </button>
@@ -66,7 +130,7 @@
       </button>
 
       <div class="nav-section-label">Resources</div>
-      <button class="nav-item" id="nav-kb" onclick="navigate('kb')">
+      <button class="nav-item" id="nav-kb" onclick="navigate('knowledge')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h8a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M6 6h4M6 9h4M6 12h2"/></svg>
         Knowledge Base
       </button>
@@ -74,7 +138,7 @@
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4h4l-3 3 1 5-4-2-4 2 1-5-3-3h4z"/></svg>
         Franchise Checks
       </button>
-      <button class="nav-item" id="nav-admin" onclick="navigate('admin')">
+      <button class="nav-item" id="nav-admin" onclick="navigate('admin')" style="display:none">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M1 14s1-4 7-4 7 4 7 4"/><path d="M12 1l1 1-5 5-2-2 5-5 1 1z"/></svg>
         Admin View
       </button>
@@ -96,19 +160,23 @@
       <div class="topbar-breadcrumb">
         NSO Portal
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <span id="topbarViewLabel">Dashboard</span>
+        <span id="topbarTitle">Dashboard</span>
       </div>
       <div class="topbar-actions">
         <span id="topbarDayLabel" style="font-size:12px;color:var(--text-muted)"></span>
+        <span id="userEmail" style="font-size:12px;color:var(--text-muted)"></span>
         <button class="btn btn-primary" onclick="navigate('competencies')">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
           Sign-offs
+        </button>
+        <button class="btn btn-ghost" onclick="signOut()" title="Sign out" style="padding:8px 10px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6"/></svg>
         </button>
       </div>
     </div>
 
     <!-- DASHBOARD VIEW -->
-    <div id="view-dashboard" class="page-content">
+    <div id="view-dashboard" class="view active page-content">
       <div class="page-header">
         <div class="eyebrow">NSO COACH PORTAL</div>
         <div class="page-title" id="dashTitle">Welcome to the NSO Portal.</div>
@@ -215,7 +283,7 @@
     </div>
 
     <!-- ROSTER VIEW -->
-    <div id="view-roster" class="page-content" style="display:none">
+    <div id="view-team" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">TEAM MANAGEMENT</div>
         <div class="page-title">Team Roster</div>
@@ -237,7 +305,7 @@
     </div>
 
     <!-- SCHEDULE / AGENDA VIEW -->
-    <div id="view-schedule" class="page-content" style="display:none">
+    <div id="view-schedule" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">DAILY AGENDA</div>
         <div class="page-title">Training Schedule</div>
@@ -254,7 +322,7 @@
     </div>
 
     <!-- COMPETENCIES VIEW -->
-    <div id="view-competencies" class="page-content" style="display:none">
+    <div id="view-competencies" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">COMPETENCY TRACKING</div>
         <div class="page-title">Sign-offs</div>
@@ -271,7 +339,7 @@
     </div>
 
     <!-- RECAP VIEW -->
-    <div id="view-recap" class="page-content" style="display:none">
+    <div id="view-recap" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">DAILY DOCUMENTATION</div>
         <div class="page-title">Daily Recap Builder</div>
@@ -288,7 +356,7 @@
     </div>
 
     <!-- KNOWLEDGE BASE VIEW -->
-    <div id="view-kb" class="page-content" style="display:none">
+    <div id="view-knowledge" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">REFERENCE LIBRARY</div>
         <div class="page-title">Knowledge Base</div>
@@ -311,7 +379,7 @@
     </div>
 
     <!-- FRANCHISE CHECKS VIEW -->
-    <div id="view-franchise" class="page-content" style="display:none">
+    <div id="view-franchise" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">FRANCHISE VERIFICATION</div>
         <div class="page-title">Franchise Checks</div>
@@ -321,7 +389,7 @@
     </div>
 
     <!-- ADMIN VIEW -->
-    <div id="view-admin" class="page-content" style="display:none">
+    <div id="view-admin" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">OPS &amp; L&amp;D</div>
         <div class="page-title">Admin View</div>
@@ -467,6 +535,9 @@
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="db.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

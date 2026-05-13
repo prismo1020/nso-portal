@@ -3,14 +3,18 @@
 // ============================================================
 let state = {
   opening: null,
+  openingId: null,
+  userRole: 'coach',
+  userEmail: null,
   currentDay: 1,
   currentAgendaDay: 1,
   currentCompDay: 1,
   currentRecapDay: 1,
   currentView: 'dashboard',
   trainees: [],
-  signoffs: {},   // { "traineeId_competencyId": "signed|needs-work|not-met" }
-  recaps: {},     // { dayNum: { topics, team, tech, ops, sm, tomorrow, actions } }
+  signoffs: {},
+  recaps: {},
+  franchiseChecks: {}
 };
 
 let contextTarget = null;
@@ -545,11 +549,7 @@ function navigate(view) {
   if (view === 'team') renderTeamRoster();
   if (view === 'recap') loadRecapFields(state.currentRecapDay);
   if (view === 'admin') {
-    // reset lock state each visit
-    document.getElementById('adminLock').style.display = 'block';
-    document.getElementById('adminContent').style.display = 'none';
-    document.getElementById('adminPwInput').value = '';
-    document.getElementById('adminPwError').style.display = 'none';
+    renderAdminPage();
   }
 }
 
@@ -775,10 +775,11 @@ function setSignoff(status) {
   if (status === 'pending') delete state.signoffs[key];
   else state.signoffs[key] = status;
   document.getElementById('contextMenu').classList.remove('open');
+  const { traineeId, compId } = contextTarget;
   contextTarget = null;
   renderCompetencyTable(state.currentCompDay);
   updateDashboardStats();
-  saveState();
+  dbSaveSignoff(traineeId, compId, status);
   showToast(status === 'signed' ? 'Competency signed off!' : status === 'pending' ? 'Sign-off cleared' : 'Status updated', status === 'signed' ? 'success' : 'info');
 }
 
@@ -872,7 +873,7 @@ function saveRecap() {
     const el = document.getElementById('recap-' + f);
     if (el) state.recaps[day][f] = el.value;
   });
-  saveState();
+  dbSaveRecap(day);
   showToast(`Day ${day} recap saved!`, 'success');
   updateRecapStatusCard();
   const badge = document.getElementById('navRecapBadge');
@@ -1078,65 +1079,96 @@ function updateRecapStatusCard() {
 }
 
 // ============================================================
-// PERSISTENT STORAGE (localStorage prototype)
+// AUTH
 // ============================================================
-function saveState() {
-  try {
-    const toSave = {
-      opening: state.opening,
-      currentDay: state.currentDay,
-      trainees: state.trainees,
-      signoffs: state.signoffs,
-      recaps: state.recaps,
-      franchiseChecks: state.franchiseChecks
-    };
-    localStorage.setItem('nso_current', JSON.stringify(toSave));
+async function initApp() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    await onSignedIn();
+  } else {
+    showLoginScreen();
+  }
 
-    // Also save to all-openings log
-    if (state.opening) {
-      const allKey = 'nso_all_openings';
-      let all = [];
-      try { all = JSON.parse(localStorage.getItem(allKey) || '[]'); } catch(e) { all = []; }
-      const openingId = state.opening.store + '_' + state.opening.date;
-      const idx = all.findIndex(o => o.id === openingId);
-      const entry = { id: openingId, ...toSave, lastSaved: new Date().toISOString() };
-      if (idx >= 0) all[idx] = entry;
-      else all.push(entry);
-      localStorage.setItem(allKey, JSON.stringify(all));
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN') {
+      await onSignedIn();
+    } else if (event === 'SIGNED_OUT') {
+      Object.assign(state, {
+        opening: null, openingId: null, userRole: 'coach', userEmail: null,
+        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {}
+      });
+      showLoginScreen();
     }
-  } catch(e) { /* no localStorage in some contexts */ }
+  });
 }
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem('nso_current');
-    if (saved) {
-      const s = JSON.parse(saved);
-      if (s.opening) {
-        state.opening = s.opening;
-        state.currentDay = s.currentDay || 1;
-        state.trainees = s.trainees || [];
-        state.signoffs = s.signoffs || {};
-        state.recaps = s.recaps || {};
-        state.franchiseChecks = s.franchiseChecks || {};
-        // restore UI
-        document.getElementById('sidebarStoreName').textContent = state.opening.store;
-        document.getElementById('dashTitle').textContent = `Welcome back, ${state.opening.coach}.`;
-        document.getElementById('dashSubtitle').textContent = `${state.opening.store} — Day ${state.currentDay} of 5. You've got this.`;
-        if (state.opening.date) {
-          const start = new Date(state.opening.date);
-          const end = new Date(start); end.setDate(end.getDate() + 4);
-          const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          document.getElementById('sidebarDates').textContent = `${fmt(start)} – ${fmt(end)}`;
-        }
-        selectDay(state.currentDay);
-        updateDayPips();
-        updateDashboardStats();
-        updateTopbarDayLabel();
-      }
-    }
-  } catch(e) { /* fail silently */ }
+async function onSignedIn() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  const loaded = await dbLoadState();
+  if (loaded) {
+    refreshAfterLoad();
+  }
+  document.getElementById('userEmail').textContent = state.userEmail || '';
+  document.getElementById('nav-admin').style.display = state.userRole === 'admin' ? 'flex' : 'none';
 }
+
+function showLoginScreen() {
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('signupError').style.display = 'none';
+}
+
+function showLoginTab(tab) {
+  document.getElementById('paneSignIn').style.display = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('paneSignUp').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tabSignIn').classList.toggle('active', tab === 'signin');
+  document.getElementById('tabSignUp').classList.toggle('active', tab === 'signup');
+}
+
+async function signIn() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
+}
+
+async function signUp() {
+  const name = document.getElementById('loginName').value.trim();
+  const email = document.getElementById('loginEmailSignUp').value.trim();
+  const password = document.getElementById('loginPasswordSignUp').value;
+  const errEl = document.getElementById('signupError');
+  errEl.style.display = 'none';
+  if (!name) { errEl.textContent = 'Please enter your name.'; errEl.style.display = 'block'; return; }
+  const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
+  else { errEl.style.color = 'var(--success)'; errEl.textContent = 'Account created! Check your email to confirm, then sign in.'; errEl.style.display = 'block'; }
+}
+
+async function signOut() {
+  await supabase.auth.signOut();
+}
+
+function refreshAfterLoad() {
+  if (!state.opening) return;
+  document.getElementById('sidebarStoreName').textContent = state.opening.store;
+  document.getElementById('dashTitle').textContent = `Welcome back, ${state.opening.coach}.`;
+  document.getElementById('dashSubtitle').textContent = `${state.opening.store} — Day ${state.currentDay} of 5. You've got this.`;
+  if (state.opening.date) {
+    const start = new Date(state.opening.date);
+    const end = new Date(start); end.setDate(end.getDate() + 4);
+    const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    document.getElementById('sidebarDates').textContent = `${fmt(start)} – ${fmt(end)}`;
+  }
+  document.getElementById('dashSetupPrompt').style.display = 'none';
+  selectDay(state.currentDay);
+  updateDayPips();
+  updateDashboardStats();
+  updateTopbarDayLabel();
+}
+
+function saveState() { /* no-op — replaced by targeted db calls */ }
 
 // ============================================================
 // SETUP MODAL
@@ -1179,8 +1211,9 @@ function saveSetup() {
   updateDashboardStats();
   updateTopbarDayLabel();
   closeModal('setupModal');
-  saveState();
-  showToast(`Opening set up for ${store}!`, 'success');
+  document.getElementById('dashSetupPrompt').style.display = 'none';
+  dbSaveOpening().then(() => showToast(`Opening set up for ${store}!`, 'success'));
+  showToast(`Setting up ${store}…`, 'info');
 }
 
 // ============================================================
@@ -1206,11 +1239,12 @@ function addTrainee() {
   if (!name) { showToast('Please enter a name', 'info'); return; }
   if (state.trainees.length >= 12) { showToast('Maximum 12 trainees per opening', 'info'); return; }
 
-  state.trainees.push({ id: 'trainee-' + Date.now() + Math.random(), name, role });
+  const trainee = { id: crypto.randomUUID(), name, role };
+  state.trainees.push(trainee);
   document.getElementById('trainee-name').value = '';
   renderTeamRoster();
   updateDashboardStats();
-  saveState();
+  dbSaveTrainee(trainee);
   showToast(`${name} added!`, 'success');
   // Keep modal open so coach can keep adding
 }
@@ -1226,14 +1260,13 @@ function bulkAddTrainees() {
     showToast(`Only ${available} spots left. First ${available} names will be added.`, 'info');
   }
   const toAdd = names.slice(0, available);
-  toAdd.forEach(name => {
-    state.trainees.push({ id: 'trainee-' + Date.now() + Math.random(), name, role });
-  });
+  const newTrainees = toAdd.map(name => ({ id: crypto.randomUUID(), name, role }));
+  newTrainees.forEach(t => state.trainees.push(t));
 
   closeModal('addTraineeModal');
   renderTeamRoster();
   updateDashboardStats();
-  saveState();
+  Promise.all(newTrainees.map(t => dbSaveTrainee(t)));
   showToast(`${toAdd.length} trainees added!`, 'success');
 }
 
@@ -1241,13 +1274,13 @@ function removeTrainee(id) {
   state.trainees = state.trainees.filter(t => t.id !== id);
   renderTeamRoster();
   updateDashboardStats();
-  saveState();
+  dbDeleteTrainee(id);
   showToast('Trainee removed', 'info');
 }
 
 function editTraineeRole(id, newRole) {
   const t = state.trainees.find(t => t.id === id);
-  if (t) { t.role = newRole; renderTeamRoster(); saveState(); }
+  if (t) { t.role = newRole; renderTeamRoster(); dbSaveTrainee(t); }
 }
 
 // ============================================================
@@ -1277,30 +1310,26 @@ function closeDrawer() {
 // ============================================================
 // ADMIN PAGE
 // ============================================================
-const ADMIN_PW = 'sandbox2026';
-
 function checkAdminPw() {
-  const val = document.getElementById('adminPwInput').value;
-  if (val === ADMIN_PW) {
-    document.getElementById('adminLock').style.display = 'none';
-    document.getElementById('adminContent').style.display = 'block';
-    renderAdminPage();
-  } else {
-    document.getElementById('adminPwError').style.display = 'block';
-  }
+  // Legacy stub — admin access is now role-based via Supabase
+  renderAdminPage();
 }
 
-function renderAdminPage() {
+async function renderAdminPage() {
   var container = document.getElementById('adminOpeningsList');
-  var allOpenings = [];
-  try { allOpenings = JSON.parse(localStorage.getItem('nso_all_openings') || '[]'); } catch(e) {}
+  container.innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:13px">Loading all openings…</div>';
 
-  if (state.opening) {
-    var oid = state.opening.store + '_' + state.opening.date;
-    if (!allOpenings.find(function(o){ return o.id === oid; })) {
-      allOpenings.push({ id: oid, opening: state.opening, currentDay: state.currentDay, trainees: state.trainees, signoffs: state.signoffs, recaps: state.recaps, franchiseChecks: state.franchiseChecks || {} });
-    }
+  if (state.userRole !== 'admin') {
+    container.innerHTML = '<div class="empty-state" style="padding:48px 0"><div style="font-size:13px;color:var(--text-muted)">Admin access only. Ask your Ops lead to grant admin role in Supabase.</div></div>';
+    document.getElementById('adminLock').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    return;
   }
+
+  document.getElementById('adminLock').style.display = 'none';
+  document.getElementById('adminContent').style.display = 'block';
+
+  var allOpenings = await dbLoadAllOpenings();
 
   if (allOpenings.length === 0) {
     container.innerHTML = '<div class="empty-state" style="padding:48px 0"><div style="font-size:13px;color:var(--text-muted)">No openings have been tracked yet.</div></div>';
@@ -1309,16 +1338,16 @@ function renderAdminPage() {
 
   var html = '';
   allOpenings.forEach(function(o) {
-    var opening = o.opening || {};
     var trainees = o.trainees || [];
-    var signoffs = o.signoffs || {};
-    var recaps = o.recaps || {};
-    var franchiseChecks = o.franchiseChecks || {};
-    var allSigned = Object.values(signoffs).filter(function(v){ return v === 'signed'; }).length;
+    var signoffs = o.signoffs || [];
+    var recaps = o.recaps || [];
+    var franchiseChecks = o.franchise_checks || [];
+    var allSigned = signoffs.filter(function(s){ return s.status === 'signed'; }).length;
     var allTotal = COMPETENCIES.length * trainees.length;
     var pct = allTotal > 0 ? Math.round((allSigned / allTotal) * 100) : 0;
-    var recapCount = Object.keys(recaps).filter(function(k){ return recaps[k] && (recaps[k]['ld-topics'] || recaps[k]['ld-team']); }).length;
+    var recapCount = recaps.filter(function(r){ return r.ld_topics || r.ld_team; }).length;
     var openingId = 'admin-' + o.id.replace(/[^a-z0-9]/gi, '_');
+    var opening = { store: o.store_name, coach: o.coach_name || (o.profiles && o.profiles.full_name) || '—', date: o.start_date };
     var pctBadge = pct === 100 ? 'badge-green' : 'badge-gray';
     var recapBadge = recapCount >= 5 ? 'badge-green' : 'badge-amber';
 
@@ -1326,7 +1355,7 @@ function renderAdminPage() {
     html += '<div class="card-header" style="cursor:pointer" onclick="toggleAdminOpening(\'' + openingId + '\')">';
     html += '<div style="flex:1">';
     html += '<div class="card-title">' + (opening.store || 'Unknown Store') + '</div>';
-    html += '<div class="card-subtitle">Coach: ' + (opening.coach || '—') + ' · Start: ' + (opening.date || '—') + ' · Day ' + (o.currentDay || '?') + ' of 5</div>';
+    html += '<div class="card-subtitle">Coach: ' + (opening.coach || '—') + ' · Start: ' + (opening.date || '—') + ' · Day ' + (o.current_day || '?') + ' of 5</div>';
     html += '</div>';
     html += '<div style="display:flex;gap:16px;align-items:center">';
     html += '<span class="badge badge-blue">' + trainees.length + ' trainees</span>';
@@ -1338,17 +1367,15 @@ function renderAdminPage() {
     html += '<div style="padding:20px;border-top:1px solid var(--border-light)">';
 
     // Franchise checks
-    var fcKeys = Object.keys(franchiseChecks);
-    if (fcKeys.length > 0) {
+    if (franchiseChecks.length > 0) {
       html += '<div style="margin-bottom:20px">';
       html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px">Franchise Verifications</div>';
-      fcKeys.forEach(function(k) {
-        var v = franchiseChecks[k];
-        var bg = v ? 'var(--success-light)' : 'var(--warning-light)';
-        var col = v ? '#0D7A4E' : 'var(--warning)';
+      franchiseChecks.forEach(function(fc) {
+        var bg = fc.checked ? 'var(--success-light)' : 'var(--warning-light)';
+        var col = fc.checked ? '#0D7A4E' : 'var(--warning)';
         html += '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px">';
-        html += '<div style="width:16px;height:16px;border-radius:50%;background:' + bg + ';display:flex;align-items:center;justify-content:center;font-size:10px;color:' + col + '">' + (v ? '&#10003;' : '!') + '</div>';
-        html += '<span style="color:var(--text-secondary)">' + k + '</span></div>';
+        html += '<div style="width:16px;height:16px;border-radius:50%;background:' + bg + ';display:flex;align-items:center;justify-content:center;font-size:10px;color:' + col + '">' + (fc.checked ? '&#10003;' : '!') + '</div>';
+        html += '<span style="color:var(--text-secondary)">' + fc.check_key + '</span></div>';
       });
       html += '</div>';
     }
@@ -1366,7 +1393,7 @@ function renderAdminPage() {
       html += '<th style="text-align:center;padding:8px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);border-bottom:1px solid var(--border-light)">Progress</th>';
       html += '</tr></thead><tbody>';
       trainees.forEach(function(t) {
-        var tc = COMPETENCIES.filter(function(c){ return signoffs[t.id+'_'+c.id] === 'signed'; }).length;
+        var tc = signoffs.filter(function(s){ return s.trainee_id === t.id && s.status === 'signed'; }).length;
         var tp = Math.round((tc / COMPETENCIES.length) * 100);
         var barColor = tp === 100 ? 'var(--success)' : 'var(--trigger)';
         html += '<tr>';
@@ -1384,8 +1411,8 @@ function renderAdminPage() {
     html += '<div>';
     html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px">Daily Recaps</div>';
     [1,2,3,4,5].forEach(function(d) {
-      var r = recaps[d];
-      var hasContent = r && (r['ld-topics'] || r['ld-team'] || r['tech']);
+      var r = recaps.find(function(x){ return x.day_num === d; });
+      var hasContent = r && (r.ld_topics || r.ld_team || r.tech);
       var badge = hasContent ? 'badge-green' : 'badge-gray';
       var label = hasContent ? 'Complete' : 'Pending';
       html += '<div style="padding:10px 0;border-bottom:1px solid var(--border-light)">';
@@ -1394,12 +1421,12 @@ function renderAdminPage() {
       html += '<span class="badge ' + badge + '">' + label + '</span>';
       html += '</div>';
       if (hasContent) {
-        if (r['ld-topics']) {
-          var ldText = r['ld-topics'].substring(0, 120) + (r['ld-topics'].length > 120 ? '...' : '');
+        if (r.ld_topics) {
+          var ldText = r.ld_topics.substring(0, 120) + (r.ld_topics.length > 120 ? '...' : '');
           html += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px"><strong>L&amp;D:</strong> ' + ldText + '</div>';
         }
-        if (r['sm']) {
-          var smText = r['sm'].substring(0, 100) + (r['sm'].length > 100 ? '...' : '');
+        if (r.sm_notes) {
+          var smText = r.sm_notes.substring(0, 100) + (r.sm_notes.length > 100 ? '...' : '');
           html += '<div style="font-size:12px;color:var(--text-secondary)"><strong>SM:</strong> ' + smText + '</div>';
         }
       }
@@ -1421,23 +1448,21 @@ function toggleAdminOpening(id) {
   if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
-function exportAllAdmin() {
-  let allOpenings = [];
-  try { allOpenings = JSON.parse(localStorage.getItem('nso_all_openings') || '[]'); } catch(e) {}
+async function exportAllAdmin() {
+  const allOpenings = await dbLoadAllOpenings();
 
   let csv = 'Store,Coach,Date,Day,Trainee,Role,Signoffs,Recap Days Complete\n';
   allOpenings.forEach(o => {
-    const opening = o.opening || {};
     const trainees = o.trainees || [];
-    const signoffs = o.signoffs || {};
-    const recaps = o.recaps || {};
-    const recapCount = Object.keys(recaps).filter(k => recaps[k] && (recaps[k]['ld-topics'] || recaps[k]['ld-team'])).length;
+    const signoffs = o.signoffs || [];
+    const recaps = o.recaps || [];
+    const recapCount = recaps.filter(r => r.ld_topics || r.ld_team).length;
     if (trainees.length === 0) {
-      csv += `"${opening.store||''}","${opening.coach||''}","${opening.date||''}","${o.currentDay||''}","(no trainees)","","","${recapCount}"\n`;
+      csv += `"${o.store_name||''}","${o.coach_name||''}","${o.start_date||''}","${o.current_day||''}","(no trainees)","","","${recapCount}"\n`;
     } else {
       trainees.forEach(t => {
-        const tc = COMPETENCIES.filter(c => signoffs[t.id+'_'+c.id] === 'signed').length;
-        csv += `"${opening.store||''}","${opening.coach||''}","${opening.date||''}","${o.currentDay||''}","${t.name}","${t.role}","${tc}/${COMPETENCIES.length}","${recapCount}"\n`;
+        const tc = signoffs.filter(s => s.trainee_id === t.id && s.status === 'signed').length;
+        csv += `"${o.store_name||''}","${o.coach_name||''}","${o.start_date||''}","${o.current_day||''}","${t.name}","${t.role}","${tc}/${COMPETENCIES.length}","${recapCount}"\n`;
       });
     }
   });
@@ -1451,11 +1476,9 @@ function exportAllAdmin() {
 // ============================================================
 // FRANCHISE CHECKS
 // ============================================================
-if (!state.franchiseChecks) state.franchiseChecks = {};
-
 function toggleFranchiseCheck(key, checked) {
   state.franchiseChecks[key] = checked;
-  saveState();
+  dbSaveFranchiseCheck(key, checked);
 }
 
 // ============================================================
@@ -1480,4 +1503,4 @@ function showToast(msg, type = 'info') {
 selectDayAgenda(1);
 renderKBNav();
 document.getElementById('agendacard-1').classList.add('active');
-loadState();
+initApp();
