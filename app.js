@@ -1130,8 +1130,14 @@ async function signIn() {
   const password = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
+  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
+  } catch (e) {
+    errEl.textContent = 'Connection error: ' + e.message;
+    errEl.style.display = 'block';
+  }
 }
 
 async function signUp() {
@@ -1139,11 +1145,25 @@ async function signUp() {
   const email = document.getElementById('loginEmailSignUp').value.trim();
   const password = document.getElementById('loginPasswordSignUp').value;
   const errEl = document.getElementById('signupError');
+  errEl.style.color = 'var(--danger)';
   errEl.style.display = 'none';
   if (!name) { errEl.textContent = 'Please enter your name.'; errEl.style.display = 'block'; return; }
-  const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
-  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
-  else { errEl.style.color = 'var(--success)'; errEl.textContent = 'Account created! Check your email to confirm, then sign in.'; errEl.style.display = 'block'; }
+  if (!email) { errEl.textContent = 'Please enter your email.'; errEl.style.display = 'block'; return; }
+  if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
+  try {
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+    if (error) {
+      errEl.textContent = error.message;
+      errEl.style.display = 'block';
+    } else {
+      errEl.style.color = 'var(--success)';
+      errEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+      errEl.style.display = 'block';
+    }
+  } catch (e) {
+    errEl.textContent = 'Connection error: ' + e.message;
+    errEl.style.display = 'block';
+  }
 }
 
 async function signOut() {
