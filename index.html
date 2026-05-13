@@ -184,10 +184,21 @@
 
     <!-- DASHBOARD VIEW -->
     <div id="view-dashboard" class="view active page-content">
-      <div class="page-header">
-        <div class="eyebrow">NSO COACH PORTAL</div>
-        <div class="page-title" id="dashTitle">Welcome to the NSO Portal.</div>
-        <div class="page-subtitle" id="dashSubtitle">Set up your opening to get started. Use the button in the sidebar or below.</div>
+      <div class="page-header flex-between" style="align-items:flex-start;gap:24px">
+        <div>
+          <div class="eyebrow">NSO COACH PORTAL</div>
+          <div class="page-title" id="dashTitle">Welcome to the NSO Portal.</div>
+          <div class="page-subtitle" id="dashSubtitle">Set up your opening to get started. Use the button in the sidebar or below.</div>
+        </div>
+        <div id="dayAdvancer" style="display:none;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;padding-top:4px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);font-weight:700">Training Day</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button id="dayPrevBtn" class="btn btn-secondary" style="padding:6px 12px;font-size:12px" onclick="advanceDay(-1)">← Prev</button>
+            <div style="font-size:20px;font-weight:800;color:var(--hb);min-width:72px;text-align:center;line-height:1.1" id="dayAdvancerLabel">Day 1</div>
+            <button id="dayNextBtn" class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="advanceDay(1)">Next →</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);text-align:right" id="dayAdvancerSub">of 5 training days</div>
+        </div>
       </div>
 
       <div style="margin-bottom:20px;padding:16px 20px;background:var(--trigger-light);border:1px solid rgba(0,118,255,0.15);border-left:3px solid var(--trigger);border-radius:var(--radius-md)">

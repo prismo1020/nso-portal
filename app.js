@@ -600,6 +600,11 @@ function selectDay(day) {
   dbUpdateCurrentDay(); // persist to Supabase
 }
 
+function advanceDay(delta) {
+  const newDay = Math.min(5, Math.max(1, state.currentDay + delta));
+  if (newDay !== state.currentDay) selectDay(newDay);
+}
+
 function selectDayAgenda(day) {
   state.currentAgendaDay = day;
   document.querySelectorAll('.day-card[id^="agendacard-"]').forEach(c => c.classList.remove('active'));
@@ -1103,6 +1108,21 @@ function updateDashboardStats() {
 function updateDashboardFocus() {
   if (!state.opening) return;
   const day = DAYS[state.currentDay - 1];
+
+  // Update page subtitle to reflect current day
+  const subtitleEl = document.getElementById('dashSubtitle');
+  if (subtitleEl) subtitleEl.textContent = `${state.opening.store} — Day ${state.currentDay} of 5. You've got this.`;
+
+  // Update the day advancer control
+  const advancer = document.getElementById('dayAdvancer');
+  if (advancer) {
+    advancer.style.display = 'flex';
+    document.getElementById('dayAdvancerLabel').textContent = `Day ${state.currentDay}`;
+    document.getElementById('dayAdvancerSub').textContent = `of 5 training days`;
+    document.getElementById('dayPrevBtn').disabled = state.currentDay <= 1;
+    document.getElementById('dayNextBtn').disabled = state.currentDay >= 5;
+  }
+
   document.getElementById('todayFocusLabel').textContent = `Day ${state.currentDay}: ${day.title}`;
   document.getElementById('todayFocusContent').innerHTML = `
     <span class="badge badge-${day.type === 'Learning Plan' ? 'blue' : day.type === 'Roleplay Day' ? 'amber' : 'green'}" style="margin-bottom:10px;display:inline-flex">${day.type}</span>
@@ -1262,7 +1282,6 @@ function refreshAfterLoad() {
   if (!state.opening) return;
   document.getElementById('sidebarStoreName').textContent = state.opening.store;
   document.getElementById('dashTitle').textContent = `Welcome back, ${state.opening.coach}.`;
-  document.getElementById('dashSubtitle').textContent = `${state.opening.store} — Day ${state.currentDay} of 5. You've got this.`;
   if (state.opening.date) {
     const start = new Date(state.opening.date);
     const end = new Date(start); end.setDate(end.getDate() + 4);
@@ -1327,7 +1346,6 @@ function saveSetup() {
 
   document.getElementById('sidebarStoreName').textContent = store;
   document.getElementById('dashTitle').textContent = `Welcome back, ${coach}.`;
-  document.getElementById('dashSubtitle').textContent = `${store} — Day ${day} of 5. You've got this.`;
 
   if (date) {
     const start = new Date(date);
