@@ -1502,5 +1502,6 @@ function showToast(msg, type = 'info') {
 // ============================================================
 selectDayAgenda(1);
 renderKBNav();
-document.getElementById('agendacard-1').classList.add('active');
+const _ac1 = document.getElementById('agendacard-1');
+if (_ac1) _ac1.classList.add('active');
 initApp();
