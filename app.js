@@ -1460,11 +1460,77 @@ function closeDrawer() {
 }
 
 // ============================================================
-// ADMIN PAGE
+// ADMIN PAGE — CREATE USER
 // ============================================================
 function checkAdminPw() {
   // Legacy stub — admin access is now role-based via Supabase
   renderAdminPage();
+}
+
+function generatePassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+  let pw = '';
+  for (let i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+  document.getElementById('newUserPassword').value = pw;
+}
+
+async function createUserLogin() {
+  const name  = (document.getElementById('newUserName').value || '').trim();
+  const email = (document.getElementById('newUserEmail').value || '').trim();
+  const pw    = (document.getElementById('newUserPassword').value || '').trim();
+  const role  = document.getElementById('newUserRole').value;
+
+  const errEl = document.getElementById('createUserError');
+  const okEl  = document.getElementById('createUserSuccess');
+  const btn   = document.getElementById('createUserBtn');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!name || !email || !pw) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+  if (pw.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+
+  // Use a secondary client that doesn't persist session so the admin stays logged in
+  const tempClient = window._supabaseSDK.createClient(
+    'https://uvbkiudfemyesizvecos.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YmtpdWRmZW15ZXNpenZlY29zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MjY3MzksImV4cCI6MjA5NDIwMjczOX0._6-wR9OZ-hUFyo0rQ_wig8C65miqpmpclAcz0cxjqu4',
+    { auth: { persistSession: false, autoRefreshToken: false } }
+  );
+
+  const { data, error } = await tempClient.auth.signUp({
+    email,
+    password: pw,
+    options: { data: { full_name: name } }
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Create Login';
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // Try to update the profile role (requires admin update RLS policy)
+  if (data.user) {
+    await supabase.from('profiles').update({ role, full_name: name }).eq('id', data.user.id);
+  }
+
+  let msg = `Email: ${email}<br>Password: ${pw}<br>Role: ${role}`;
+  if (role === 'admin') {
+    msg += `<br><br><strong>To confirm admin access, run this in Supabase → SQL Editor:</strong><br><code style="font-size:11px;background:rgba(0,0,0,0.06);padding:3px 6px;border-radius:4px;display:inline-block;margin-top:4px">UPDATE public.profiles SET role = 'admin' WHERE email = '${email}';</code>`;
+  }
+  document.getElementById('createUserSuccessMsg').innerHTML = msg;
+  okEl.style.display = 'block';
+
+  // Clear form
+  document.getElementById('newUserName').value = '';
+  document.getElementById('newUserEmail').value = '';
+  document.getElementById('newUserPassword').value = '';
+  document.getElementById('newUserRole').value = 'coach';
 }
 
 async function renderAdminPage() {

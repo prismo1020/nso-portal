@@ -115,6 +115,10 @@ create policy "profiles_select" on public.profiles for select to authenticated
 create policy "profiles_update_own" on public.profiles for update to authenticated
   using (id = auth.uid());
 
+-- Admins can update any profile (needed for setting roles when creating logins)
+create policy "profiles_update_admin" on public.profiles for update to authenticated
+  using (public.is_admin()) with check (public.is_admin());
+
 -- Helper: is the current user an admin?
 create or replace function public.is_admin()
 returns boolean

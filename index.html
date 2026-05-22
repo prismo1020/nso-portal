@@ -716,16 +716,53 @@
         <div class="page-title">Admin View</div>
         <div class="page-subtitle">All openings across all coaches. Restricted access.</div>
       </div>
-      <div id="adminLock" style="max-width:400px">
-        <div class="card" style="padding:32px">
-          <div style="font-size:16px;font-weight:700;color:var(--hb);margin-bottom:6px">Enter Admin Password</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">This view is for Ops &amp; L&amp;D only.</div>
-          <input class="input" type="password" id="adminPwInput" placeholder="Admin password" onkeydown="if(event.key==='Enter')checkAdminPw()" style="margin-bottom:12px">
-          <div id="adminPwError" style="display:none;color:var(--danger);font-size:12px;margin-bottom:10px">Incorrect password. Try again.</div>
-          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="checkAdminPw()">Unlock</button>
-        </div>
-      </div>
+      <div id="adminLock" style="display:none"></div>
       <div id="adminContent" style="display:none">
+
+        <!-- Create User Login card -->
+        <div class="card mb-20" style="max-width:520px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Create a Login</div>
+              <div class="card-subtitle">Set up credentials for a coach or admin. They sign in directly — no sign-up needed.</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="createUserSuccess" style="display:none;padding:14px 16px;background:var(--success-light);border:1px solid #A3E6C8;border-radius:var(--radius-md);margin-bottom:16px">
+              <div style="font-size:13px;font-weight:700;color:#0D7A4E;margin-bottom:4px">✓ Login created successfully</div>
+              <div id="createUserSuccessMsg" style="font-size:12px;color:#0D7A4E;line-height:1.6"></div>
+            </div>
+            <div id="createUserError" style="display:none;padding:10px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius-md);margin-bottom:16px;font-size:12px;color:var(--danger)"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:block;margin-bottom:6px">Full Name</label>
+                <input class="input" id="newUserName" type="text" placeholder="Jane Smith" data-lpignore="true" autocomplete="off">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:block;margin-bottom:6px">Role</label>
+                <select class="input" id="newUserRole">
+                  <option value="coach">Coach</option>
+                  <option value="admin">Admin (Ops / L&amp;D)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+              <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:block;margin-bottom:6px">Email</label>
+                <input class="input" id="newUserEmail" type="email" placeholder="jane@company.com" data-lpignore="true" autocomplete="off">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:block;margin-bottom:6px">Temporary Password</label>
+                <div style="display:flex;gap:6px">
+                  <input class="input" id="newUserPassword" type="text" placeholder="Min. 8 characters" data-lpignore="true" autocomplete="off" style="flex:1;min-width:0">
+                  <button class="btn btn-secondary" style="padding:0 10px;flex-shrink:0;font-size:11px" onclick="generatePassword()" title="Generate password">⟳</button>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="createUserBtn" onclick="createUserLogin()" style="width:100%;justify-content:center">Create Login</button>
+          </div>
+        </div>
+
         <div id="adminOpeningsList"></div>
       </div>
     </div>
