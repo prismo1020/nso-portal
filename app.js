@@ -144,454 +144,573 @@ const COMPETENCIES = [
 // KNOWLEDGE BASE DATA
 // ============================================================
 const KB = {
-  'The Guest Journey': [
+  'Start Here': [
     {
-      id: 'gj-overview',
-      title: 'The Guest Journey: Overview',
-      category: 'The Guest Journey',
-      eyebrow: 'GUEST EXPERIENCE',
-      subtitle: 'Four touchpoints. One unforgettable experience.',
-      content: `<h3>What is the Guest Journey?</h3>
-<p>The Guest Journey is the term Sandbox VR uses for the complete arc of a guest's visit — from the moment they walk through the door to the moment they leave. It is not a series of tasks. It is a narrative you and your team co-create with every group you host.</p>
-<p>There are four key touchpoints:</p>
+      id: 'start-learning-plan',
+      title: 'How to Use the NSO GEG Learning Plan',
+      category: 'Start Here',
+      eyebrow: 'START HERE',
+      subtitle: 'The Learning Plan is the source of truth. This is how to use it.',
+      content: `<h3>What the Learning Plan Is</h3>
+<p>The NSO GEG Learning Plan is your primary agenda for the 3-day training program. It tells you what gets trained, in what order, how long each block takes, and which Delightree resources trainees need to complete. Follow it. Do not improvise the structure unless real store conditions force you to adjust.</p>
+<div class="science-callout"><div class="science-callout-label">Coach Principle</div><div class="science-callout-text">The Learning Plan exists because sequence matters. Trainees who learn tracking before they understand the Guest Journey have the wrong mental model. Do not skip blocks or reorder the day unless the store is genuinely not ready for a specific activity.</div></div>
+<h3>Where It Lives</h3>
 <ul>
-<li><strong>Entrance / Check-In</strong> — The Host makes the first impression. Warm, knowledgeable, and energized.</li>
-<li><strong>Barracks</strong> — Guests gear up. GEGs help with trackers, explain the experience, and build anticipation.</li>
-<li><strong>Holodeck</strong> — The experience runs. GEGs monitor, troubleshoot, and keep energy high.</li>
-<li><strong>Post-Experience</strong> — Guests decompress, watch their recap video, and this is where your best repeatability conversations happen.</li>
+<li>The full Learning Plan is printed and should be in your coach kit before Day 1.</li>
+<li>Digital version: provided by L&amp;D prior to the opening.</li>
+<li>All referenced Delightree resources are linked in the <strong>Delightree Resource Links</strong> article in this Knowledge Base.</li>
 </ul>
-<div class="science-callout"><div class="science-callout-label">Training Science</div><div class="science-callout-text">Peak-end rule (Kahneman, 1999): Guests remember an experience based primarily on how it felt at its most intense moment and how it ended. Your Post-Experience interaction is as important as the Holodeck itself. Train your team to own the ending.</div></div>
-<h3>The Host Role</h3>
-<p>The Host is responsible for check-in: greeting groups, confirming bookings in Checkfront, processing the digital waiver, and handing the group off to the Barracks GEG. The Host also handles walk-in traffic and phone inquiries — two major conversion opportunities.</p>
-<h3>The Barracks GEG Role</h3>
-<p>The Barracks GEG explains the experience, fits trackers, pairs haptic vests, and ensures every guest is set up correctly before they enter the Holodeck. This is the last preparation touchpoint — any anxiety a guest has needs to be addressed here.</p>`
+<h3>How to Follow the Day-by-Day Structure</h3>
+<ul>
+<li>Review the full plan the evening before each training day.</li>
+<li>Know which blocks are <strong>learning-plan driven</strong> (video + discussion) vs. <strong>hands-on practice</strong> (group stations).</li>
+<li>For each block: open the Delightree resource first, then facilitate — do not read from the plan out loud.</li>
+<li>Keep time. If a block runs long, identify what gets shortened — never skip a required completion item.</li>
+<li>Completion items (eLearnings marked required in Delightree) must be done by every trainee before end of day.</li>
+</ul>
+<h3>Required Completion vs. Reference Resources</h3>
+<ul>
+<li><strong>Required:</strong> Assigned Delightree eLearnings that trainees must complete and reach 100% on.</li>
+<li><strong>Reference:</strong> SOPs, checklists, and guides trainees can revisit after training — not gated.</li>
+<li>Coach tracks required completion via the Tracking tab in Delightree. If access is missing, contact L&amp;D immediately.</li>
+</ul>
+<h3>When to Adjust</h3>
+<ul>
+<li>Store not physically ready (e.g. trackers not received): reschedule the hands-on block and fill with a group eLearning or role-play.</li>
+<li>Tech issue that cannot be resolved quickly: do not lose the day. Pivot to a non-tech block and schedule a make-up.</li>
+<li>Trainee access issue in Delightree: continue group learning, flag to L&amp;D, ensure the individual completes solo before end of day.</li>
+</ul>
+<div class="science-callout"><div class="science-callout-label">What You Should Not Do</div><div class="science-callout-text">Do not add your own content blocks that are not in the plan. Do not reorder the three days. Do not tell trainees the Learning Plan is optional. The plan reflects months of instructional design work — deviations compound across the opening program.</div></div>`
     },
     {
-      id: 'gj-scripts',
-      title: 'Guest Interaction Scripts',
-      category: 'The Guest Journey',
-      eyebrow: 'GUEST EXPERIENCE',
-      subtitle: 'Natural language, not a script. A guide, not a script.',
-      content: `<h3>Why We Use Scripted Language</h3>
-<p>Scripted language isn't about making GEGs robotic — it's about ensuring that every guest hears the right information in the right way, every time. Think of it as a jazz standard: you know the melody, but you're free to interpret it.</p>
-<div class="science-callout"><div class="science-callout-label">Training Science</div><div class="science-callout-text">Cognitive load theory (Sweller, 1988) shows that when people are overwhelmed with decisions, performance drops. Scripts reduce decision-making burden so GEGs can focus on reading the guest, not on figuring out what to say next.</div></div>
-<h3>Check-In Language</h3>
-<p>At check-in, the goal is warm, confident, and efficient. Guests often arrive excited and slightly nervous. Your energy sets the tone.</p>
+      id: 'start-delightree-links',
+      title: 'Delightree Resource Links',
+      category: 'Start Here',
+      eyebrow: 'START HERE',
+      subtitle: 'Every resource coaches and trainees need, in one place.',
+      content: `<h3>How to Use This Page</h3>
+<p>These are the Delightree resources referenced in the NSO GEG Learning Plan. Open the relevant link before each training block. Where completion tracking is required, make sure every trainee is logged into their own Delightree account.</p>
+<h3>Brand &amp; Guest Experience</h3>
 <ul>
-<li>Greet by group size: "Welcome to Sandbox VR! Are you here for [booking name]?"</li>
-<li>Plant the seed early: "After your experience today, I can show you how to book another session — a lot of groups love going back-to-back."</li>
-<li>For walk-ins: "Have you heard of us before? Let me show you something..."</li>
+<li><a href="http://sandboxvr.com" target="_blank" style="color:var(--trigger)">Sandbox VR Website →</a> — Brand story, experiences, and context for the Day 1 intro block.</li>
+<li><a href="https://app.delightree.com/folders/lznpb993j5p5il58l625pde9" target="_blank" style="color:var(--trigger)">Service Essentials: Guest Journey →</a> — Full Guest Journey eLearning. Required Day 1 completion.</li>
 </ul>
-<h3>Gear-Up Language</h3>
-<p>In the Barracks, guests are putting on unfamiliar equipment. Your calm competence is contagious.</p>
+<h3>Technology</h3>
 <ul>
-<li>"These trackers go on your wrists and ankles — they're how the system sees your movement."</li>
-<li>"The vest has vibrating motors — you'll actually feel things in the experience."</li>
-<li>"If anything feels loose or uncomfortable once we start, just let me know through the mic."</li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/lznpb9bl5kmz149zr93xpwl2" target="_blank" style="color:var(--trigger)">Tech Essentials: Tracking →</a> — Tracker theory, build specs, 20% rule. Watch before the tracker build block.</li>
+<li><a href="https://app.delightree.com/chapters/view/o9ozzbz7nnxx0xkd87bxqll4" target="_blank" style="color:var(--trigger)">Calibration SOP →</a> — Step-by-step room calibration. Required reference for Day 3 opening procedures.</li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/j4ne2bb97929086m7p9b8ee6" target="_blank" style="color:var(--trigger)">Technology Essentials: Holodeck Room Servers →</a> — EMU server overview. Day 2 block.</li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/mj8nlao797aos2pnwaze72o2" target="_blank" style="color:var(--trigger)">Tech Essentials: Wireless Streaming →</a> — Wireless streaming hardware and reset procedures. Day 2 block.</li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/6qzp38pwwr9jt7d25doj76pn" target="_blank" style="color:var(--trigger)">Tech Essentials: Haptic Feedback Vests →</a> — Vest pairing, LED states, fitting. Day 2 block.</li>
+<li><a href="https://app.delightree.com/chapters/view/2l9eep69x5jj0ezo58l8zx6m" target="_blank" style="color:var(--trigger)">Quick Reference Guide: Haptic Feedback Vests →</a> — One-page quick reference for vest operations.</li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/4qjepln3zkom1akjnk6354ol" target="_blank" style="color:var(--trigger)">Tech Essentials: Props →</a> — Prop types, pairing, troubleshooting. Day 2 block.</li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/b5mzxb8z8bazcazar9252zpm" target="_blank" style="color:var(--trigger)">Technology Essentials: T1 Workflow →</a> — Escalation process and ticket submission. Day 3 block.</li>
+</ul>
+<h3>Systems &amp; Software</h3>
+<ul>
+<li><a href="https://app.delightree.com/chapters/view/5qqrqm2ko4ansm272keoq6wx" target="_blank" style="color:var(--trigger)">SOP: Checkfront →</a> — Booking management, check-in flow, daily manifest. Day 2 block.</li>
+</ul>
+<h3>Store Operations</h3>
+<ul>
+<li><a href="http://app.delightree.com" target="_blank" style="color:var(--trigger)">Opening Checklist →</a> — Full opening procedure checklist. Day 3 block.</li>
+<li><a href="https://app.delightree.com/chapters/view/zb4jjqwwm4e60zqd8lpl362r" target="_blank" style="color:var(--trigger)">Closing Checklist →</a> — Full closing procedure checklist. Day 3 block.</li>
+<li><a href="https://app.delightree.com/chapters/view/9qxrrw548blphl34935lz7lm" target="_blank" style="color:var(--trigger)">Store Cleaning SOP →</a> — Daily cleaning standards and responsibilities.</li>
+<li><a href="https://app.delightree.com/chapters/view/pzxaaen5x6d4u6xj5838bpnd" target="_blank" style="color:var(--trigger)">Restroom Cleaning Checklist →</a> — Restroom cleaning standards.</li>
 </ul>`
     }
   ],
-  'Technology': [
+  'Daily Facilitation': [
     {
-      id: 'tech-tracking',
-      title: 'Passive Trackers: Build, Inspect & Troubleshoot',
-      category: 'Technology',
-      eyebrow: 'TECH ESSENTIALS',
-      subtitle: 'Trackers don\'t have batteries. They don\'t need charging. They do need your attention.',
-      content: `<h3>What Passive Trackers Are</h3>
-<p>Passive limb trackers are small devices strapped to a guest's wrists and ankles. They use reflective marker balls that Vicon infrared cameras detect in 3D space — translating physical movement into the virtual world. There are no batteries in trackers. Do not tell guests they need charging. Only props, vests, and headsets have batteries.</p>
-<div class="science-callout"><div class="science-callout-label">The 20% Rule</div><div class="science-callout-text">Replace a tracker ball only when more than 20% of its reflective surface is damaged, scratched, or missing. Cosmetic wear alone does not justify replacement. Inspect every ball before every session — damaged balls cause tracking drift that guests experience as phantom movement or jitter.</div></div>
-<h3>Building Trackers</h3>
-<p>When building trackers from scratch, always reference the Tracker Build Chart for the correct setup. Pin counts vary by type: limb trackers and wand trackers use 5 pins; gun and pistol trackers use 4. Tracker balls are hand-tightened only — never use tools. The screw size for limb trackers is 4x8, not 4x6.</p>
-<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Tracker building is one of the best hands-on learning activities in the NSO program — high repetition, tangible output, and every trainee can do it at the same time. Make sure each person completes at least one full build independently before signing off on this competency.</div></div>
-<h3>Prop Tracker Placement</h3>
+      id: 'daily-day1',
+      title: 'Day 1 Facilitation Guide',
+      category: 'Daily Facilitation',
+      eyebrow: 'DAILY FACILITATION',
+      subtitle: 'All Things Sandbox VR, the Guest Experience, and Building Trackers.',
+      content: `<h3>Day 1 Purpose</h3>
+<p>Day 1 builds the foundation. Trainees need to understand <em>why</em> they are here, <em>what</em> Sandbox VR is, and <em>who</em> they are serving before they learn how. End the day with every trainee having built at least one tracker from start to finish.</p>
+<h3>Agenda at a Glance</h3>
 <ul>
-<li><strong>Gun trackers</strong> — Slide onto rail with set screws facing you. Stop at the 6th gap, tighten onto the ridge immediately after.</li>
-<li><strong>Pistol trackers</strong> — Stop at the 7th gap, tighten onto the ridge immediately after.</li>
-<li>The set screw must always tighten onto a ridge, never inside a gap.</li>
+<li><strong>15 min</strong> — Intros &amp; Store Tour</li>
+<li><strong>30 min</strong> — Introduction to Sandbox VR</li>
+<li><strong>60 min</strong> — GEG Responsibilities &amp; Guest Journey (video + debrief)</li>
+<li><strong>30 min</strong> — Guest Policies, Procedures &amp; Recovery</li>
+<li><strong>30 min</strong> — Break</li>
+<li><strong>20 min</strong> — Tech Essentials: Tracking (video)</li>
+<li><strong>240+ min</strong> — Build All Store Trackers (Assembly Line)</li>
 </ul>
-<h3>Tracker Asset Numbers</h3>
-<p>Each tracker is assigned a number in Vicon Evoke. If a box is unchecked next to a number, that tracker is disabled and won't appear in-experience. Player 1 (Red) limbs run 12–15, Player 2 (Blue) run 22–25, and so on through Player 6 (Purple) at 62–65. ATH head trackers are the X0 number for each player (10, 20, 30...).</p>
-<h3>Troubleshooting Order</h3>
+<h3>Block-by-Block Coaching Notes</h3>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Intros &amp; Store Tour</h4>
 <ul>
-<li>First, inspect reflective tracker balls — condition and damage.</li>
-<li>Second, check pin condition — correct count, not bent, not loose.</li>
-<li>Third, verify tracker build against the Tracker Build Chart.</li>
-<li>Fourth, check Vicon Evoke — all tracker assets enabled.</li>
-<li>Fifth, recalibrate the room if all checks pass and issues persist.</li>
-<li>If a tracker looks upside down or twisted in-experience, the physical tracker is almost always worn incorrectly — check orientation before any software steps.</li>
+<li>Walk the store yourself first. Name every area by its correct term: Lobby, Barracks, Holodeck.</li>
+<li>Narrate the Guest Journey as you walk — plant the mental model early.</li>
+<li>Watch body language. Who is curious? Who is disengaged? That data is useful on Day 4.</li>
 </ul>
-<div class="science-callout"><div class="science-callout-label">Dead Spots</div><div class="science-callout-text">If tracking fails consistently in one specific area of the holodeck, that may be a camera dead spot. Do not adjust or re-angle Vicon cameras. Submit a T1 tracking ticket and wait for confirmation before any camera work is done.</div></div>`
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Introduction to Sandbox VR</h4>
+<ul>
+<li>Tell the story — do not read slides. The Hong Kong origin, the celebrity investors, the word-of-mouth growth. Make them feel like they are joining something.</li>
+<li>Ask each trainee to name one Core Value they connect with. Write them on the whiteboard. Return to this on Day 5.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">GEG Responsibilities &amp; Guest Journey</h4>
+<ul>
+<li>Show the <a href="https://app.delightree.com/folders/lznpb993j5p5il58l625pde9" target="_blank" style="color:var(--trigger)">Service Essentials: Guest Journey →</a> video first. Then debrief. Do not talk over the video.</li>
+<li>After the video: "What stood out? What would be hardest to do under pressure?"</li>
+<li>Pair trainees to practice the check-in script. Give feedback in real time. Rotate partners.</li>
+<li>Confirm all trainees mark this complete in their Delightree accounts before end of day.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Guest Policies &amp; Recovery</h4>
+<ul>
+<li>Do not lecture the policy list. Present a scenario and ask how they would handle it.</li>
+<li>Cover: late arrivals, the 5-minute grace, rebooking fee, waivers, refunds.</li>
+<li>Run the Acknowledge–Empathize–Resolve model through at least one real-feeling scenario.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Tech Essentials: Tracking</h4>
+<ul>
+<li>Show the <a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/lznpb9bl5kmz149zr93xpwl2" target="_blank" style="color:var(--trigger)">Tech Essentials: Tracking →</a> video. Pause at the 20% rule to physically demonstrate with a tracker ball.</li>
+<li>Do not over-explain passive tracking theory — the build block that follows teaches it through doing.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Build All Store Trackers (Assembly Line)</h4>
+<ul>
+<li>Brief roles before touching anything. See the <strong>Tracker Building Assembly Line</strong> article for full facilitation steps.</li>
+<li>Every trainee must build at least one complete tracker independently before you sign off on that competency.</li>
+<li>Use Validators (SM/Lead) to quality-check and confirm MoCap visibility in Vicon Evoke.</li>
+</ul>
+<div class="science-callout"><div class="science-callout-label">End of Day 1 Check</div><div class="science-callout-text">Before closing: confirm all trainees have completed the Guest Journey eLearning in Delightree. Trackers should be fully built, validated, and confirmed in MoCap. Note any trainee who seemed disengaged or struggled — follow up at the start of Day 2.</div></div>`
     },
     {
-      id: 'tech-tracker-assembly-line',
-      title: 'Assembly Line Process for Building Trackers',
-      category: 'Technology',
-      eyebrow: 'TECH ESSENTIALS',
-      subtitle: 'The fastest and most accurate way to build a full store\'s worth of trackers.',
-      content: `<h3>Why Assembly Line?</h3>
-<p>Building trackers one at a time is slow and error-prone. The assembly line system assigns each person a single repeated task, which dramatically increases speed and accuracy through repetition. Three to four teams work in parallel — each handling one phase of the build — so a full store's tracker set can be completed in a fraction of the time.</p>
-<div class="science-callout"><div class="science-callout-label">Training Science</div><div class="science-callout-text">Blocked practice — repeating the same task over and over before moving to the next — builds initial skill faster than switching between tasks. The assembly line leverages this: a builder who puts the same pin in the same position 30 times in a row makes far fewer errors than one who builds every tracker from start to finish.</div></div>
-<h3>The Teams</h3>
-
-<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🏷️ Sticker Captain — 1–2 people</h4>
-<p>The Sticker Captains are responsible for placing stickers on the predetermined quantity of trackers being built. They must have a list of quantities ready and distribute the correct sticker for each tracker type.</p>
+      id: 'daily-day2',
+      title: 'Day 2 Facilitation Guide',
+      category: 'Daily Facilitation',
+      eyebrow: 'DAILY FACILITATION',
+      subtitle: 'Infrastructure, hardware, and technology — from Checkfront to Props.',
+      content: `<h3>Day 2 Purpose</h3>
+<p>Day 2 is technology-heavy. By end of day, every trainee should be able to book a session in Checkfront, pair a vest, pair props, reset wireless streaming, and navigate holodeck room servers without prompting. Speed comes later — confidence comes today.</p>
+<h3>Agenda at a Glance</h3>
 <ul>
-<li>Ensure each builder is building trackers <strong>in order of quantity</strong> — the same build repeats over and over until that type is finished.</li>
-<li>This creates accuracy through repetition: a builder who builds 5 red left hands back-to-back makes fewer mistakes than one switching between types.</li>
-<li>Pass pre-stickered bases forward to the Builder Team as they are completed.</li>
+<li><strong>60 min</strong> — Checkfront &amp; Silica (software practice)</li>
+<li><strong>60 min</strong> — How to Sell Sandbox VR (Repeatability)</li>
+<li><strong>30 min</strong> — Tech Essentials: Holodeck Room Servers (video)</li>
+<li><strong>30 min</strong> — Procedure Checklist: Holodeck Room Servers</li>
+<li><strong>30 min</strong> — Break</li>
+<li><strong>30 min</strong> — Tech Essentials: Wireless Streaming (video)</li>
+<li><strong>60 min</strong> — Procedure Checklist: Wireless Streaming (hands-on)</li>
+<li><strong>30 min</strong> — Tech Essentials: Haptic Vests (video + pairing practice)</li>
+<li><strong>30 min</strong> — Tech Essentials: Props (video + pairing practice)</li>
 </ul>
-
-<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🔧 Builder Team — 3–5 people</h4>
-<p>This team hand-tightens tracker pins to the correct position on each tracker base. Each builder is assigned <strong>one tracker type</strong> and repeats that build until their quantity is done.</p>
+<h3>Block-by-Block Coaching Notes</h3>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Checkfront &amp; Silica</h4>
 <ul>
-<li>Example: Builder #1 builds 5 red left hands. Builder #2 builds 5 red right hands. Builder #3 builds 5 blue left hands. And so on.</li>
-<li>Builders receive pre-stickered bases from the Sticker Captains and pass completed bases forward to the Screwdriver Team.</li>
-<li>Pins are hand-tightened only — never use tools at this stage.</li>
+<li>Confidence comes from repetition, not explanation. Get trainees into the software immediately.</li>
+<li>Each trainee completes a full practice booking and check-in in Checkfront independently. Watch — do not coach until they finish their attempt.</li>
+<li>Silica: walk through session setup, health check colors, and QR code display as a group first, then trainees reproduce it solo.</li>
+<li>Reference: <a href="https://app.delightree.com/chapters/view/5qqrqm2ko4ansm272keoq6wx" target="_blank" style="color:var(--trigger)">SOP: Checkfront →</a></li>
 </ul>
-
-<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🪛 Screwdriver Team — 3–5 people</h4>
-<p>This team secures tracker balls to each pin and screws the tracker bases into their corresponding mounts based on tracker type.</p>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">How to Sell Sandbox VR (Repeatability)</h4>
 <ul>
-<li>Receive built bases from the Builder Team and complete the mechanical fastening.</li>
-<li>Use the correct screw size for each tracker type — limb trackers use <strong>4x8 screws</strong> (not 4x6).</li>
-<li>Pass completed tracker assemblies forward to the Velcro/Mount Team.</li>
+<li>Reframe it before you start: this is not sales, it is offering more of something they are about to love.</li>
+<li>Demonstrate all three repeatability moments yourself first: check-in, barracks gear-up, post-experience.</li>
+<li>Role-play in rotation. Every trainee goes twice. Give live feedback after each attempt — specific, not general.</li>
 </ul>
-
-<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🪢 Velcro / Mount Team — 2–4 people</h4>
-<p>This team completes the final assembly steps:</p>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Holodeck Room Servers</h4>
 <ul>
-<li>Thread Velcro through the rubber body tracker mounts.</li>
-<li>Secure weapon mounts to the weapons.</li>
-<li>Slide HMD mounts onto the PICO headsets.</li>
+<li>Show <a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/j4ne2bb97929086m7p9b8ee6" target="_blank" style="color:var(--trigger)">Technology Essentials: Holodeck Room Servers →</a></li>
+<li>Connect server roles to tracker data from Day 1 — EMU takes that data and turns it into the virtual world.</li>
+<li>After the video: walk to the server room. Have trainees label each server type before you confirm answers.</li>
 </ul>
-<p>This team is the end of the line — their output is a finished, ready-to-use tracker.</p>
-
-<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">✅ Validators — Managers / Leads</h4>
-<p>Validators are responsible for quality control and system verification. They do not build — they check.</p>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Wireless Streaming</h4>
 <ul>
-<li>Test the tightness of each completed tracker and adjust as needed.</li>
-<li>Ensure trackers are built strong and sufficiently tight — loose pins cause tracking drift.</li>
-<li>Place each completed tracker inside a holodeck and confirm it is recognized correctly in the MoCap view (Vicon Evoke).</li>
-<li>Flag any tracker that does not appear or appears incorrectly for rebuild before it enters rotation.</li>
+<li>Show <a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/mj8nlao797aos2pnwaze72o2" target="_blank" style="color:var(--trigger)">Tech Essentials: Wireless Streaming →</a></li>
+<li>Have trainees draw the wireless signal flow on a whiteboard before touching hardware.</li>
+<li>Every trainee completes the full wireless reset procedure independently — at least twice.</li>
 </ul>
-<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Run this on Day 1 during the "Build All Store Trackers" block. Assign roles before starting — don't let trainees self-organize or you'll end up with everyone crowding the screwdrivers. Put your fastest learner as a Sticker Captain so they can manage the pace. Use this activity to observe who takes quality seriously and who rushes — it tells you a lot about how they'll handle guest-facing pressure later.</div></div>
-
-<h3>Tips for Running the Line Smoothly</h3>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Haptic Vests</h4>
 <ul>
-<li><strong>Brief before you build.</strong> Walk everyone through their role before a single tracker is touched. Five minutes of clarity saves thirty minutes of rework.</li>
-<li><strong>Quantity lists matter.</strong> The Sticker Captain's list is the single source of truth. If they're off, everyone downstream is off.</li>
-<li><strong>Keep the line moving.</strong> If one station bottlenecks, shift a person. The Screwdriver Team often needs the most people.</li>
-<li><strong>Validators are not builders.</strong> If validators start building, quality checks get skipped. Keep them on quality only.</li>
-</ul>`
+<li>Show <a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/6qzp38pwwr9jt7d25doj76pn" target="_blank" style="color:var(--trigger)">Tech Essentials: Haptic Feedback Vests →</a></li>
+<li>Vest pairing under time pressure is where new GEGs lose composure. Drill it until it is automatic.</li>
+<li>Stations of 3: one pairs, one checks LED state and lock settings, one calls out steps. Rotate.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Props</h4>
+<ul>
+<li>Show <a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/4qjepln3zkom1akjnk6354ol" target="_blank" style="color:var(--trigger)">Tech Essentials: Props →</a></li>
+<li>Normalize troubleshooting: props do not always pair on the first attempt. That is expected — stay calm.</li>
+<li>Each trainee must pair all three prop types and complete the re-pair process.</li>
+</ul>
+<div class="science-callout"><div class="science-callout-label">End of Day 2 Check</div><div class="science-callout-text">Before closing: every trainee should be able to complete a Checkfront booking, pair a vest, pair props, and reset wireless streaming without prompting. If anyone cannot do all four, assign a catch-up station before Day 3 starts.</div></div>`
     },
     {
-      id: 'tech-vests',
-      title: 'Haptic Vests: Fitting, Pairing & Care',
-      category: 'Technology',
-      eyebrow: 'TECH ESSENTIALS',
-      subtitle: 'The vest is what guests feel. Get the fit and pairing right every time.',
-      content: `<h3>What the Vest Does</h3>
-<p>The haptic vest (bHaptics TactSuit X40) has vibrating motors distributed across the torso that fire in sync with in-experience events. A poorly fitted vest means muted haptics and a diminished guest experience. This matters — teach trainees to care about fit, not just getting it on quickly.</p>
-<h3>LED States</h3>
+      id: 'daily-day3',
+      title: 'Day 3 Facilitation Guide',
+      category: 'Daily Facilitation',
+      eyebrow: 'DAILY FACILITATION',
+      subtitle: 'Role-play, review, and store operations — where knowledge becomes execution.',
+      content: `<h3>Day 3 Purpose</h3>
+<p>Day 3 is where training converts to performance. Trainees stop learning new content and start running the store. Your job shifts from instructor to coach: walk the floor, give live feedback, and let the SM run more of the day independently.</p>
+<h3>Agenda at a Glance</h3>
 <ul>
-<li><strong>Solid blue</strong> — vest is paired and ready.</li>
-<li><strong>Flashing blue</strong> — vest is unpaired and needs pairing.</li>
-<li><strong>No light</strong> — vest is off or uncharged.</li>
+<li><strong>60 min</strong> — Opening Procedures (full open)</li>
+<li><strong>30 min</strong> — T1 Ticket Workflow</li>
+<li><strong>2+ hrs</strong> — Role-Play Block 1: Full Guest Journey</li>
+<li><strong>30 min</strong> — Break</li>
+<li><strong>2+ hrs</strong> — Role-Play Block 2: Scenarios &amp; Cleaning</li>
+<li><strong>60 min</strong> — Closing Procedures</li>
 </ul>
-<p>Lock state is not shown by LED color. Confirm Button Lock and Stay Lock status through bHaptics Player only.</p>
-<h3>Pairing Procedure</h3>
+<h3>Block-by-Block Coaching Notes</h3>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Opening Procedures</h4>
+<ul>
+<li>Walk through the <a href="http://app.delightree.com" target="_blank" style="color:var(--trigger)">Opening Checklist →</a> item by item before trainees attempt it.</li>
+<li>Each trainee leads the opening sequence for one room from start to finish. Do not step in unless safety is at risk.</li>
+<li>Watch for the instinct to rush. Speed comes with experience — completeness comes with habit.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">T1 Ticket Workflow</h4>
+<ul>
+<li>Show <a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/b5mzxb8z8bazcazar9252zpm" target="_blank" style="color:var(--trigger)">Technology Essentials: T1 Workflow →</a></li>
+<li>The 5-minute rule: escalating fast is the professional move, not an admission of failure.</li>
+<li>Each trainee submits a practice T1 ticket for a hypothetical issue. Check for: correct info, appropriate tone, timing relative to the 5-minute rule.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Role-Play Block 1</h4>
+<ul>
+<li>Rotate groups of 3 through each station: Host, Barracks GEG, Holodeck GEG.</li>
+<li>Coach walks the floor. Give live micro-feedback between runs — not during.</li>
+<li>Include at least one recovery scenario per group before the break.</li>
+<li>Note: who excels at each touchpoint? Who freezes? Who leads others?</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Role-Play Block 2</h4>
+<ul>
+<li>Debrief Block 1 before starting. Call out wins by name. Name specific improvements needed — not general feedback like "be more confident."</li>
+<li>Use Block 2 to address gaps from Block 1. Weak vest pairing? Drill vests. Stiff recovery? Run recovery scenarios.</li>
+<li>Cleaning and maintenance run alongside role-play — not after.</li>
+</ul>
+<h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Closing Procedures</h4>
+<ul>
+<li>Walk through the <a href="https://app.delightree.com/chapters/view/zb4jjqwwm4e60zqd8lpl362r" target="_blank" style="color:var(--trigger)">Closing Checklist →</a> and <a href="https://app.delightree.com/chapters/view/9qxrrw548blphl34935lz7lm" target="_blank" style="color:var(--trigger)">Store Cleaning SOP →</a> before trainees begin.</li>
+<li>End with a full close. A team that can open and close cleanly knows what they are doing.</li>
+<li>Watch for shortcuts at closing — energy is lowest and this is when habits form.</li>
+</ul>
+<div class="science-callout"><div class="science-callout-label">End of Day 3 Check</div><div class="science-callout-text">Before leaving: every trainee should have completed a full open and a full close independently. All Delightree completions should be at 100%. Document anyone with outstanding items — Day 4 starts with role-play pressure, and gaps compound fast.</div></div>`
+    },
+    {
+      id: 'daily-recap-check',
+      title: 'Daily Recap and Completion Check',
+      category: 'Daily Facilitation',
+      eyebrow: 'DAILY FACILITATION',
+      subtitle: 'How to close each training day correctly.',
+      content: `<h3>Why the Daily Recap Matters</h3>
+<p>A strong daily recap locks in the day's learning, surfaces what did not land, and sets up the next day. It is your quality control checkpoint. If something was not completed today, it does not become easier to complete tomorrow — it becomes a liability under pressure.</p>
+<h3>Closing Checklist — Run This Every Day</h3>
 <ol style="padding-left:18px;margin-bottom:12px;font-size:13.5px;color:var(--text-secondary);line-height:1.8">
-<li>Hold the vest power button until LED blinks blue (pairing mode).</li>
-<li>VNC into the corresponding SPC.</li>
-<li>Open bHaptics mini-player, select the gear icon (top right).</li>
-<li>Go to Device tab — only one vest should appear.</li>
-<li>Select the vest and click Pair.</li>
-<li>Confirm solid blue LED.</li>
-<li>Set: Button Lock ON, Stay Lock ON, Turn Off After = Never.</li>
-<li>Close VNC — leaving it open slows SPC performance.</li>
+<li>Ask each group: "What did you practice today? What felt solid? What felt shaky?"</li>
+<li>Open Delightree Tracking tab. Check every trainee's completion status for the day's required items.</li>
+<li>Anyone below 100% on a required eLearning: assign catch-up time before the next block or first thing tomorrow.</li>
+<li>Document any trainee concerns in the portal Daily Recap section.</li>
+<li>Escalate missing Delightree access or completion tracking issues to L&amp;D — do not wait.</li>
+<li>Preview tomorrow's learning blocks with the team. Tell them what to expect, not what to memorize.</li>
 </ol>
-<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Vest pairing under time pressure is where new GEGs lose composure. The pairing process should feel automatic before Day 5. Drill it in groups of 3, rotating, until every trainee can pair without hesitation. If a red bar appears in bHaptics during pairing, that's a driver issue — contact T1. Do not reseat the dongle.</div></div>
-<h3>Gear Up (Always Track Up First)</h3>
-<p>Trackers go on before the vest — always. Put wrist and ankle trackers on first. Fully loosen vest straps before distributing. Distribute by player color: Red (P1), Blue (P2), Green (P3), Yellow (P4), Pink (P5), Purple (P6). Tighten side straps for a snug fit. For guests with broader shoulders, unbutton the shoulder buttons at the top.</p>
-<h3>Charging Rules</h3>
+<h3>If Completion Tracking Is Not Visible</h3>
 <ul>
-<li>Charge all vests overnight at close of business.</li>
-<li>Unplug all vests at opening — charging during business hours causes connection issues.</li>
-<li>Battery life is approximately 10 hours. Full charge takes approximately 2 hours (USB-C).</li>
+<li>Contact L&amp;D for access or reporting support before end of day.</li>
+<li>Have trainees self-report and screenshot their completion screens in the meantime.</li>
+<li>Do not assume completion without evidence.</li>
 </ul>
-<h3>Cleaning & Storage</h3>
+<h3>The Business Connection</h3>
+<p>Strong training execution directly protects store performance. This is operational, not abstract.</p>
 <ul>
-<li>Spray microfiber cloth with Briotech sanitizer — never spray directly onto the vest (damages electronics).</li>
-<li>Wash vest liners in a washing machine weekly. Fabric refresher spray is for odor between washes only.</li>
-<li>Hang vests by their sleeves, never by the straps (straps break over time).</li>
-<li>Store in color order: Red, Blue, Green, Yellow, Pink, Purple.</li>
+<li><strong>Guest experience</strong> — Trainees who are not confident cause longer gear-up times, awkward interactions, and lower post-experience scores.</li>
+<li><strong>Session timing</strong> — Incomplete tech training causes avoidable delays that cascade through the day's bookings.</li>
+<li><strong>Repeatability</strong> — A team not trained on the rebooking conversation misses revenue at the most natural moment in the guest journey.</li>
+<li><strong>Tech escalations</strong> — Teams not trained on T1 workflow either under-escalate (keeping guests waiting) or over-escalate (unnecessary tickets).</li>
+<li><strong>Opening readiness</strong> — The store's first real guest day reflects everything your training program did and did not do. That is the measure.</li>
 </ul>`
-    },
-    {
-      id: 'tech-atd',
-      title: 'Active Tracking Head Mount (ATH)',
-      category: 'Technology',
-      eyebrow: 'TECH ESSENTIALS',
-      subtitle: 'Head tracking lives here. Know the LED states before you need them.',
-      content: `<h3>What the ATH Does</h3>
-<p>The Active Tracking Head Mount (ATH) clips onto the HTC Vive Focus Vision headset and uses infrared LEDs tracked by the MoCap cameras to capture guest head movement. Unlike passive trackers, the ATH is a powered device — it charges simultaneously with the headset.</p>
-<h3>Required Components</h3>
-<ul>
-<li>1x Vive Focus Vision headset</li>
-<li>1x Active Tracking Head Mount (ATH)</li>
-<li>1x Silicone Face Shield</li>
-<li>1x 3.5mm Audio Spiral Cable</li>
-<li>2x Cable Clips</li>
-</ul>
-<p>If any component is missing, the setup is invalid. Do not run a session without all five.</p>
-<h3>Status LED Guide</h3>
-<ul>
-<li><strong>Red</strong> — No communication between ATH and headset. Tracking cannot work.</li>
-<li><strong>Yellow</strong> — Communication okay, standby mode, IR LEDs off. Normal when not streaming.</li>
-<li><strong>Green</strong> — Communication okay, operation mode, IR LEDs active. Expected during gameplay.</li>
-</ul>
-<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Teach trainees the LED states as a table, not a list. Red = problem, Yellow = standby/normal, Green = good. When they can recall this instantly, they won't waste time second-guessing a yellow ATH between sessions.</div></div>
-<h3>Player ID Color Codes</h3>
-<p>Each ATH is assigned to a player slot. The Player ID must match the assigned station and should not be blinking during a session: P1 Red (23679), P2 Blue (13578), P3 Green (12579), P4 Yellow (13689), P5 Pink (23478), P6 Purple (12489).</p>
-<h3>Basic Troubleshooting</h3>
-<ul>
-<li><strong>LED Red</strong> — Physically seat and connect the headset. Restart Kiosk Mode (long-press side button). Still red: contact T1.</li>
-<li><strong>Front LED blinking white</strong> — Turn ATH off, wait 10 seconds, turn on. Repeat up to 3 times. Still blinking: replace ATH and contact T1.</li>
-<li><strong>Yellow during active experience</strong> — Confirm experience is launched. Restart Kiosk Mode. Still yellow: escalate to T1.</li>
-</ul>`
-    },
-    {
-      id: 'tech-t1',
-      title: 'T1 Escalation: The 5-Minute Rule',
-      category: 'Technology',
-      eyebrow: 'TECH SUPPORT',
-      subtitle: 'When to escalate, how to escalate, and how to manage the guest while you do.',
-      content: `<h3>The 5-Minute Rule</h3>
-<p>If you have been troubleshooting a tech issue for 5 minutes and it is not resolved, stop and escalate to T1. This is not a defeat — it is the professional move. T1 is available 24/7 precisely so you don't have to troubleshoot alone.</p>
-<div class="science-callout"><div class="science-callout-label">Why GEGs Delay (And Why They Shouldn't)</div><div class="science-callout-text">New GEGs often delay T1 escalation out of pride or concern about bothering the helpdesk. In the meantime, guests are waiting, frustration builds, and recovery becomes harder. Fast escalation is the sign of a professional, not a failure. Build this instinct early.</div></div>
-<h3>How to Submit a T1 Ticket via Slack</h3>
-<ul>
-<li>Use the T1 Slack workflow — the workflow link goes first, before any troubleshooting.</li>
-<li>Include: store name, room number, issue description, what you have already tried.</li>
-<li>Copy the booking ID from the Silica in-experience page (press the copy button) to give T1 immediate context.</li>
-<li>Stay with the guest while the ticket is open — don't disappear.</li>
-</ul>
-<h3>Managing the Guest During a Tech Issue</h3>
-<p>Use the Acknowledge-Empathize-Resolve model:</p>
-<ul>
-<li><strong>Acknowledge</strong> — "We have a small tech hiccup — I'm on it right now."</li>
-<li><strong>Empathize</strong> — "You're not losing any playing time — we'll make sure of that."</li>
-<li><strong>Resolve</strong> — If resolution takes more than a few minutes, involve your manager. Consider a voucher or time extension.</li>
-</ul>
-<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Run a simulated T1 escalation scenario on Day 3 — give a trainee a "tech problem" mid-practice session and watch how they communicate with the guest AND submit the ticket simultaneously. This dual-task moment reveals who is truly guest-ready under pressure.</div></div>`
     }
   ],
-  'Systems & Software': [
+  'Group Learning Methods': [
     {
-      id: 'sys-checkfront',
-      title: 'Checkfront: Bookings, Check-In & Daily Manifest',
-      category: 'Systems & Software',
-      eyebrow: 'SYSTEMS',
-      subtitle: 'The booking system every GEG touches every shift. Know it cold.',
-      content: `<h3>What Checkfront Does</h3>
-<p>Checkfront is Sandbox VR's booking and payment platform. GEGs use it to create bookings, process payments, view the daily manifest, and check guests in. The web browser version handles almost everything. The Checkfront app is used only for gift card payments, Apple Pay, Google Pay, and Square Reader transactions.</p>
-<h3>Making a New Booking</h3>
+      id: 'method-elearning',
+      title: 'Facilitating Group eLearning in Delightree',
+      category: 'Group Learning Methods',
+      eyebrow: 'GROUP LEARNING',
+      subtitle: 'Watch together. Complete individually. Confirm every time.',
+      content: `<h3>The Core Rule</h3>
+<p>Group viewing and individual completion are not the same thing. Trainees can watch a video together — but each trainee must log into their own Delightree account and reach 100% completion individually. There are no shortcuts here.</p>
+<h3>How to Run a Group eLearning Block</h3>
 <ol style="padding-left:18px;margin-bottom:12px;font-size:13.5px;color:var(--text-secondary);line-height:1.8">
-<li>Go to the Bookings tab → New Booking.</li>
-<li>Select the date, then choose Private or Public session.</li>
-<li>Select the experience and time slot. Always enter the number of guests — even for private sessions.</li>
-<li>If a promo code applies, select Apply Discount before entering guest details.</li>
-<li>Enter guest name, email, and phone number.</li>
-<li>Select Pay Now. Payment must be completed immediately — bookings must never sit in Reserved status without payment.</li>
+<li>Open the Delightree learning item on a shared screen or cast to the post-experience TV.</li>
+<li>Have every trainee log into their own Delightree account on their device before you start.</li>
+<li>Watch the video together. Pause after key moments — gear changes, policy steps, tech procedures — for discussion or live demonstration.</li>
+<li>After the video: give trainees 3–5 minutes to individually complete required items in their Delightree account.</li>
+<li>Check the Training or Tracking tab to confirm every trainee has reached 100% on required eLearning.</li>
+<li>If you cannot see completion tracking, reach out to L&amp;D for access or reporting support immediately.</li>
+<li>If a trainee is missing access, notify L&amp;D immediately. Do not close the day without resolving it.</li>
 </ol>
-<div class="science-callout"><div class="science-callout-label">Critical Rule</div><div class="science-callout-text">Bookings must never remain in Reserved status without payment. There is no 72-hour grace period. If a booking is Reserved and unpaid, address it immediately. Always send a confirmation email after any booking modification.</div></div>
-<h3>The Daily Manifest</h3>
-<p>The Daily Manifest lives in the Bookings tab and is the primary tool for daily operations. Review it at the start of every shift. It shows all bookings, booking status, guest names, room assignments, and which public sessions can be combined to free up capacity. Use it to contact guests, confirm arrival times, and prep any pre-ordered add-ons.</p>
-<h3>Booking Statuses</h3>
+<h3>When to Pause the Video</h3>
 <ul>
-<li><strong>Paid</strong> — Fully paid. Ready to go.</li>
-<li><strong>Reserved</strong> — No payment processed. Not acceptable for standard operations.</li>
-<li><strong>Deposit</strong> — Partially paid (typically event packages).</li>
-<li><strong>Cancelled</strong> — Payment forfeited or refunded.</li>
-<li><strong>VIP</strong> — Influencer or celebrity guest.</li>
+<li>After a step that requires a physical demonstration (e.g. tracker ball inspection).</li>
+<li>After a policy or procedure that needs to be discussed in context of this specific store.</li>
+<li>When trainees have stopped watching — pause, ask a question, re-engage before continuing.</li>
 </ul>
-<h3>Booking Not Showing on Check-In iPad?</h3>
-<p>This is almost always a Checkfront sync issue, not an iPad problem. Fix 1: find the booking in Checkfront, set Invoice Status to Reserved, wait 5 seconds, then set it back to Paid. This forces a re-sync. If that doesn't work, use the manual check-in URL: <code>https://checkin.sandboxvr.com/[StoreCode]-[BookingID]</code>. If the check-in app is frozen, force-close and relaunch, then restart the iPad if needed. Still failing: contact T1.</p>
-<div class="science-callout"><div class="science-callout-label">Coach Note — Say See Do</div><div class="science-callout-text">Say: walk through a complete booking scenario while the team follows along on their own iPads. See: watch for hesitation on the payment step and the check-in flow — this is where new GEGs lose time with guests. Do: each trainee completes a full practice booking independently, then checks themselves in using the Daily Manifest.</div></div>`
+<h3>If a Trainee Cannot Access the Assignment</h3>
+<ul>
+<li>Have them continue as a group observer and note the issue.</li>
+<li>Notify L&amp;D immediately with the trainee's name and the specific assignment.</li>
+<li>The trainee must complete the item individually before end of that training day.</li>
+</ul>`
     },
     {
-      id: 'sys-silica',
-      title: 'Silica: Session Management from Start to Finish',
-      category: 'Systems & Software',
-      eyebrow: 'SYSTEMS',
-      subtitle: 'Silica is not SBOS. Learn how sessions are created, run, and closed.',
-      content: `<h3>What Silica Is</h3>
-<p>Silica is Sandbox VR's current operating platform for in-store session management. It replaces the legacy SBOS system entirely. Do not apply SBOS knowledge to Silica — the platforms behave differently. Silica does not support user-initiated OS restarts. You can restart the experience window, but not the Silica OS itself.</p>
-<h3>Session Status Colors (Main Dashboard)</h3>
+      id: 'method-casting',
+      title: 'Casting Learning Videos to Post-Experience TVs',
+      category: 'Group Learning Methods',
+      eyebrow: 'GROUP LEARNING',
+      subtitle: 'Use the room. Set up for group viewing without disrupting operations.',
+      content: `<h3>When to Use the Post-Experience TVs</h3>
 <ul>
-<li><strong>Green</strong> — Room is ready.</li>
-<li><strong>Gray</strong> — Room is in use.</li>
-<li><strong>Dark gray</strong> — Room is wrapping up.</li>
+<li>For any Delightree eLearning video that benefits from group viewing — tech essentials, guest journey, T1 workflow.</li>
+<li>When the group is too large to huddle around a single iPad.</li>
+<li>When you want the debrief to happen as a team, not in small clusters.</li>
 </ul>
-<h3>Creating a Session</h3>
+<h3>Setup Steps</h3>
 <ol style="padding-left:18px;margin-bottom:12px;font-size:13.5px;color:var(--text-secondary);line-height:1.8">
-<li>Open the Silica app on the staff iPad.</li>
-<li>Tap Create Session — a list of Checkfront bookings within ~2 hours appears.</li>
-<li>Select the booking row (highlights green when all guests have checked in).</li>
-<li>Assign a vacant holodeck.</li>
-<li>Confirm the experience (auto-filled from Checkfront), select language, tap Continue.</li>
-<li>Enter team name, take player photos, confirm nicknames (auto-filled from mobile check-in).</li>
-<li>Help guests choose avatars or weapons, then tap Continue.</li>
+<li>Confirm the store is not in live Guest operations before using post-experience TVs for training.</li>
+<li>Connect your device to the TV using the available input (HDMI, casting, or screen mirroring — varies by store).</li>
+<li>Open the Delightree video and verify audio and video before bringing the group in.</li>
+<li>Seat trainees so everyone has a clear sightline to the screen.</li>
+<li>Remind trainees to have their own Delightree accounts open if completion tracking is required.</li>
 </ol>
-<h3>Health Check Page</h3>
-<p>After player setup, Silica runs a health check. Gray = not started, Red = issue, Green = ready. Launch Mirror Room only activates when all required checks are green. Props will show red until the trigger is pulled — that's normal. Vests can show red and you can still proceed; resolve vest issues after launching.</p>
-<h3>Player Status Colors (During Session)</h3>
+<h3>Important Reminders</h3>
 <ul>
-<li><strong>Green</strong> — Normal.</li>
-<li><strong>Red</strong> — Headset disconnected.</li>
-<li><strong>Orange</strong> — Headset latency issues. Contact T1 via Slack immediately.</li>
-<li><strong>Yellow</strong> — Other device issues (audio, vest, props).</li>
+<li>Verify audio and video before the group is assembled — dead audio wastes the block.</li>
+<li>If completion tracking is required, trainees must still log in individually on their own devices after watching.</li>
+<li>Do not use post-experience TVs while Guests are in the building without manager approval.</li>
 </ul>
-<div class="science-callout"><div class="science-callout-label">Critical</div><div class="science-callout-text">If status colors are consistently red, orange, or yellow, contact T1 on Slack immediately. Do not wait to see if it clears on its own. Each new booking requires a fresh check-in — prior check-in details do not carry over between sessions.</div></div>
-<h3>Mobile Check-In</h3>
-<p>Guests can complete check-in at home before arriving — via the website immediately after booking, or through the confirmation email. Waivers, nicknames, and booking details are submitted in advance. Nicknames auto-populate in Silica. This saves significant time during gear-up. If a guest arrives without checking in, they can use the in-store kiosk iPad to complete it on-site.</p>
-<h3>End of Session</h3>
-<p>At the end of a session, cast the scoreboard and souvenir video to the Post-Experience TV from within Silica. The QR code for guests to download their video is on the Silica iPad — not the TV. The TV shows the video; the iPad has the download link.</p>
-<div class="science-callout"><div class="science-callout-label">Coach Note — Say See Do</div><div class="science-callout-text">Say: walk through the full session creation flow while the team watches on a second device. See: watch for hesitation on the health check page — new GEGs often panic when they see red on props or vests. Do: each trainee creates a test session from scratch and walks through the health check to launch independently.</div></div>`
+<div class="science-callout"><div class="science-callout-label">If Tech Fails</div><div class="science-callout-text">If the TV, display, or casting is not working, do not spend more than 5 minutes troubleshooting. Switch to small-group iPad viewing or individual devices and continue. Do not lose the learning block chasing a display issue.</div></div>`
+    },
+    {
+      id: 'method-stations',
+      title: 'Facilitating Hands-On Practice Stations',
+      category: 'Group Learning Methods',
+      eyebrow: 'GROUP LEARNING',
+      subtitle: 'Groups of 3–4. Rotate. Validate every person.',
+      content: `<h3>The Station Model</h3>
+<p>Hands-on skills are not learned by watching. Split trainees into groups of 3–4, assign each group a station, and rotate them through. Every trainee should demonstrate every skill before you sign off on it.</p>
+<h3>How to Run Stations</h3>
+<ol style="padding-left:18px;margin-bottom:12px;font-size:13.5px;color:var(--text-secondary);line-height:1.8">
+<li>Assign groups before the block starts — do not let trainees self-organize.</li>
+<li>At each station: one trainee is the <strong>Doer</strong>, one is the <strong>Checker</strong>, one is the <strong>Explainer</strong>.</li>
+<li>The Doer performs the task. The Checker watches for errors. The Explainer narrates what is happening and why.</li>
+<li>Rotate roles within the group until every person has been the Doer at least once.</li>
+<li>Rotate groups through stations on a timed cycle — do not wait for the slowest group to finish.</li>
+<li>Coach circulates. Do a table touch at every station each rotation.</li>
+</ol>
+<h3>Suggested Stations</h3>
+<ul>
+<li>Tracker building</li>
+<li>Prop pairing and troubleshooting</li>
+<li>Vest pairing and LED state identification</li>
+<li>HTC headset gesture navigation</li>
+<li>Entering and quitting Kiosk Mode</li>
+<li>Calibration practice</li>
+<li>Checkfront booking and check-in flow</li>
+<li>Silica session setup</li>
+<li>T1 ticket submission practice</li>
+<li>Full gear-up / gear-down role play</li>
+</ul>
+<h3>What Coaches Do While Stations Run</h3>
+<ul>
+<li>Circulate constantly — do not stay at one station.</li>
+<li>Ask validation questions at each stop. See <strong>Coach Table Touches and Validation Questions</strong> for scripts.</li>
+<li>Note anyone who cannot complete the task without prompting — they need individual follow-up.</li>
+<li>Do not re-lecture the full SOP unless the entire group is missing the same concept. Individual errors get individual coaching.</li>
+</ul>
+<div class="science-callout"><div class="science-callout-label">Training Science</div><div class="science-callout-text">Interleaved practice — rotating trainees through different tasks rather than drilling one skill all day — feels harder but produces significantly better long-term retention and transfer. Do not be alarmed when trainees seem slower mid-rotation. The struggle is the learning.</div></div>`
+    },
+    {
+      id: 'method-validation',
+      title: 'Coach Table Touches and Validation Questions',
+      category: 'Group Learning Methods',
+      eyebrow: 'GROUP LEARNING',
+      subtitle: 'What to watch, what to ask, and what a ready trainee looks like.',
+      content: `<h3>How to Use This Article</h3>
+<p>Use these questions while circulating during practice stations or role-play. A good answer tells you the trainee has internalized the concept. A shaky answer tells you where to spend the next coaching minute.</p>
+<h3>Guest Journey</h3>
+<ul>
+<li>"What should happen in the first 5 minutes after Guests arrive?"</li>
+<li>"Where does timing usually break down during gear-up?"</li>
+<li>"What do you say if a Guest needs help during the experience?"</li>
+<li>"How do you make the post-experience feel intentional instead of rushed?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee can describe all four touchpoints and name a specific action at each. Stumbling on post-experience is common — that is where most coaching time is needed.</p>
+<h3>Repeatability</h3>
+<ul>
+<li>"What are the three moments to offer a repeat experience?"</li>
+<li>"How would you offer it without sounding pushy?"</li>
+<li>"What would you say to a group that loved it but seems ready to leave?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee can demonstrate the re-booking conversation naturally at any of the three moments without it sounding scripted.</p>
+<h3>Trackers</h3>
+<ul>
+<li>"How do you know this tracker is built correctly?"</li>
+<li>"What are you checking before it goes into use?"</li>
+<li>"What do you do if a tracker looks wrong in the experience?"</li>
+<li>"When do you escalate versus inspect first?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee physically inspects the tracker (ball condition, pin count, tightness) without being asked, and can describe troubleshooting order correctly.</p>
+<h3>Haptic Vests</h3>
+<ul>
+<li>"What does solid blue mean?"</li>
+<li>"What does flashing blue mean?"</li>
+<li>"How do you confirm lock settings are correct?"</li>
+<li>"What cleaning step can damage the vest if done incorrectly?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee can pair a vest without notes, and correctly identify LED states on demand.</p>
+<h3>Props</h3>
+<ul>
+<li>"What is the difference between prop pairing and prop tracking?"</li>
+<li>"What should happen when you pull the trigger after assigning the room?"</li>
+<li>"What do you do immediately after a prop swap?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee can pair all three prop types and complete a re-pair without hesitation.</p>
+<h3>HTC / Kiosk Mode</h3>
+<ul>
+<li>"Show me how to navigate using gestures."</li>
+<li>"Show me how to quit Kiosk Mode."</li>
+<li>"Show me how to re-enter Kiosk Mode."</li>
+<li>"What should you avoid pressing or changing?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee demonstrates gesture navigation fluently and can enter/exit Kiosk Mode without prompting.</p>
+<h3>Calibration</h3>
+<ul>
+<li>"What order do the calibration steps happen in?"</li>
+<li>"When should strobes be on versus off?"</li>
+<li>"What calibration number is acceptable?"</li>
+<li>"What do you do if one camera is above the threshold?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee can complete the full calibration sequence for one room independently.</p>
+<h3>Checkfront</h3>
+<ul>
+<li>"How do you find today's bookings?"</li>
+<li>"How do you confirm the balance is paid?"</li>
+<li>"How do you check whether waivers are complete?"</li>
+<li>"How do you handle a walk-in?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee completes a full booking and check-in workflow without asking for help.</p>
+<h3>Silica</h3>
+<ul>
+<li>"How do you create a session?"</li>
+<li>"What do the health check colors mean?"</li>
+<li>"Where does the QR code display?"</li>
+<li>"What do you do if a player status stays red, orange, or yellow?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee can create and launch a session in Silica without prompting.</p>
+<h3>T1 Workflow</h3>
+<ul>
+<li>"When do you stop troubleshooting and escalate?"</li>
+<li>"What information does T1 need in the ticket?"</li>
+<li>"What should you tell Guests while you are waiting?"</li>
+<li>"Where should follow-up communication happen?"</li>
+</ul>
+<p><strong>Ready when:</strong> Trainee states the 5-minute rule correctly and can write a clear, complete T1 ticket from a hypothetical scenario.</p>`
     }
   ],
-  'Sales & KPIs': [
+  'NSO Training Activities': [
     {
-      id: 'sales-repeatability',
-      title: 'Repeatability: How to Sell More Experiences',
-      category: 'Sales & KPIs',
-      eyebrow: 'SALES',
-      subtitle: 'Three moments. One KPI. Countless return visits.',
-      content: `<h3>What is Repeatability?</h3>
-<p>Repeatability tracks the percentage of guests who book an additional experience — either back-to-back the same day or a future return visit (replay within 6 months). It is one of Sandbox VR's core KPIs because return guests drive sustainable revenue and are far more likely to bring new groups.</p>
-<h3>The Three Repeatability Moments</h3>
-<p>Repeatability conversations work best when they happen at the right emotional moment — not as a sale, but as a natural extension of enthusiasm.</p>
+      id: 'nso-assembly-line',
+      title: 'Tracker Building Assembly Line',
+      category: 'NSO Training Activities',
+      eyebrow: 'NSO TRAINING',
+      subtitle: 'How to run the line — not tracker theory. That lives in Delightree.',
+      content: `<h3>Before You Start</h3>
+<p>Review <a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/lznpb9bl5kmz149zr93xpwl2" target="_blank" style="color:var(--trigger)">Tech Essentials: Tracking →</a> with the group before touching supplies. The assembly line assumes trainees understand what trackers are and why build quality matters.</p>
+<h3>Stage Supplies Before Briefing</h3>
 <ul>
-<li><strong>Check-In</strong> — Plant the seed before the experience. "Many groups love the back-to-back — keeps the momentum going."</li>
-<li><strong>Still Geared Up</strong> — The highest-conversion moment. Guests are still in the adrenaline window. "How was it? Ready to go again?"</li>
-<li><strong>Post-Experience</strong> — For future replay booking. Show the Checkfront calendar. "We have availability in [timeframe] — want to lock it in?"</li>
+<li>Count and sort tracker bases, balls, pins, screws, Velcro, and mounts by type before trainees enter.</li>
+<li>Print or display the quantity list the Sticker Captain will use.</li>
+<li>Lay out screwdrivers, the tracker build chart, and screw sizing reference at the Screwdriver station.</li>
+<li>Set aside a completed sample tracker at each station as a visual reference.</li>
 </ul>
-<div class="science-callout"><div class="science-callout-label">Training Science</div><div class="science-callout-text">Emotional state influences decision-making (Damasio, 1994). Guests asked to rebook while still geared up — in the peak of their excitement — are significantly more likely to say yes than guests asked at checkout. Train your team to use that window.</div></div>
-<h3>Conversion: Walk-Ins and Phone Inquiries</h3>
-<p>Staff Conversion tracks the percentage of guests who didn't have a booking but made one after interacting with a team member. Every interaction with a curious passerby is a conversion opportunity.</p>
+<h3>Roles</h3>
 <ul>
-<li>Invite them in for a quick look at the Holodeck or the recap video playing on the Post-Experience TV.</li>
-<li>Use the experiences as conversation hooks — "Have you seen Squid Game? We have a VR version."</li>
-</ul>`
+<li><strong>Sticker Captain (1–2 people)</strong> — Places stickers on bases. Manages the quantity list. Ensures builders repeat the same build until their count is done. Controls the pace of the whole line.</li>
+<li><strong>Builder Team (3–5 people)</strong> — Hand-tightens pins to the correct position. Each builder repeats one tracker type. Receives pre-stickered bases, passes completed bases forward.</li>
+<li><strong>Screwdriver Team (3–5 people)</strong> — Secures tracker balls to pins and screws bases into mounts. Limb trackers use 4x8 screws, not 4x6.</li>
+<li><strong>Velcro / Mount Team (2–4 people)</strong> — Threads Velcro, secures weapon mounts, slides HMD mounts onto headsets. End of the line — their output is a finished tracker.</li>
+<li><strong>Validators (SM / Leads)</strong> — Do not build. Test tightness of every tracker. Place in holodeck and confirm MoCap visibility in Vicon Evoke. Flag anything that fails for rebuild.</li>
+</ul>
+<h3>Preventing Bottlenecks</h3>
+<ul>
+<li>Screwdriver Team typically needs the most people — assign extra here if the line backs up.</li>
+<li>If the Sticker Captain falls behind, the whole line stalls — give them a second person early.</li>
+<li>If Velcro/Mount Team is idle between batches, they can assist the Screwdriver Team.</li>
+</ul>
+<h3>Quality Control</h3>
+<ul>
+<li>Validators check every tracker — not a sample. A tracker that fails in the holodeck disrupts a guest session.</li>
+<li>Common errors: loose pins, wrong screw size, incorrect sticker placement, Velcro threaded backward.</li>
+<li>If the same error appears repeatedly at one station, pause the line, address the whole station, then restart.</li>
+</ul>
+<h3>Debrief When Done</h3>
+<ul>
+<li>"What errors came up most often? What caused them?"</li>
+<li>"Which role was hardest? Which was easiest? Why?"</li>
+<li>"What would you do differently if you ran this line again?"</li>
+</ul>
+<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Every trainee must build at least one complete tracker independently before you sign off on this competency — not just rotate through a station. The assembly line builds speed. Individual completion builds accountability. Both are required.</div></div>`
     }
   ],
-  'Policies & Procedures': [
+  'Reference': [
     {
-      id: 'policy-overview',
-      title: 'Guest Policies: The Quick Reference',
-      category: 'Policies & Procedures',
-      eyebrow: 'OPERATIONS',
-      subtitle: 'Know these cold. You will be asked in the middle of a busy shift.',
-      content: `
-<div style="background:var(--warning-light);border:1px solid rgba(245,166,35,0.3);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:20px">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#8A5A00;margin-bottom:8px">Franchise Verification Required</div>
-  <div style="font-size:13px;color:var(--hb);margin-bottom:12px">Before training on guest policies, confirm with the franchisee that these policies match their local standards. Some franchisees may operate under different pricing, cancellation, or timing policies. Check each item before teaching.</div>
-  <div style="display:flex;flex-direction:column;gap:8px">
-    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--hb)">
-      <input type="checkbox" onchange="toggleFranchiseCheck('Cancellation policy confirmed with franchisee', this.checked)" style="margin-top:2px;width:16px;height:16px;cursor:pointer">
-      <span>Cancellation & refund policy confirmed with franchisee</span>
-    </label>
-    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--hb)">
-      <input type="checkbox" onchange="toggleFranchiseCheck('Late arrival / grace period policy confirmed', this.checked)" style="margin-top:2px;width:16px;height:16px;cursor:pointer">
-      <span>Late arrival / grace period policy confirmed</span>
-    </label>
-    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--hb)">
-      <input type="checkbox" onchange="toggleFranchiseCheck('Minor waiver policy confirmed', this.checked)" style="margin-top:2px;width:16px;height:16px;cursor:pointer">
-      <span>Minor waiver requirements confirmed</span>
-    </label>
-    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--hb)">
-      <input type="checkbox" onchange="toggleFranchiseCheck('Rescheduling policy confirmed', this.checked)" style="margin-top:2px;width:16px;height:16px;cursor:pointer">
-      <span>Rescheduling policy confirmed</span>
-    </label>
-    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--hb)">
-      <input type="checkbox" onchange="toggleFranchiseCheck('Voucher and rebooking fee amounts confirmed', this.checked)" style="margin-top:2px;width:16px;height:16px;cursor:pointer">
-      <span>Voucher amounts and rebooking fee confirmed</span>
-    </label>
-  </div>
-</div>
-<h3>Arrival & Grace Period</h3>
+      id: 'ref-guest',
+      title: 'Guest Journey, Sales &amp; Policies: Source Links',
+      category: 'Reference',
+      eyebrow: 'REFERENCE ONLY',
+      subtitle: 'Procedural detail lives in Delightree and the Learning Plan. Link out — do not duplicate.',
+      content: `<h3>Guest Journey</h3>
+<p>The full Guest Journey curriculum — touchpoints, scripts, role responsibilities, and Guest Recovery model — lives in Delightree. Use the portal's Day 1 Facilitation Guide to run the block. Use this link for the source material.</p>
 <ul>
-<li>Guests should arrive 15–30 minutes before their booking.</li>
-<li>5-minute grace period from session start time.</li>
-<li>After 5 minutes: booking subject to cancellation. Payment issues as a voucher, minus a $50 rebooking fee.</li>
-<li>No-show: booking auto-cancelled, payment forfeited.</li>
+<li><a href="https://app.delightree.com/folders/lznpb993j5p5il58l625pde9" target="_blank" style="color:var(--trigger)">Service Essentials: Guest Journey →</a></li>
+<li><a href="http://sandboxvr.com" target="_blank" style="color:var(--trigger)">Sandbox VR Website →</a> — Brand story and experience overview.</li>
 </ul>
-<h3>Cancellation Policy</h3>
-<ul>
-<li>72+ hours before booking: full refund.</li>
-<li>48–72 hours: $50 fee, remainder as voucher.</li>
-<li>Under 48 hours: no refund.</li>
-</ul>
-<h3>Physical Requirements & Waivers</h3>
-<ul>
-<li>No weight limit, but haptic vests adjust up to 50" chest circumference.</li>
-<li>Not recommended for pregnant guests or those with heart conditions.</li>
-<li>Guests under 18: parent/guardian must be physically present to sign the minor waiver.</li>
-</ul>
-<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Policy knowledge prevents the worst guest service moments — the ones where a GEG gives incorrect information under pressure. Don't just recite the policy. Run scenarios: "A guest arrives 8 minutes late — what do you do?" "A guest wants to cancel tomorrow. What are their options?" Scenario drilling makes policy instinctive.</div></div>
-<h3>Guest Recovery Model</h3>
-<p>When something goes wrong, use the Acknowledge-Empathize-Resolve framework:</p>
-<ul>
-<li><strong>Acknowledge</strong> — Acknowledge the issue without blame or excuses. Keep it calm.</li>
-<li><strong>Empathize</strong> — The guest won't lose playing time. You're on it.</li>
-<li><strong>Resolve</strong> — Find the right solution. Involve leadership for vouchers or refunds. Never penalize a guest for an operational failure.</li>
-</ul>`
-    }
-  ],
-  'Core Concepts': [
+<h3>Sales &amp; KPIs</h3>
+<p>Repeatability and KPI content is covered in the Day 2 sales block. Facilitation notes are in the Day 2 Facilitation Guide. There is no separate source link — the script lives in the Learning Plan.</p>
+<h3>Policies &amp; Procedures</h3>
+<p>Guest policies (late arrivals, waivers, cancellations, refunds, grace period) are covered in Day 1. The standard reference is Learning Plan pages 14–20. Facilitate using scenarios, not by reading the list.</p>`
+    },
     {
-      id: 'core-values',
-      title: 'Mission, Vision & Core Values',
-      category: 'Core Concepts',
-      eyebrow: 'CULTURE',
-      subtitle: 'This is who we are. Everything else follows from here.',
-      content: `<h3>Mission</h3>
-<p>We are taking our Sandbox holodeck platform to the next level — so that it remains the most social and immersive experience you can have with your friends. The Sandbox experience isn't just virtual reality — it's <em>Reality Elevated.</em></p>
-<h3>The Three Core Values</h3>
-<p><strong>We Embrace an Underdog Mindset</strong> — We remember where we started. Resilient, adaptable, scrappy. We don't succeed because we have the most resources — we succeed because we outwork and out-innovate.</p>
-<p><strong>We Are Egoless</strong> — Humility, honesty, coachability. No job is above another. We pursue what's best for the company, not personal agendas. Growth comes through self-awareness and openness to feedback.</p>
-<p><strong>We Win Collectively</strong> — Service is a core function — serving guests and serving each other. We build inclusive, uplifting communities. Communication and transparency are non-negotiables.</p>
-<div class="science-callout"><div class="science-callout-label">Training Science</div><div class="science-callout-text">Values-based orientation (not just rules-based) produces significantly higher employee discretionary effort and alignment with organizational goals (Deci & Ryan, 2000). Trainees who internalize the "why" behind their work outperform those who are only taught the "how." Teach the values first.</div></div>
-<h3>KPIs Overview</h3>
+      id: 'ref-tech',
+      title: 'Technology: Source Links',
+      category: 'Reference',
+      eyebrow: 'REFERENCE ONLY',
+      subtitle: 'Detailed tech SOPs live in Delightree. Link out — do not duplicate.',
+      content: `<h3>Tracking</h3>
 <ul>
-<li><strong>Repeatability %</strong> — Guests who book back-to-back or replay within 6 months.</li>
-<li><strong>Google Review Quantity & Rating</strong> — Social proof that drives new guest acquisition.</li>
-<li><strong>Staff Conversion</strong> — Walk-in to booking conversion rate.</li>
-<li><strong>Video Download & Share Rate</strong> — Souvenir video engagement.</li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/lznpb9bl5kmz149zr93xpwl2" target="_blank" style="color:var(--trigger)">Tech Essentials: Tracking →</a> — Build specs, 20% rule, asset numbers, troubleshooting order.</li>
+<li><a href="https://app.delightree.com/chapters/view/o9ozzbz7nnxx0xkd87bxqll4" target="_blank" style="color:var(--trigger)">Calibration SOP →</a></li>
+</ul>
+<h3>Vests &amp; Props</h3>
+<ul>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/6qzp38pwwr9jt7d25doj76pn" target="_blank" style="color:var(--trigger)">Tech Essentials: Haptic Feedback Vests →</a></li>
+<li><a href="https://app.delightree.com/chapters/view/2l9eep69x5jj0ezo58l8zx6m" target="_blank" style="color:var(--trigger)">Quick Reference Guide: Haptic Feedback Vests →</a></li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/4qjepln3zkom1akjnk6354ol" target="_blank" style="color:var(--trigger)">Tech Essentials: Props →</a></li>
+</ul>
+<h3>Infrastructure</h3>
+<ul>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/j4ne2bb97929086m7p9b8ee6" target="_blank" style="color:var(--trigger)">Technology Essentials: Holodeck Room Servers →</a></li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/mj8nlao797aos2pnwaze72o2" target="_blank" style="color:var(--trigger)">Tech Essentials: Wireless Streaming →</a></li>
+<li><a href="https://app.delightree.com/folders/mj8nedo6jlz7s2q2eoxz378e/b5mzxb8z8bazcazar9252zpm" target="_blank" style="color:var(--trigger)">Technology Essentials: T1 Workflow →</a></li>
 </ul>`
     },
     {
-      id: 'core-experiences',
-      title: 'Sandbox VR Experiences: The Trainer\'s Guide',
-      category: 'Core Concepts',
-      eyebrow: 'EXPERIENCES',
-      subtitle: 'Know them. Love them. Sell them with genuine enthusiasm.',
-      content: `<h3>Why Experience Knowledge Matters</h3>
-<p>GEGs who know the experiences deeply — not just the names but the feelings, the mechanics, the audience — sell repeatability naturally. You cannot generate authentic excitement about something you don't understand.</p>
-<div class="science-callout"><div class="science-callout-label">Coaching Tip</div><div class="science-callout-text">Have every trainee pick three experiences to become the "expert" on during training. When a guest asks, that GEG owns the answer. Distributed expertise in a team reduces bottlenecks and builds individual pride.</div></div>
-<h3>Current Experiences</h3>
+      id: 'ref-systems',
+      title: 'Systems &amp; Operations: Source Links',
+      category: 'Reference',
+      eyebrow: 'REFERENCE ONLY',
+      subtitle: 'Systems and operations SOPs live in Delightree.',
+      content: `<h3>Software</h3>
 <ul>
-<li><strong>Amber Sky</strong> — Sci-fi action. Robotic warriors vs. alien invasion. Hong Kong skyscraper setting. High energy, great for competitive groups.</li>
-<li><strong>Curse of Davy Jones</strong> — Family-friendly pirates. Sword and flintlock. Best for families and first-timers who want fun without fear.</li>
-<li><strong>Deadwood Mansion</strong> — Horror atmosphere. Zombie-infested mansion. For groups who want genuine fear in a safe environment.</li>
-<li><strong>Deadwood Valley</strong> — Action horror. Zombie apocalypse city escape. More kinetic than Mansion.</li>
-<li><strong>Deadwood Phobia</strong> — Psychological horror. Perception-bending. For brave groups who want something truly unsettling.</li>
-<li><strong>Dragonfire: Seekers of the Shard</strong> — Fantasy RPG. Choose your class, fight a dragon. Great for gaming audiences.</li>
-<li><strong>Rebel Moon</strong> — Netflix partnership (Zack Snyder). Sci-fi rebellion. Appeals to film fans and sci-fi enthusiasts.</li>
-<li><strong>Squid Game Virtuals</strong> — Netflix IP. Most-watched show. Massive pop culture hook — the easiest sell to almost any group.</li>
-<li><strong>Unbound Fighting League</strong> — PvP gladiator combat. The only player-vs-player experience. For competitive groups.</li>
-<li><strong>Stranger Things: Catalyst</strong> — Netflix IP. Hawkins' secrets. Massive fan base. Strong family and nostalgia appeal.</li>
+<li><a href="https://app.delightree.com/chapters/view/5qqrqm2ko4ansm272keoq6wx" target="_blank" style="color:var(--trigger)">SOP: Checkfront →</a> — Bookings, check-in, walk-ins, daily manifest.</li>
+</ul>
+<h3>Store Operations</h3>
+<ul>
+<li><a href="http://app.delightree.com" target="_blank" style="color:var(--trigger)">Opening Checklist →</a></li>
+<li><a href="https://app.delightree.com/chapters/view/zb4jjqwwm4e60zqd8lpl362r" target="_blank" style="color:var(--trigger)">Closing Checklist →</a></li>
+<li><a href="https://app.delightree.com/chapters/view/9qxrrw548blphl34935lz7lm" target="_blank" style="color:var(--trigger)">Store Cleaning SOP →</a></li>
+<li><a href="https://app.delightree.com/chapters/view/pzxaaen5x6d4u6xj5838bpnd" target="_blank" style="color:var(--trigger)">Restroom Cleaning Checklist →</a></li>
 </ul>`
     }
   ]
