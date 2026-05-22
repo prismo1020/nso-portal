@@ -1407,6 +1407,7 @@ async function signIn() {
   const password = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
   const btn = document.getElementById('signInBtn');
+  console.log('[signIn] email:', email, '| password length:', password.length);
   errEl.style.display = 'none';
   if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
   btn.textContent = 'Signing in…'; btn.disabled = true;
@@ -1416,8 +1417,10 @@ async function signIn() {
       supabase.auth.signInWithPassword({ email, password }),
       timeout
     ]);
+    console.log('[signIn] result error:', error);
     if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
   } catch (e) {
+    console.log('[signIn] caught exception:', e.message);
     errEl.textContent = e.message || 'Connection error. Try again.';
     errEl.style.display = 'block';
   } finally {
