@@ -31,10 +31,10 @@ const DAYS = [
     blocks: [
       { time: '15 min', title: 'Intros & Store Tour', objectives: ['Gain familiarity with the store layout.','Learn key Sandbox VR vocabulary (pages 8-10 of Learning Plan).','Set the tone — excited, professional, immersive.'], tip: 'Walk the team through the store yourself first, calling out each area by its correct name (Lobby, Barracks, Holodeck). Narrate the Guest Journey as you walk. This primes their mental model before they open a single document.', say: 'Tell the team what they\'re about to do and why each area matters to the Guest.', see: 'Watch for body language — curiosity is a good sign. Note who asks questions.', doText: 'Ask each team member to name one area and its purpose.', resources: ['Sandbox VR Vocab (Learning Plan pages 8-10)'] },
       { time: '30 min', title: 'Introduction to Sandbox VR', objectives: ['Describe Sandbox VR\'s History, Mission, & Core Values.','Discover the VR experiences available.','Understand KPIs and what drives the business.'], tip: 'Don\'t just read the history slides. Tell the story with pride. The detail that Sandbox VR started in Hong Kong in 2017, grew through word of mouth, and now has celebrity investors like Justin Timberlake and Katy Perry — that\'s a story. Make them feel like they\'re joining something special.', say: 'Explain why the mission matters to guests and to the team.', see: 'Watch for trainees who light up when they hear about the experiences. Those are your future top sellers.', doText: 'Have each trainee share one core value they connect with personally.', resources: ['Sandbox VR Website','Learning Plan: History (pages 6-9)','Mission & Core Values (page 7)'] },
-      { time: '60 min', title: 'GEG Responsibilities & the Guest Journey', objectives: ['Watch Service Essentials: Guest Journey video.','Discuss GEG responsibilities at each touchpoint.','Walk through interaction scripts.'], tip: 'Always show the video first, then debrief. Research on multimedia learning (Mayer, 2009) shows that people retain more when they receive visual and auditory information together before verbal discussion. Let the video do the heavy lifting, then you amplify.', say: 'Explain each of the four touchpoints: Entrance/Check-In, Barracks, Holodeck, Post-Experience.', see: 'Watch how trainees respond to the scripted language — are they natural or stiff? Note it.', doText: 'Pair up and practice the check-in script with each other, rotating roles.', resources: ['Service Essentials: Guest Journey (Delightree)','Learning Plan pages 18-20'] },
+      { time: '60 min', title: 'GEG Responsibilities & the Guest Journey', objectives: ['Watch Service Essentials: Guest Journey video.','Discuss GEG responsibilities at each touchpoint.','Walk through interaction scripts.'], tip: 'Always show the video first, then debrief. Research on multimedia learning (Mayer, 2009) shows that people retain more when they receive visual and auditory information together before verbal discussion. Let the video do the heavy lifting, then you amplify.', say: 'Explain each of the four touchpoints: Entrance/Check-In, Barracks, Holodeck, Post-Experience.', see: 'Watch how trainees respond to the scripted language — are they natural or stiff? Note it.', doText: 'Pair up and practice the check-in script with each other, rotating roles.', resources: ['<a href="https://app.delightree.com/chapters/view/kz3q68dxq5n5inwaw936b9n6" target="_blank" style="color:var(--trigger)">▶ Service Essentials: Guest Journey CH 1 — Introduction →</a>','<a href="https://app.delightree.com/chapters/view/rzbo5apd44j8hlqlmnj84j9j" target="_blank" style="color:var(--trigger)">▶ Service Essentials: Guest Journey CH 2 — Lobby →</a>','<a href="https://app.delightree.com/chapters/view/4qjzk9n9nb9pflqlx3knzplx" target="_blank" style="color:var(--trigger)">▶ Service Essentials: Guest Journey CH 3 — Barracks →</a>','<a href="https://app.delightree.com/chapters/view/2l97zx7x6knatlaba3x6kw26" target="_blank" style="color:var(--trigger)">▶ Service Essentials: Guest Journey CH 4 — Holodeck →</a>','<a href="https://app.delightree.com/chapters/view/7qz9kwplp6d306zomwonop6w" target="_blank" style="color:var(--trigger)">▶ Service Essentials: Guest Journey CH 5 — Post Experience →</a>','Learning Plan pages 18-20'] },
       { time: '30 min', title: 'Guest Policies, Procedures & Guest Recovery', objectives: ['Review critical policies: late arrivals, cancellations, waivers, refunds.','Understand the Acknowledge-Empathize-Resolve recovery model.','Practice one Guest Recovery scenario.'], tip: 'Policies only stick when trainees practice applying them to real situations. Use the 5-minute grace period, the $50 rebooking fee, and a frustrated guest scenario as practice prompts. Make it feel real — not hypothetical.', say: 'Walk through the most common guest challenges and the policy response for each.', see: 'Who handles awkward guest scenarios naturally? Who freezes? Both are useful data.', doText: 'Role-play one delayed-guest scenario and one tech-issue recovery.', resources: ['Policies and Procedures (page 14)','Guest Recovery Model (page 14)'] },
       { time: '30 min', title: 'Break', objectives: ['Rest & recharge.'], tip: 'Use break time to do a quick informal check-in with the SM. How are they feeling about running the training? Note any early alignment or gaps.', say: '', see: '', doText: '', resources: [] },
-      { time: '20 min', title: 'Technology Essentials: Tracking', objectives: ['Watch Tech Essentials: Tracking video.','Understand passive vs. active tracking fundamentals.','Learn tracker ball inspection standards (20% rule).'], tip: 'Tracking is the backbone of the entire experience. If trainees don\'t understand why tracker calibration matters, they\'ll treat it as a checkbox. Connect the tech to the guest — a bad calibration equals a broken experience.', say: 'Explain how mocap translates physical movement into the virtual world.', see: 'Look for trainees who seem genuinely curious about the technology — they often become your technical leaders.', doText: 'Inspect tracker balls as a group and practice identifying whether one meets the 20% damage threshold.', resources: ['Tech Essentials: Tracking (Delightree)','Calibration SOP (Delightree)'] },
+      { time: '20 min', title: 'Technology Essentials: Tracking', objectives: ['Watch Tech Essentials: Tracking video.','Understand passive vs. active tracking fundamentals.','Learn tracker ball inspection standards (20% rule).'], tip: 'Tracking is the backbone of the entire experience. If trainees don\'t understand why tracker calibration matters, they\'ll treat it as a checkbox. Connect the tech to the guest — a bad calibration equals a broken experience.', say: 'Explain how mocap translates physical movement into the virtual world.', see: 'Look for trainees who seem genuinely curious about the technology — they often become your technical leaders.', doText: 'Inspect tracker balls as a group and practice identifying whether one meets the 20% damage threshold.', resources: ['<a href="https://app.delightree.com/chapters/view/nm8qwxowdn3lizmdwkb392kb" target="_blank" style="color:var(--trigger)">▶ Tracking CH 1 — Active Tracking Headmount Intro →</a>','<a href="https://app.delightree.com/chapters/view/qn6q3ex3wb7mfbdwb4bna8x9" target="_blank" style="color:var(--trigger)">▶ Tracking CH 2 — Control Panel & Modes →</a>','<a href="https://app.delightree.com/chapters/view/lznqb2x884jr0wkdw6w329z5" target="_blank" style="color:var(--trigger)">▶ Tracking CH 3 — Troubleshooting and Care →</a>','<a href="https://app.delightree.com/chapters/view/kz3q66aal9baclewb2359e2q" target="_blank" style="color:var(--trigger)">▶ Tracking CH 4 — Passive Tracking Intro →</a>','<a href="https://app.delightree.com/chapters/view/aamqzz73az8btwmkr7j4zz6w" target="_blank" style="color:var(--trigger)">▶ Tracking CH 5 — Passive Tracking Props →</a>','<a href="https://app.delightree.com/chapters/view/zb43wwlaej32fl256wkn77ab" target="_blank" style="color:var(--trigger)">▶ Tracking CH 6 — Passive Limb Tracker Assembly →</a>','<a href="https://app.delightree.com/chapters/view/xxmpbbxklb9aideb7qwojbw8" target="_blank" style="color:var(--trigger)">▶ Tracking CH 7 — Passive Tracking Prop Tracker Assembly →</a>','Calibration SOP (Delightree)'] },
       { time: '240+ min', title: 'Build All Store Trackers', objectives: ['Complete the Procedure Checklist: Trackers.','Build all limb and prop trackers as a group.','Ensure correct screw sizing (4x8 for limb trackers).'], tip: 'This is high-repetition hands-on learning at its best — exactly where retention rates spike. Space out the work so everyone touches each step multiple times, not just once. Blocked practice builds initial skill; varied practice builds lasting retention. Note: limb trackers use 4x8 screws, NOT 4x6.', say: 'Walk through each step of the Procedure Checklist before starting.', see: 'Observe technique and confidence. Anyone struggling becomes a priority for additional coaching.', doText: 'Every trainee builds at least one tracker from start to finish independently.', resources: ['Procedure Checklist: Trackers (page 26)'] },
     ]
   },
@@ -44,15 +44,15 @@ const DAYS = [
     type: 'Learning Plan',
     focus: 'Day 2 is about equipping the team to handle a full session operationally. By end of day, every trainee should be able to navigate Checkfront, demonstrate vest pairing, and understand our sales approach.',
     blocks: [
-      { time: '60 min', title: 'Booking & Experience Software: Checkfront & Silica', objectives: ['Navigate Checkfront to book, check-in, and manage sessions.','Use the Silica App on the staff iPad.','Practice a complete booking workflow.'], tip: 'Software confidence comes from repetition, not explanation. Give trainees hands-on time with the system as early as possible. Pair them up so they teach each other — peer teaching drives deeper processing.', say: 'Walk through a complete booking scenario while team follows along.', see: 'Watch for hesitation on the check-in flow — this is where new GEGs lose time with guests.', doText: 'Each trainee completes a practice booking and check-in independently.', resources: ['Checkfront Procedures Checklist (page 21)','SOP – Checkfront (Delightree)','Silica App (page 22)'] },
+      { time: '60 min', title: 'Booking & Experience Software: Checkfront & Silica', objectives: ['Navigate Checkfront to book, check-in, and manage sessions.','Use the Silica App on the staff iPad.','Practice a complete booking workflow.'], tip: 'Software confidence comes from repetition, not explanation. Give trainees hands-on time with the system as early as possible. Pair them up so they teach each other — peer teaching drives deeper processing.', say: 'Walk through a complete booking scenario while team follows along.', see: 'Watch for hesitation on the check-in flow — this is where new GEGs lose time with guests.', doText: 'Each trainee completes a practice booking and check-in independently.', resources: ['Checkfront Procedures Checklist (page 21)','SOP – Checkfront (Delightree)','<a href="https://app.delightree.com/chapters/view/qnn62o8el7a9h885pblbwmqp" target="_blank" style="color:var(--trigger)">▶ Silica CH 1 — Intro and Mobile Check-In →</a>','<a href="https://app.delightree.com/chapters/view/j44nba73ea9mtjlnoador9b7" target="_blank" style="color:var(--trigger)">▶ Silica CH 2 — Running Sessions →</a>'] },
       { time: '60 min', title: 'How to Sell Sandbox VR', objectives: ['Understand the Repeatability KPI and the three moments to sell it.','Practice back-to-back booking conversations.','Understand Staff Conversion and walk-in engagement.'], tip: 'Selling at Sandbox VR isn\'t about pushing product — it\'s about extending a great experience. Trainees who feel awkward about sales usually do when framed as "convince them to spend money." Reframe it: you are offering them more of something they\'re already about to love.', say: 'Demonstrate the three repeatability moments: check-in, mid-experience (while geared up), post-experience.', see: 'Note natural salespeople vs. those who seem hesitant. Both can be great with the right framing.', doText: 'Role-play all three repeatability moments in rotation. Everyone goes twice.', resources: ['Upselling (page 13)'] },
-      { time: '30 min', title: 'Technology Essentials: Holodeck Room Servers', objectives: ['Watch Technology Essentials: Holodeck Room Servers.','Understand the roles of EMU (Experience, Mocap, Video Servers).','Review basic hardware layout.'], tip: 'Connect the servers to what trainees already learned about tracking. EMU servers are what take the tracker data and turn it into the VR world. When they understand the signal flow, troubleshooting becomes intuitive instead of mysterious.', say: 'Explain what each server does in plain language — not technical specs.', see: 'Who asks the most system-level questions? Those are your tech-inclined GEGs.', doText: 'Trainees label each server type on a diagram before touching the hardware.', resources: ['Technology Essentials: Holodeck Room Servers (Delightree)'] },
+      { time: '30 min', title: 'Technology Essentials: Holodeck Room Servers', objectives: ['Watch Technology Essentials: Holodeck Room Servers.','Understand the roles of EMU (Experience, Mocap, Video Servers).','Review basic hardware layout.'], tip: 'Connect the servers to what trainees already learned about tracking. EMU servers are what take the tracker data and turn it into the VR world. When they understand the signal flow, troubleshooting becomes intuitive instead of mysterious.', say: 'Explain what each server does in plain language — not technical specs.', see: 'Who asks the most system-level questions? Those are your tech-inclined GEGs.', doText: 'Trainees label each server type on a diagram before touching the hardware.', resources: ['<a href="https://app.delightree.com/chapters/view/6qz4kkmjj2pbuxaek6j3lqbm" target="_blank" style="color:var(--trigger)">▶ Holodeck Server Rack CH 1 — Introduction →</a>','<a href="https://app.delightree.com/chapters/view/7qz9k29par75ipw9bw7639lp" target="_blank" style="color:var(--trigger)">▶ Holodeck Server Rack CH 2 — VNC →</a>','<a href="https://app.delightree.com/chapters/view/b5mqdw47pzad1pn8wmmzaqbk" target="_blank" style="color:var(--trigger)">▶ Holodeck Server Rack CH 3 — Daily Operations and Care →</a>'] },
       { time: '30 min', title: 'Procedure Checklist: Holodeck Room Servers', objectives: ['Complete the Basic Technology Procedures Checklist.','Review cleaning & maintenance responsibilities for Holodeck Room Servers.'], tip: 'Checklists reduce cognitive load and catch errors that confidence-based working misses. Frame checklists not as bureaucracy but as the standard every Sandbox location holds itself to — the mark of a professional team.', say: 'Walk through each step before trainees attempt it.', see: 'Observe speed and accuracy. Both extremes need coaching.', doText: 'Each trainee completes the checklist solo and self-checks against the answer.', resources: ['Basic Procedures Checklist (page 29)'] },
       { time: '30 min', title: 'Break', objectives: ['Rest & recharge.'], tip: '', say: '', see: '', doText: '', resources: [] },
-      { time: '30 min', title: 'Technology Essentials: Wireless Streaming', objectives: ['Watch Tech Essentials: Wireless Streaming.','Understand hardware and software components of wireless streaming.'], tip: '', say: 'Cover the key components: headsets, base stations, wireless access points.', see: 'Watch for anyone who looks confused — wireless streaming has the most moving parts.', doText: 'Trainees draw the wireless signal flow from headset to server on a whiteboard.', resources: ['Tech Essentials: Wireless Streaming (Delightree)'] },
+      { time: '30 min', title: 'Technology Essentials: Wireless Streaming', objectives: ['Watch Tech Essentials: Wireless Streaming.','Understand hardware and software components of wireless streaming.'], tip: '', say: 'Cover the key components: headsets, base stations, wireless access points.', see: 'Watch for anyone who looks confused — wireless streaming has the most moving parts.', doText: 'Trainees draw the wireless signal flow from headset to server on a whiteboard.', resources: ['<a href="https://app.delightree.com/chapters/view/qn6q38w5ow6a16x89xjbrn42" target="_blank" style="color:var(--trigger)">▶ Wireless CH 1 — Intro to Wireless →</a>','<a href="https://app.delightree.com/chapters/view/eo5ql8w73487u7lbmde4wbx2" target="_blank" style="color:var(--trigger)">▶ Wireless CH 2 — HTC Basics Wireless →</a>','<a href="https://app.delightree.com/chapters/view/6qz4ke8e5e5qhxaek6edjm2z" target="_blank" style="color:var(--trigger)">▶ Wireless CH 3 — Hardware and Software Infrastructure →</a>','<a href="https://app.delightree.com/chapters/view/nm8qwpjw48kjczmdwkdoe79p" target="_blank" style="color:var(--trigger)">▶ Wireless CH 4 — Wireless Daily Operations →</a>'] },
       { time: '60 min', title: 'Procedure Checklist: Wireless Streaming', objectives: ['Complete the Wireless Streaming Procedure Checklist.','Demonstrate ability to reset and reconnect wireless components.'], tip: 'This is a hands-on competency that every GEG will need to perform under guest pressure. Make sure every trainee does the full reset process at least twice before signing off.', say: 'Walk through each procedure step with explanations.', see: 'Watch for trainees who skip steps or do them out of order.', doText: 'Every trainee completes the full wireless reset procedure independently.', resources: ['Wireless Procedure Checklist (page 26)'] },
-      { time: '30 min', title: 'Technology Essentials: Haptic Vests', objectives: ['Watch Tech Essentials: Haptic Vests video.','Understand haptic feedback technology and vest adjustment.','Complete vest pairing & troubleshooting activity.'], tip: 'The haptic vest is what guests are most excited about. Use that. When trainees understand that a poorly fitted vest means muted haptics and a diminished guest experience, they care more about getting it right.', say: 'Demonstrate proper vest fitting: adjustment range (up to 50"), pairing process, and LED status indicators.', see: 'Watch for proper adjustment technique — vest fit affects both haptic quality and guest comfort.', doText: 'Pair, troubleshoot, and re-pair vests in groups of 3. Rotate until each person has done it twice.', resources: ['Tech Essentials: Haptic Vests (Delightree)','Quick Reference Guide - Haptic Vests'] },
-      { time: '30 min', title: 'Technology Essentials: Props', objectives: ['Watch Tech Essentials: Props.','Understand prop types (Gun, Wand, Pistol) and their experience assignments.','Complete prop pairing & troubleshooting activity.'], tip: 'Props are often where new GEGs lose confidence under pressure because props don\'t always pair on the first attempt. Give trainees permission to troubleshoot — normalize the issue-solving process as part of the role.', say: 'Explain each prop type and which experiences they are used for.', see: 'Who handles prop troubleshooting calmly? Who gets frustrated? Coaching opportunity.', doText: 'Each trainee pairs all three prop types successfully and practices the re-pair process.', resources: ['Tech Essentials: Props (Delightree)','Procedure Checklist: Prop Pairing (page 27)'] },
+      { time: '30 min', title: 'Technology Essentials: Haptic Vests', objectives: ['Watch Tech Essentials: Haptic Vests video.','Understand haptic feedback technology and vest adjustment.','Complete vest pairing & troubleshooting activity.'], tip: 'The haptic vest is what guests are most excited about. Use that. When trainees understand that a poorly fitted vest means muted haptics and a diminished guest experience, they care more about getting it right.', say: 'Demonstrate proper vest fitting: adjustment range (up to 50"), pairing process, and LED status indicators.', see: 'Watch for proper adjustment technique — vest fit affects both haptic quality and guest comfort.', doText: 'Pair, troubleshoot, and re-pair vests in groups of 3. Rotate until each person has done it twice.', resources: ['<a href="https://app.delightree.com/chapters/view/rzbo5lzdjko6ul64b95a2j5e" target="_blank" style="color:var(--trigger)">▶ Vests CH 1 — Introduction to Vests →</a>','<a href="https://app.delightree.com/chapters/view/mj8qelb9d9w3sqxw37b9lnzd" target="_blank" style="color:var(--trigger)">▶ Vests CH 2 — Vest Pairing →</a>','<a href="https://app.delightree.com/chapters/view/qn6q3lboedjoh5oz3xp2zbj8" target="_blank" style="color:var(--trigger)">▶ Vests CH 3 — Vest Operations →</a>','Quick Reference Guide - Haptic Vests'] },
+      { time: '30 min', title: 'Technology Essentials: Props', objectives: ['Watch Tech Essentials: Props.','Understand prop types (Gun, Wand, Pistol) and their experience assignments.','Complete prop pairing & troubleshooting activity.'], tip: 'Props are often where new GEGs lose confidence under pressure because props don\'t always pair on the first attempt. Give trainees permission to troubleshoot — normalize the issue-solving process as part of the role.', say: 'Explain each prop type and which experiences they are used for.', see: 'Who handles prop troubleshooting calmly? Who gets frustrated? Coaching opportunity.', doText: 'Each trainee pairs all three prop types successfully and practices the re-pair process.', resources: ['<a href="https://app.delightree.com/chapters/view/o9oqp8a6o43lizwrp8l6amza" target="_blank" style="color:var(--trigger)">▶ Props CH 1 — WiFi Prop Pairing & Troubleshooting →</a>','<a href="https://app.delightree.com/chapters/view/9qxojzxldz3dtezr3jnb7dp5" target="_blank" style="color:var(--trigger)">▶ Props CH 2 — Building Props →</a>','<a href="https://app.delightree.com/chapters/view/xxx3qoqnpm45c6oqmq9j267o" target="_blank" style="color:var(--trigger)">▶ Props CH 3 — Daily Operations and Care →</a>','Procedure Checklist: Prop Pairing (page 27)'] },
     ]
   },
   {
@@ -62,7 +62,7 @@ const DAYS = [
     focus: 'Day 3 ties everything together. The shift from knowledge to execution happens here. Role-play should be the majority of the day — the more realistic the scenarios, the better.',
     blocks: [
       { time: '60 min', title: 'Opening Procedures', objectives: ['Practice completing the Opening Checklist.','Complete Room Calibration for all rooms.','Identify and correct any calibration issues independently.'], tip: 'Opening is where the day\'s operational success is set. Trainees who can execute a clean open will handle busy days with confidence. Trainees who skip steps will create downstream problems. Don\'t let shortcuts slide today.', say: 'Walk through the Opening Checklist item by item before trainees attempt it.', see: 'Watch for the instinct to rush. Speed comes with experience — completeness comes with habit.', doText: 'Each trainee leads the opening sequence for one room from start to finish.', resources: ['Opening Checklist (Delightree)','Room Calibration SOP (Delightree)','Checklist (page 28)'] },
-      { time: '30 min', title: 'T1 Ticket Workflow', objectives: ['Watch Technology Essentials: T1 Workflow.','Understand when to escalate to T1 (5-minute rule).','Practice submitting a T1 ticket.'], tip: 'The 5-minute rule exists for a reason: GEGs often try to resolve things themselves out of pride or guest embarrassment. Make it clear that fast escalation to T1 is the professional move, not an admission of failure.', say: 'Cover the 5-minute escalation rule, what info to include in a ticket, and how to communicate the delay to guests.', see: 'Look for confidence and clarity in how trainees describe a tech issue — this is what they\'ll need under real-time pressure.', doText: 'Each trainee submits a practice T1 ticket describing a hypothetical issue.', resources: ['Technology Essentials: T1 Workflow (Delightree)'] },
+      { time: '30 min', title: 'T1 Ticket Workflow', objectives: ['Watch Technology Essentials: T1 Workflow.','Understand when to escalate to T1 (5-minute rule).','Practice submitting a T1 ticket.'], tip: 'The 5-minute rule exists for a reason: GEGs often try to resolve things themselves out of pride or guest embarrassment. Make it clear that fast escalation to T1 is the professional move, not an admission of failure.', say: 'Cover the 5-minute escalation rule, what info to include in a ticket, and how to communicate the delay to guests.', see: 'Look for confidence and clarity in how trainees describe a tech issue — this is what they\'ll need under real-time pressure.', doText: 'Each trainee submits a practice T1 ticket describing a hypothetical issue.', resources: ['<a href="https://app.delightree.com/chapters/view/b5mq93opkldqt5mqd4rn3b34" target="_blank" style="color:var(--trigger)">▶ Tech Essentials: T1 Communication →</a>'] },
       { time: '2+ hrs', title: 'Role-Play Block 1: Full Guest Journey', objectives: ['Practice the complete Guest Journey from check-in to post-experience.','Apply scripts naturally — not robotically.','Handle at least one recovery scenario per group.'], tip: 'Rotate groups of 3 through each station while the rest practice tech tasks. Use a rotation so no one sits idle. The goal is maximum repetition in the time available. Research shows that spaced repetition dramatically outperforms massed practice for retention (Ebbinghaus, 1885; Kornell & Bjork, 2008).', say: 'Brief the team on what a "full run" looks like. Set the standard before they start.', see: 'Observe energy, language, and guest handling. Note who excels at each touchpoint.', doText: 'Rotate groups of 3 through the full Guest Journey. Coach walks the floor and gives live feedback.', resources: [] },
       { time: '30 min', title: 'Break', objectives: ['Rest & recharge.'], tip: '', say: '', see: '', doText: '', resources: [] },
       { time: '2+ hrs', title: 'Role-Play Block 2: Scenarios & Cleaning', objectives: ['Practice additional roleplay scenarios focusing on weak areas from Block 1.','Complete cleaning & maintenance for props, vests, headsets, and limb trackers.'], tip: 'Use Block 2 to address the gaps you identified in Block 1. If someone struggled with vest pairing — put them back on vests. If the sales pitch was weak — drill repeatability. Targeted practice in the areas of weakness is more efficient than general repetition.', say: 'Debrief Block 1 before starting. Call out wins and name the specific improvements needed.', see: 'Watch for improvement from Block 1. Acknowledge it publicly — positive reinforcement accelerates learning.', doText: 'Run targeted scenarios based on Block 1 observations. Cleaning happens alongside.', resources: [] },
@@ -736,7 +736,8 @@ function navigate(view) {
     knowledge: 'Knowledge Base',
     franchise: 'Day 0 Checks',
     leadership: 'Leadership Lens',
-    admin: 'All Openings'
+    admin: 'All Openings',
+    videos: 'Training Videos'
   };
   document.getElementById('topbarTitle').textContent = titles[view] || view;
   state.currentView = view;
@@ -750,7 +751,8 @@ function navigate(view) {
     knowledge: 'nav-kb',
     franchise: 'nav-franchise',
     leadership: 'nav-leadership',
-    admin: 'nav-admin'
+    admin: 'nav-admin',
+    videos: 'nav-videos'
   };
   const navEl = document.getElementById(navIdMap[view]);
   if (navEl) navEl.classList.add('active');
@@ -763,6 +765,7 @@ function navigate(view) {
   if (view === 'franchise') renderFranchiseChecks();
   if (view === 'leadership') renderLeadershipLens();
   if (view === 'admin') renderAdminPage();
+  if (view === 'videos') renderVideosPage();
 }
 
 // ============================================================
@@ -1869,6 +1872,109 @@ async function exportAllAdmin() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download='nso_admin_export.csv'; a.click();
   showToast('Admin data exported!', 'success');
+}
+
+// ============================================================
+// TRAINING VIDEOS
+// ============================================================
+function renderVideosPage() {
+  var el = document.getElementById('pageContent');
+  if (!el) return;
+
+  var VIDEOS = {
+    'Tech Essentials: Tracking': [
+      { title: 'CH 1 — Active Tracking Headmount Intro', url: 'https://app.delightree.com/chapters/view/nm8qwxowdn3lizmdwkb392kb' },
+      { title: 'CH 2 — Active Tracking Headmount Control Panel & Modes', url: 'https://app.delightree.com/chapters/view/qn6q3ex3wb7mfbdwb4bna8x9' },
+      { title: 'CH 3 — Active Tracking Headmount Troubleshooting and Care', url: 'https://app.delightree.com/chapters/view/lznqb2x884jr0wkdw6w329z5' },
+      { title: 'CH 4 — Passive Tracking Intro', url: 'https://app.delightree.com/chapters/view/kz3q66aal9baclewb2359e2q' },
+      { title: 'CH 5 — Passive Tracking Props', url: 'https://app.delightree.com/chapters/view/aamqzz73az8btwmkr7j4zz6w' },
+      { title: 'CH 6 — Passive Limb Tracker Assembly', url: 'https://app.delightree.com/chapters/view/zb43wwlaej32fl256wkn77ab' },
+      { title: 'CH 7 — Passive Tracking Prop Tracker Assembly', url: 'https://app.delightree.com/chapters/view/xxmpbbxklb9aideb7qwojbw8' },
+    ],
+    'Tech Essentials: Wireless': [
+      { title: 'CH 1 — Intro to Wireless', url: 'https://app.delightree.com/chapters/view/qn6q38w5ow6a16x89xjbrn42' },
+      { title: 'CH 2 — HTC Basics Wireless', url: 'https://app.delightree.com/chapters/view/eo5ql8w73487u7lbmde4wbx2' },
+      { title: 'CH 3 — Hardware and Software Infrastructure', url: 'https://app.delightree.com/chapters/view/6qz4ke8e5e5qhxaek6edjm2z' },
+      { title: 'CH 4 — Wireless Daily Operations', url: 'https://app.delightree.com/chapters/view/nm8qwpjw48kjczmdwkdoe79p' },
+    ],
+    'Tech Essentials: Holodeck Server Rack': [
+      { title: 'CH 1 — Introduction', url: 'https://app.delightree.com/chapters/view/6qz4kkmjj2pbuxaek6j3lqbm' },
+      { title: 'CH 2 — VNC', url: 'https://app.delightree.com/chapters/view/7qz9k29par75ipw9bw7639lp' },
+      { title: 'CH 3 — Daily Operations and Care', url: 'https://app.delightree.com/chapters/view/b5mqdw47pzad1pn8wmmzaqbk' },
+    ],
+    'Tech Essentials: Haptic Vests': [
+      { title: 'CH 1 — Introduction to Vests', url: 'https://app.delightree.com/chapters/view/rzbo5lzdjko6ul64b95a2j5e' },
+      { title: 'CH 2 — Vest Pairing', url: 'https://app.delightree.com/chapters/view/mj8qelb9d9w3sqxw37b9lnzd' },
+      { title: 'CH 3 — Vest Operations', url: 'https://app.delightree.com/chapters/view/qn6q3lboedjoh5oz3xp2zbj8' },
+    ],
+    'Tech Essentials: Props': [
+      { title: 'CH 1 — WiFi Prop Pairing & Troubleshooting', url: 'https://app.delightree.com/chapters/view/o9oqp8a6o43lizwrp8l6amza' },
+      { title: 'CH 2 — Building Props', url: 'https://app.delightree.com/chapters/view/9qxojzxldz3dtezr3jnb7dp5' },
+      { title: 'CH 3 — Props Daily Operations and Care', url: 'https://app.delightree.com/chapters/view/xxx3qoqnpm45c6oqmq9j267o' },
+    ],
+    'Tech Essentials: Silica': [
+      { title: 'CH 1 — Intro and Mobile Check-In', url: 'https://app.delightree.com/chapters/view/qnn62o8el7a9h885pblbwmqp' },
+      { title: 'CH 2 — Running Sessions', url: 'https://app.delightree.com/chapters/view/j44nba73ea9mtjlnoador9b7' },
+    ],
+    'Tech Essentials: Other': [
+      { title: 'T1 Communication', url: 'https://app.delightree.com/chapters/view/b5mq93opkldqt5mqd4rn3b34' },
+      { title: 'HTC Handling Guide', url: 'https://app.delightree.com/chapters/view/b5mqdo42wro6ta7r4xwj5kpj' },
+    ],
+    'Service Essentials: Guest Journey': [
+      { title: 'CH 1 — Introduction to Guest Journey', url: 'https://app.delightree.com/chapters/view/kz3q68dxq5n5inwaw936b9n6' },
+      { title: 'CH 2 — Lobby', url: 'https://app.delightree.com/chapters/view/rzbo5apd44j8hlqlmnj84j9j' },
+      { title: 'CH 3 — Barracks', url: 'https://app.delightree.com/chapters/view/4qjzk9n9nb9pflqlx3knzplx' },
+      { title: 'CH 4 — Holodeck', url: 'https://app.delightree.com/chapters/view/2l97zx7x6knatlaba3x6kw26' },
+      { title: 'CH 5 — Post Experience', url: 'https://app.delightree.com/chapters/view/7qz9kwplp6d306zomwonop6w' },
+    ],
+    'Service Essentials: Experiences': [
+      { title: 'Age of Dinosaurs', url: 'https://app.delightree.com/chapters/view/7qqxb9naljwdu96kzkwb3l5l' },
+      { title: 'Deadwood Phobia', url: 'https://app.delightree.com/chapters/view/aamqzj6366jou86e8x82xd8r' },
+      { title: 'Exterminator', url: 'https://app.delightree.com/chapters/view/o9oqp69znp640zqxdrnbam83' },
+      { title: 'Gatling Gun', url: 'https://app.delightree.com/chapters/view/2l97zzkazjpzsol45dpnnklo' },
+    ],
+  };
+
+  var sectionColors = {
+    'Tech Essentials: Tracking': 'var(--trigger)',
+    'Tech Essentials: Wireless': 'var(--trigger)',
+    'Tech Essentials: Holodeck Server Rack': 'var(--trigger)',
+    'Tech Essentials: Haptic Vests': 'var(--trigger)',
+    'Tech Essentials: Props': 'var(--trigger)',
+    'Tech Essentials: Silica': 'var(--trigger)',
+    'Tech Essentials: Other': 'var(--trigger)',
+    'Service Essentials: Guest Journey': 'var(--warp)',
+    'Service Essentials: Experiences': 'var(--warp)',
+  };
+
+  var html = '<div class="page-header" style="margin-bottom:24px"><div>' +
+    '<div class="page-title">Training Videos</div>' +
+    '<div class="page-subtitle">All Delightree training videos — cast to the post-experience TV during each block.</div>' +
+    '</div></div>';
+
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">';
+
+  Object.keys(VIDEOS).forEach(function(section) {
+    var color = sectionColors[section] || 'var(--trigger)';
+    var isTech = section.startsWith('Tech');
+    var badgeColor = isTech ? 'blue' : 'green';
+    html += '<div class="card">';
+    html += '<div class="card-header" style="padding-bottom:12px">';
+    html += '<div class="card-title" style="font-size:14px">' + section + '</div>';
+    html += '<span class="badge badge-' + badgeColor + '">' + (isTech ? 'Tech' : 'Service') + '</span>';
+    html += '</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:6px;padding:0 20px 16px">';
+    VIDEOS[section].forEach(function(v) {
+      html += '<a href="' + v.url + '" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-light);text-decoration:none;color:var(--text-primary);font-size:13px;transition:background 0.15s" onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'transparent\'">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+        '<span>' + v.title + '</span>' +
+        '</a>';
+    });
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 // ============================================================
