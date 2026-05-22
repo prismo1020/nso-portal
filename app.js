@@ -156,8 +156,8 @@ const KB = {
 <div class="science-callout"><div class="science-callout-label">Coach Principle</div><div class="science-callout-text">The Learning Plan exists because sequence matters. Trainees who learn tracking before they understand the Guest Journey have the wrong mental model. Do not skip blocks or reorder the day unless the store is genuinely not ready for a specific activity.</div></div>
 <h3>Where It Lives</h3>
 <ul>
+<li><a href="https://app.delightree.com/chapters/view/nmm89lolo598sr5opzam7nz3" target="_blank" style="color:var(--trigger)">Open the NSO GEG Learning Plan on Delightree →</a></li>
 <li>The full Learning Plan is printed and should be in your coach kit before Day 1.</li>
-<li>Digital version: provided by L&amp;D prior to the opening.</li>
 <li>All referenced Delightree resources are linked in the <strong>Delightree Resource Links</strong> article in this Knowledge Base.</li>
 </ul>
 <h3>How to Follow the Day-by-Day Structure</h3>
@@ -190,6 +190,7 @@ const KB = {
       subtitle: 'Every resource coaches and trainees need, in one place.',
       content: `<h3>How to Use This Page</h3>
 <p>These are the Delightree resources referenced in the NSO GEG Learning Plan. Open the relevant link before each training block. Where completion tracking is required, make sure every trainee is logged into their own Delightree account.</p>
+<p><a href="https://app.delightree.com/chapters/view/nmm89lolo598sr5opzam7nz3" target="_blank" style="color:var(--trigger);font-weight:600">→ Open the NSO GEG Learning Plan</a></p>
 <h3>Brand &amp; Guest Experience</h3>
 <ul>
 <li><a href="http://sandboxvr.com" target="_blank" style="color:var(--trigger)">Sandbox VR Website →</a> — Brand story, experiences, and context for the Day 1 intro block.</li>
