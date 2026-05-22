@@ -224,6 +224,68 @@ const KB = {
 <div class="science-callout"><div class="science-callout-label">Dead Spots</div><div class="science-callout-text">If tracking fails consistently in one specific area of the holodeck, that may be a camera dead spot. Do not adjust or re-angle Vicon cameras. Submit a T1 tracking ticket and wait for confirmation before any camera work is done.</div></div>`
     },
     {
+      id: 'tech-tracker-assembly-line',
+      title: 'Assembly Line Process for Building Trackers',
+      category: 'Technology',
+      eyebrow: 'TECH ESSENTIALS',
+      subtitle: 'The fastest and most accurate way to build a full store\'s worth of trackers.',
+      content: `<h3>Why Assembly Line?</h3>
+<p>Building trackers one at a time is slow and error-prone. The assembly line system assigns each person a single repeated task, which dramatically increases speed and accuracy through repetition. Three to four teams work in parallel — each handling one phase of the build — so a full store's tracker set can be completed in a fraction of the time.</p>
+<div class="science-callout"><div class="science-callout-label">Training Science</div><div class="science-callout-text">Blocked practice — repeating the same task over and over before moving to the next — builds initial skill faster than switching between tasks. The assembly line leverages this: a builder who puts the same pin in the same position 30 times in a row makes far fewer errors than one who builds every tracker from start to finish.</div></div>
+<h3>The Teams</h3>
+
+<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🏷️ Sticker Captain — 1–2 people</h4>
+<p>The Sticker Captains are responsible for placing stickers on the predetermined quantity of trackers being built. They must have a list of quantities ready and distribute the correct sticker for each tracker type.</p>
+<ul>
+<li>Ensure each builder is building trackers <strong>in order of quantity</strong> — the same build repeats over and over until that type is finished.</li>
+<li>This creates accuracy through repetition: a builder who builds 5 red left hands back-to-back makes fewer mistakes than one switching between types.</li>
+<li>Pass pre-stickered bases forward to the Builder Team as they are completed.</li>
+</ul>
+
+<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🔧 Builder Team — 3–5 people</h4>
+<p>This team hand-tightens tracker pins to the correct position on each tracker base. Each builder is assigned <strong>one tracker type</strong> and repeats that build until their quantity is done.</p>
+<ul>
+<li>Example: Builder #1 builds 5 red left hands. Builder #2 builds 5 red right hands. Builder #3 builds 5 blue left hands. And so on.</li>
+<li>Builders receive pre-stickered bases from the Sticker Captains and pass completed bases forward to the Screwdriver Team.</li>
+<li>Pins are hand-tightened only — never use tools at this stage.</li>
+</ul>
+
+<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🪛 Screwdriver Team — 3–5 people</h4>
+<p>This team secures tracker balls to each pin and screws the tracker bases into their corresponding mounts based on tracker type.</p>
+<ul>
+<li>Receive built bases from the Builder Team and complete the mechanical fastening.</li>
+<li>Use the correct screw size for each tracker type — limb trackers use <strong>4x8 screws</strong> (not 4x6).</li>
+<li>Pass completed tracker assemblies forward to the Velcro/Mount Team.</li>
+</ul>
+
+<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">🪢 Velcro / Mount Team — 2–4 people</h4>
+<p>This team completes the final assembly steps:</p>
+<ul>
+<li>Thread Velcro through the rubber body tracker mounts.</li>
+<li>Secure weapon mounts to the weapons.</li>
+<li>Slide HMD mounts onto the PICO headsets.</li>
+</ul>
+<p>This team is the end of the line — their output is a finished, ready-to-use tracker.</p>
+
+<h4 style="font-size:14px;font-weight:700;color:var(--hb);margin:20px 0 6px">✅ Validators — Managers / Leads</h4>
+<p>Validators are responsible for quality control and system verification. They do not build — they check.</p>
+<ul>
+<li>Test the tightness of each completed tracker and adjust as needed.</li>
+<li>Ensure trackers are built strong and sufficiently tight — loose pins cause tracking drift.</li>
+<li>Place each completed tracker inside a holodeck and confirm it is recognized correctly in the MoCap view (Vicon Evoke).</li>
+<li>Flag any tracker that does not appear or appears incorrectly for rebuild before it enters rotation.</li>
+</ul>
+<div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Run this on Day 1 during the "Build All Store Trackers" block. Assign roles before starting — don't let trainees self-organize or you'll end up with everyone crowding the screwdrivers. Put your fastest learner as a Sticker Captain so they can manage the pace. Use this activity to observe who takes quality seriously and who rushes — it tells you a lot about how they'll handle guest-facing pressure later.</div></div>
+
+<h3>Tips for Running the Line Smoothly</h3>
+<ul>
+<li><strong>Brief before you build.</strong> Walk everyone through their role before a single tracker is touched. Five minutes of clarity saves thirty minutes of rework.</li>
+<li><strong>Quantity lists matter.</strong> The Sticker Captain's list is the single source of truth. If they're off, everyone downstream is off.</li>
+<li><strong>Keep the line moving.</strong> If one station bottlenecks, shift a person. The Screwdriver Team often needs the most people.</li>
+<li><strong>Validators are not builders.</strong> If validators start building, quality checks get skipped. Keep them on quality only.</li>
+</ul>`
+    },
+    {
       id: 'tech-vests',
       title: 'Haptic Vests: Fitting, Pairing & Care',
       category: 'Technology',
