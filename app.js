@@ -246,9 +246,6 @@ const COMPETENCIES = [
   { day: 2, id: 'c2-2', name: 'Delivers repeatability pitch ×3' },
   { day: 2, id: 'c2-3', name: 'Pairs haptic vest independently' },
   { day: 2, id: 'c2-4', name: 'Pairs all prop types (Gun, Wand, Pistol)' },
-  { day: 2, id: 'c2-5', name: 'Completes full wireless reset' },
-  { day: 2, id: 'c2-6', name: 'Stores all equipment correctly post-session' },
-  { day: 2, id: 'c2-7', name: 'Handles gear carefully — no drops or rough use' },
 
   // Day 3 — Role-Play, Ops & Facility Standards
   { day: 3, id: 'c3-1', name: 'Leads opening procedures independently' },
@@ -256,22 +253,16 @@ const COMPETENCIES = [
   { day: 3, id: 'c3-3', name: 'Runs full Guest Journey without prompting' },
   { day: 3, id: 'c3-4', name: 'Tracks up a full group correctly' },
   { day: 3, id: 'c3-5', name: 'Leads closing procedures independently' },
-  { day: 3, id: 'c3-6', name: 'BOH, server room & storage clean and tour-ready' },
-  { day: 3, id: 'c3-7', name: 'Faulty gear identified, logged & escalated correctly' },
 
   // Day 4 — Full Roleplay & Leadership Habits
   { day: 4, id: 'c4-1', name: 'Performs all roles in Guest Journey rotation' },
   { day: 4, id: 'c4-2', name: 'Handles live tech issue without coach support' },
-  { day: 4, id: 'c4-3', name: 'Executes guest recovery in a live scenario' },
-  { day: 4, id: 'c4-4', name: 'SM/ASM explains today\'s Daily Budgeted Goal', smOnly: true },
   { day: 4, id: 'c4-5', name: 'SM/ASM describes labor decisions based on bookings', smOnly: true },
 
   // Day 5 — Friends & Family & Operational Readiness
   { day: 5, id: 'c5-1', name: 'Runs full F&F session without coaching' },
   { day: 5, id: 'c5-2', name: 'Maintains guest experience standard for 5+ hrs' },
   { day: 5, id: 'c5-3', name: 'SM/ASM reviews 14-day bookings & flags risk days', smOnly: true },
-  { day: 5, id: 'c5-4', name: 'ASM can run the store without operational decline', smOnly: true },
-  { day: 5, id: 'c5-5', name: 'Team supports training without dip in guest experience' },
 ];
 
 // ============================================================
