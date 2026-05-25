@@ -73,7 +73,30 @@ async function dbLoadState() {
   state.franchiseChecks = {};
   (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; });
 
+  await dbLoadOverrides();
   return true;
+}
+
+async function dbLoadOverrides() {
+  const { data, error } = await supabase.from('content_overrides').select('*');
+  if (error) { console.error('dbLoadOverrides:', error); return; }
+  state.overrides = {};
+  (data || []).forEach(r => {
+    const key = r.content_type + '|' + r.content_id + '|' + r.field_name;
+    state.overrides[key] = r.value;
+  });
+}
+
+async function dbSaveOverride(contentType, contentId, fieldName, value) {
+  const { error } = await supabase.from('content_overrides').upsert({
+    content_type: contentType,
+    content_id:   contentId,
+    field_name:   fieldName,
+    value:        value,
+    updated_at:   new Date().toISOString()
+  }, { onConflict: 'content_type,content_id,field_name' });
+  if (error) console.error('dbSaveOverride:', error);
+  return error || null;
 }
 
 async function dbSaveOpening() {

@@ -14,8 +14,141 @@ let state = {
   trainees: [],
   signoffs: {},
   recaps: {},
-  franchiseChecks: {}
+  franchiseChecks: {},
+  overrides: {}
 };
+
+// ============================================================
+// CONTENT EDITING
+// ============================================================
+const EDIT_EMAIL = 'danielle.beram1@gmail.com';
+
+function canEdit() {
+  return state.userEmail === EDIT_EMAIL;
+}
+
+function getContent(type, id, field, defaultVal) {
+  if (!state.overrides) return defaultVal;
+  const key = type + '|' + id + '|' + field;
+  return state.overrides.hasOwnProperty(key) ? state.overrides[key] : defaultVal;
+}
+
+var _agendaEditCtx = null;
+var _agendaQuill = null;
+var _kbEditId = null;
+var _kbQuill = null;
+
+function openAgendaEditor(dayNum, blockIdx) {
+  if (!canEdit()) return;
+  var block = DAYS[dayNum - 1].blocks[blockIdx];
+  var contentId = 'day' + dayNum + '-block' + blockIdx;
+  _agendaEditCtx = { dayNum, blockIdx, contentId, block };
+
+  var tip = getContent('agenda', contentId, 'tip', block.tip || '');
+  var say = getContent('agenda', contentId, 'say', block.say || '');
+  var see = getContent('agenda', contentId, 'see', block.see || '');
+  var doText = getContent('agenda', contentId, 'doText', block.doText || '');
+  var objStr = getContent('agenda', contentId, 'objectives', null);
+  var objectives = objStr ? JSON.parse(objStr) : block.objectives;
+  var resStr = getContent('agenda', contentId, 'resources', null);
+  var resources = resStr ? JSON.parse(resStr) : block.resources;
+
+  document.getElementById('agendaEditBlockTitle').textContent = 'Editing: ' + block.title;
+  document.getElementById('agendaEditSay').value = say;
+  document.getElementById('agendaEditSee').value = see;
+  document.getElementById('agendaEditDo').value = doText;
+  document.getElementById('agendaEditObjectives').value = objectives.join('\n');
+  document.getElementById('agendaEditResources').value = resources.join('\n');
+
+  if (!_agendaQuill) {
+    _agendaQuill = new Quill('#agendaEditQuill', {
+      theme: 'snow',
+      modules: { toolbar: [['bold','italic'],[{'header':2},{'header':3}],[{'list':'ordered'},{'list':'bullet'}],['link','clean']] }
+    });
+  }
+  _agendaQuill.root.innerHTML = tip;
+  document.getElementById('agendaEditModal').style.display = 'flex';
+}
+
+function closeAgendaEditor() {
+  document.getElementById('agendaEditModal').style.display = 'none';
+  _agendaEditCtx = null;
+}
+
+async function saveAgendaEdit() {
+  if (!_agendaEditCtx) return;
+  var { dayNum, blockIdx, contentId } = _agendaEditCtx;
+  var tip = _agendaQuill ? _agendaQuill.root.innerHTML : '';
+  var say = document.getElementById('agendaEditSay').value;
+  var see = document.getElementById('agendaEditSee').value;
+  var doText = document.getElementById('agendaEditDo').value;
+  var objectives = document.getElementById('agendaEditObjectives').value.split('\n').filter(s => s.trim());
+  var resources = document.getElementById('agendaEditResources').value.split('\n').filter(s => s.trim());
+
+  state.overrides['agenda|' + contentId + '|tip'] = tip;
+  state.overrides['agenda|' + contentId + '|say'] = say;
+  state.overrides['agenda|' + contentId + '|see'] = see;
+  state.overrides['agenda|' + contentId + '|doText'] = doText;
+  state.overrides['agenda|' + contentId + '|objectives'] = JSON.stringify(objectives);
+  state.overrides['agenda|' + contentId + '|resources'] = JSON.stringify(resources);
+
+  await Promise.all([
+    dbSaveOverride('agenda', contentId, 'tip', tip),
+    dbSaveOverride('agenda', contentId, 'say', say),
+    dbSaveOverride('agenda', contentId, 'see', see),
+    dbSaveOverride('agenda', contentId, 'doText', doText),
+    dbSaveOverride('agenda', contentId, 'objectives', JSON.stringify(objectives)),
+    dbSaveOverride('agenda', contentId, 'resources', JSON.stringify(resources))
+  ]);
+  closeAgendaEditor();
+  renderAgenda(dayNum);
+  showToast('Block saved!', 'success');
+}
+
+function openKBEditor(id) {
+  if (!canEdit()) return;
+  let article = null;
+  Object.values(KB).forEach(articles => { const f = articles.find(a => a.id === id); if (f) article = f; });
+  if (!article) return;
+  _kbEditId = id;
+
+  document.getElementById('kbEditTitle').value = getContent('kb', id, 'title', article.title);
+  document.getElementById('kbEditSubtitle').value = getContent('kb', id, 'subtitle', article.subtitle);
+
+  if (!_kbQuill) {
+    _kbQuill = new Quill('#kbEditQuill', {
+      theme: 'snow',
+      modules: { toolbar: [['bold','italic'],[{'header':2},{'header':3}],[{'list':'ordered'},{'list':'bullet'}],['link','blockquote','clean']] }
+    });
+  }
+  _kbQuill.root.innerHTML = getContent('kb', id, 'content', article.content);
+  document.getElementById('kbEditModal').style.display = 'flex';
+}
+
+function closeKBEditor() {
+  document.getElementById('kbEditModal').style.display = 'none';
+  _kbEditId = null;
+}
+
+async function saveKBEdit() {
+  if (!_kbEditId) return;
+  var title = document.getElementById('kbEditTitle').value;
+  var subtitle = document.getElementById('kbEditSubtitle').value;
+  var content = _kbQuill ? _kbQuill.root.innerHTML : '';
+
+  state.overrides['kb|' + _kbEditId + '|title'] = title;
+  state.overrides['kb|' + _kbEditId + '|subtitle'] = subtitle;
+  state.overrides['kb|' + _kbEditId + '|content'] = content;
+
+  await Promise.all([
+    dbSaveOverride('kb', _kbEditId, 'title', title),
+    dbSaveOverride('kb', _kbEditId, 'subtitle', subtitle),
+    dbSaveOverride('kb', _kbEditId, 'content', content)
+  ]);
+  closeKBEditor();
+  loadKBArticle(_kbEditId);
+  showToast('Article saved!', 'success');
+}
 
 let contextTarget = null;
 
@@ -833,6 +966,7 @@ function renderAgenda(dayNum) {
 
   day.blocks.forEach(function(block, idx) {
     var blockId = 'block-' + dayNum + '-' + idx;
+    var contentId = 'day' + dayNum + '-block' + idx;
 
     if (block.title === 'Break') {
       html += '<div style="display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:12px;background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light)">' +
@@ -841,35 +975,47 @@ function renderAgenda(dayNum) {
       return;
     }
 
-    var objCount = block.objectives.length;
-    var objsHtml = block.objectives.map(function(o) {
+    var objStr = getContent('agenda', contentId, 'objectives', null);
+    var objectives = objStr ? JSON.parse(objStr) : block.objectives;
+    var resStr = getContent('agenda', contentId, 'resources', null);
+    var resources = resStr ? JSON.parse(resStr) : block.resources;
+    var tip = getContent('agenda', contentId, 'tip', block.tip);
+    var say = getContent('agenda', contentId, 'say', block.say);
+    var see = getContent('agenda', contentId, 'see', block.see);
+    var doText = getContent('agenda', contentId, 'doText', block.doText);
+
+    var objCount = objectives.length;
+    var objsHtml = objectives.map(function(o) {
       return '<div class="objective-item"><div class="objective-dot"></div><span>' + o + '</span></div>';
     }).join('');
 
     var resHtml = '';
-    if (block.resources.length > 0) {
+    if (resources.length > 0) {
       resHtml = '<div style="margin-bottom:16px"><div class="objectives-label">Resources</div>' +
-        block.resources.map(function(r) {
+        resources.map(function(r) {
           return '<div class="objective-item"><div class="objective-dot" style="background:var(--warp)"></div><span style="color:var(--borg)">' + r + '</span></div>';
         }).join('') + '</div>';
     }
 
+    var editBtn = canEdit() ? '<button onclick="event.stopPropagation();openAgendaEditor(' + dayNum + ',' + idx + ')" style="margin-left:auto;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid var(--trigger);color:var(--trigger);background:transparent;cursor:pointer;white-space:nowrap">✏ Edit</button>' : '';
+
     var coachHtml = '';
-    if (block.tip) {
+    if (tip) {
       coachHtml = '<div class="coach-tip"><div class="coach-tip-label">Coach Guidance</div>' +
-        '<div class="coach-tip-text">' + block.tip + '</div></div>' +
+        '<div class="coach-tip-text">' + tip + '</div></div>' +
         '<div class="say-see-do">' +
-        '<div class="ssd-block"><div class="ssd-label say">SAY</div><div class="ssd-text">' + (block.say || '') + '</div></div>' +
-        '<div class="ssd-block"><div class="ssd-label see">SEE</div><div class="ssd-text">' + (block.see || '') + '</div></div>' +
-        '<div class="ssd-block"><div class="ssd-label do">DO</div><div class="ssd-text">' + (block.doText || '') + '</div></div>' +
+        '<div class="ssd-block"><div class="ssd-label say">SAY</div><div class="ssd-text">' + (say || '') + '</div></div>' +
+        '<div class="ssd-block"><div class="ssd-label see">SEE</div><div class="ssd-text">' + (see || '') + '</div></div>' +
+        '<div class="ssd-block"><div class="ssd-label do">DO</div><div class="ssd-text">' + (doText || '') + '</div></div>' +
         '</div>';
     }
 
     html += '<div class="agenda-block">' +
-      '<div class="agenda-block-header" id="header-' + blockId + '" onclick="toggleAgendaBlock(\'' + blockId + '\')">' +
+      '<div class="agenda-block-header" id="header-' + blockId + '" onclick="toggleAgendaBlock(\'' + blockId + '\')" style="display:flex;align-items:center;gap:10px">' +
       '<span class="agenda-time-pill">' + block.time + '</span>' +
       '<span class="agenda-block-title">' + block.title + '</span>' +
       '<span class="agenda-block-duration">' + objCount + ' objective' + (objCount !== 1 ? 's' : '') + '</span>' +
+      editBtn +
       '<svg class="agenda-block-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>' +
       '</div>' +
       '<div class="agenda-block-body" id="body-' + blockId + '">' +
@@ -1242,13 +1388,19 @@ function loadKBArticle(id) {
   window._activeKBArticle = id;
   renderKBNav();
 
+  var title   = getContent('kb', id, 'title',   article.title);
+  var subtitle = getContent('kb', id, 'subtitle', article.subtitle);
+  var body    = getContent('kb', id, 'content',  article.content);
+  var editBtn = canEdit() ? `<button onclick="openKBEditor('${id}')" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1px solid var(--trigger);color:var(--trigger);background:transparent;cursor:pointer">✏ Edit Article</button>` : '';
+
   const content = document.getElementById('kbContent');
   content.innerHTML = `
     <div class="kb-article-eyebrow">${article.eyebrow}</div>
-    <div class="kb-article-title">${article.title}</div>
-    <div class="kb-article-subtitle">${article.subtitle}</div>
+    <div class="kb-article-title">${title}</div>
+    <div class="kb-article-subtitle">${subtitle}</div>
+    ${editBtn}
     <hr class="divider">
-    <div class="kb-article-body">${article.content}</div>
+    <div class="kb-article-body">${body}</div>
   `;
 }
 
