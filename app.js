@@ -2584,6 +2584,7 @@ function renderFranchiseChecks() {
 
   FRANCHISE_CHECK_GROUPS.forEach(group => {
     const groupDone = group.checks.filter(c => state.franchiseChecks[c.key]).length;
+    const groupKeys = '[' + group.checks.map(c => "'" + c.key + "'").join(',') + ']';
     html += `<div class="card mb-20">
       <div class="card-header">
         <div>
@@ -2592,7 +2593,7 @@ function renderFranchiseChecks() {
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:12px;color:var(--text-secondary)">${groupDone}/${group.checks.length}</span>
-          <button onclick="markGroupAllComplete(${JSON.stringify(group.checks.map(c=>c.key))})" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;border:1px solid var(--trigger);background:transparent;color:var(--trigger);cursor:pointer;white-space:nowrap">✓ Mark All</button>
+          <button onclick="markGroupAllComplete(${groupKeys})" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;border:1px solid var(--trigger);background:transparent;color:var(--trigger);cursor:pointer;white-space:nowrap">✓ Mark All</button>
         </div>
       </div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:0">`;
