@@ -926,7 +926,9 @@ function renderCompetencyTable(day) {
       <tr>
         <th style="width:160px">Trainee</th>
         <th style="width:80px">Role</th>
-        <th style="width:90px;text-align:center">Attendance</th>
+        <th style="width:90px;text-align:center">Attendance
+  <button onclick="markAllAttendance(${day})" style="display:block;margin:4px auto 0;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap" title="Mark all trainees present for Day ${day}">✓ All</button>
+</th>
         ${comps.map(c => `<th class="competency-col">
   <div>${c.name}</div>
   <button onclick="markCompAllDemonstrated('${c.id}', ${day})" style="margin-top:4px;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap" title="Mark all trainees as demonstrated">✓ All</button>
@@ -984,6 +986,15 @@ function renderCompetencyTable(day) {
   html += '</tbody></table>';
   container.innerHTML = html;
   updateCompProgress(day);
+}
+
+function markAllAttendance(day) {
+  state.trainees.forEach(function(trainee) {
+    const key = trainee.id + '_attendance-d' + day;
+    state.signoffs[key] = 'signed';
+    dbSaveSignoff(trainee.id, 'attendance-d' + day, 'signed');
+  });
+  renderCompetencyTable(day);
 }
 
 function toggleAttendance(traineeId, day, newStatus) {
