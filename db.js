@@ -144,7 +144,7 @@ async function dbSaveSignoff(traineeId, compId, status) {
 }
 
 async function dbSaveRecap(day) {
-  if (!state.openingId) return;
+  if (!state.openingId) return { message: 'No opening loaded' };
   const r = state.recaps[day] || {};
   const { error } = await supabase.from('recaps').upsert({
     opening_id:   state.openingId,
@@ -167,6 +167,7 @@ async function dbSaveRecap(day) {
     updated_at:   new Date().toISOString()
   }, { onConflict: 'opening_id,day_num' });
   if (error) console.error('dbSaveRecap:', error);
+  return error || null;
 }
 
 async function dbSaveFranchiseCheck(key, checked) {

@@ -1186,14 +1186,19 @@ function updateRecapPreview() {
   document.getElementById('recapPreview').textContent = preview;
 }
 
-function saveRecap() {
+async function saveRecap() {
   const day = state.currentRecapDay;
   state.recaps[day] = {};
   RECAP_FIELDS.forEach(f => {
     const el = document.getElementById('recap-' + f);
     if (el) state.recaps[day][f] = el.value;
   });
-  dbSaveRecap(day);
+  const err = await dbSaveRecap(day);
+  if (err) {
+    console.error('saveRecap failed:', err);
+    showToast(`Save failed: ${err.message || 'DB error'}`, 'error');
+    return;
+  }
   showToast(`Day ${day} recap saved!`, 'success');
   updateRecapStatusCard();
   const badge = document.getElementById('navRecapBadge');
