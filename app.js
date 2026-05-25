@@ -1748,9 +1748,16 @@ async function renderAdminPage() {
   var container = document.getElementById('adminOpeningsList');
   document.getElementById('adminLock').style.display = 'none';
   document.getElementById('adminContent').style.display = 'block';
-  container.innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:13px">Checking access…</div>';
+  container.innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:13px">Loading…</div>';
 
-  // No role gate — all logged-in users can view opening data
+  // Re-fetch role fresh from DB on every admin page visit (avoids stale state.userRole)
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+      if (profile && profile.role) state.userRole = profile.role;
+    }
+  } catch(e) { /* keep existing state.userRole */ }
 
   container.innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:13px">Loading all openings…</div>';
   var allOpenings = await dbLoadAllOpenings();
