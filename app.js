@@ -22,7 +22,7 @@ let state = {
 // ============================================================
 // CONTENT EDITING
 // ============================================================
-const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'tyler.franz-grunwald@sandboxvr.com'];
+const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'tyler.franz-grunwald@sandboxvr.com', 'lex.snyder@sandboxvr.com'];
 
 function canEdit() {
   return EDIT_EMAILS.includes(state.userEmail);
@@ -2128,7 +2128,6 @@ function loadOSCReportFields() {
   get('osc-ff-headcount').value       = r.ff_headcount != null ? r.ff_headcount : '';
   get('osc-weekend-bookings').value    = r.weekend_bookings != null ? r.weekend_bookings : '';
   get('osc-t1-count').value           = r.t1_ticket_count != null ? r.t1_ticket_count : '';
-  get('osc-tech-type').value          = r.tech_type || '';
   get('osc-team-resolvable').value    = r.team_resolvable || '';
   get('osc-biz-impact').value         = r.biz_impact_notes || '';
   get('osc-deployed-by').value        = r.deployed_by || '';
@@ -2151,7 +2150,6 @@ async function saveOSCReport() {
     ff_headcount:          parseInt(document.getElementById('osc-ff-headcount').value)    || null,
     weekend_bookings:      parseInt(document.getElementById('osc-weekend-bookings').value) || null,
     t1_ticket_count:       parseInt(document.getElementById('osc-t1-count').value)         || null,
-    tech_type:             document.getElementById('osc-tech-type').value                  || null,
     team_resolvable:       document.getElementById('osc-team-resolvable').value            || null,
     biz_impact_notes:      document.getElementById('osc-biz-impact').value                 || null,
     deployed_by:           document.getElementById('osc-deployed-by').value                || null,

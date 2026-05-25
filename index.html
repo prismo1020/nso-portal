@@ -713,12 +713,12 @@
         <div class="card-body">
           <div class="grid-2">
             <div class="form-row">
-              <label class="form-label">Friends &amp; Family Headcount</label>
-              <input class="input" type="number" id="osc-ff-headcount" min="0" placeholder="Total guests on F&amp;F Day">
+              <label class="form-label">Friends &amp; Family Headcount <span style="font-weight:400;color:var(--text-muted)">(estimate ok)</span></label>
+              <input class="input" type="number" id="osc-ff-headcount" min="0" placeholder="Approx. guests on F&amp;F Day">
             </div>
             <div class="form-row">
-              <label class="form-label">Opening Weekend Total Bookings</label>
-              <input class="input" type="number" id="osc-weekend-bookings" min="0" placeholder="Total bookings (Sat–Sun)">
+              <label class="form-label">Opening Weekend Total Bookings <span style="font-weight:400;color:var(--text-muted)">(Fri–Sun)</span></label>
+              <input class="input" type="number" id="osc-weekend-bookings" min="0" placeholder="Total bookings Fri + Sat + Sun">
             </div>
           </div>
         </div>
@@ -735,18 +735,8 @@
         <div class="card-body">
           <div class="grid-2" style="margin-bottom:16px">
             <div class="form-row">
-              <label class="form-label">T1 Tickets Opened (Total)</label>
-              <input class="input" type="number" id="osc-t1-count" min="0" placeholder="Number of T1 tickets">
-            </div>
-            <div class="form-row">
-              <label class="form-label">Issue Type</label>
-              <select class="input" id="osc-tech-type">
-                <option value="">Select...</option>
-                <option value="None">None — no significant issues</option>
-                <option value="Software">Software only</option>
-                <option value="Hardware">Hardware only</option>
-                <option value="Both">Both software and hardware</option>
-              </select>
+              <label class="form-label">T1 Tickets Opened <span style="font-weight:400;color:var(--text-muted)">(Fri–Sun only)</span></label>
+              <input class="input" type="number" id="osc-t1-count" min="0" placeholder="Tickets opened Fri + Sat + Sun">
             </div>
             <div class="form-row">
               <label class="form-label">Team-Resolvable?</label>
@@ -776,8 +766,8 @@
         <div class="card-body">
           <div class="grid-2" style="margin-bottom:16px">
             <div class="form-row">
-              <label class="form-label">Deployed By</label>
-              <input class="input" type="text" id="osc-deployed-by" placeholder="Name of OSC / deploying coach">
+              <label class="form-label">Deployed By <span style="font-weight:400;color:var(--text-muted)">(Reliability Tech name)</span></label>
+              <input class="input" type="text" id="osc-deployed-by" placeholder="Reliability Tech name">
             </div>
             <div class="form-row">
               <label class="form-label">Deployment Rating</label>
