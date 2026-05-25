@@ -1820,6 +1820,11 @@ async function renderAdminPage() {
     var pctBadge = pct === 100 ? 'badge-green' : 'badge-gray';
     var recapBadge = recapCount >= 5 ? 'badge-green' : 'badge-amber';
 
+    // Safe store name for use inside onclick attributes (no quote issues)
+    var safeId = o.id;
+    var safeStore = (o.store_name || 'Unknown Store').replace(/'/g, '&#39;');
+    var safeCoach = (o.coach_name || opening.coach || '').replace(/'/g, '&#39;');
+
     html += '<div class="card mb-20">';
     // Clickable header — toggle only
     html += '<div class="card-header" style="cursor:pointer" onclick="toggleAdminOpening(\'' + openingId + '\')">';
@@ -1835,9 +1840,10 @@ async function renderAdminPage() {
     html += '</div>';
     html += '</div>'; // end card-header
     // Action buttons — outside the clickable header
-    html += '<div style="display:flex;gap:8px;padding:8px 16px 10px;background:var(--surface);border-top:1px solid var(--border-light)">';
-    html += '<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;gap:6px" onclick="exportOpeningCSV(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\'/><polyline points=\'7 10 12 15 17 10\'/><line x1=\'12\' y1=\'15\' x2=\'12\' y2=\'3\'/></svg> Export CSV</button>';
-    html += '<button class="btn" style="font-size:12px;padding:5px 12px;gap:6px;background:transparent;border:1px solid var(--danger);color:var(--danger)" onclick="confirmDeleteOpening(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'3 6 5 6 21 6\'/><path d=\'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\'/></svg> Delete</button>';
+    html += '<div style="display:flex;gap:8px;padding:8px 16px 10px;background:var(--surface);border-top:1px solid var(--border-light);flex-wrap:wrap">';
+    html += '<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;gap:6px" onclick="exportOpeningCSV(\'' + safeId + '\', \'' + safeStore + '\')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\'/><polyline points=\'7 10 12 15 17 10\'/><line x1=\'12\' y1=\'15\' x2=\'12\' y2=\'3\'/></svg> Export CSV</button>';
+    html += '<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;gap:6px" onclick="openRenameModal(\'' + safeId + '\', \'' + safeStore + '\', \'' + safeCoach + '\')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\'/><path d=\'M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z\'/></svg> Rename</button>';
+    html += '<button class="btn" style="font-size:12px;padding:5px 12px;gap:6px;background:transparent;border:1px solid var(--danger);color:var(--danger)" onclick="confirmDeleteOpening(\'' + safeId + '\', \'' + safeStore + '\')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'3 6 5 6 21 6\'/><path d=\'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\'/></svg> Delete</button>';
     html += '</div>';
     // Collapsible detail
     html += '<div id="' + openingId + '" style="display:none">';
@@ -1917,6 +1923,25 @@ async function renderAdminPage() {
   container.innerHTML = html;
 
   renderUserManagement();
+}
+
+function openRenameModal(openingId, storeName, coachName) {
+  document.getElementById('renameOpeningId').value = openingId;
+  document.getElementById('renameStoreName').value = storeName;
+  document.getElementById('renameCoachName').value = coachName;
+  document.getElementById('renameModal').classList.add('open');
+}
+
+async function saveRename() {
+  var openingId = document.getElementById('renameOpeningId').value;
+  var storeName = document.getElementById('renameStoreName').value.trim();
+  var coachName = document.getElementById('renameCoachName').value.trim();
+  if (!storeName) { showToast('Store name cannot be empty', 'info'); return; }
+  const { error } = await supabase.from('openings').update({ store_name: storeName, coach_name: coachName }).eq('id', openingId);
+  if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
+  closeModal('renameModal');
+  showToast('Opening updated', 'success');
+  renderAdminPage();
 }
 
 function confirmDeleteOpening(openingId, storeName) {
