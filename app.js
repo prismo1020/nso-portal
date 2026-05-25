@@ -1794,12 +1794,10 @@ async function renderAdminPage() {
     html += '<span class="badge ' + recapBadge + '">' + recapCount + '/5 recaps</span>';
     html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" id="chevron-' + openingId + '" style="transition:transform 0.2s"><path d="M2 5l5 5 5-5"/></svg>';
     html += '</div>';
-    if (state.userRole === 'admin') {
-      html += '<div style="display:flex;gap:8px;padding:8px 20px 12px;border-top:1px solid var(--border-light)">';
-      html += '<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;gap:6px" onclick="event.stopPropagation();exportOpeningCSV(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\'/><polyline points=\'7 10 12 15 17 10\'/><line x1=\'12\' y1=\'15\' x2=\'12\' y2=\'3\'/></svg> Export CSV</button>';
-      html += '<button class="btn" style="font-size:12px;padding:5px 12px;gap:6px;background:transparent;border:1px solid var(--danger);color:var(--danger)" onclick="event.stopPropagation();confirmDeleteOpening(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'3 6 5 6 21 6\'/><path d=\'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\'/></svg> Delete</button>';
-      html += '</div>';
-    }
+    html += '<div style="display:flex;gap:8px;padding:8px 20px 12px;border-top:1px solid var(--border-light)">';
+    html += '<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;gap:6px" onclick="event.stopPropagation();exportOpeningCSV(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\'/><polyline points=\'7 10 12 15 17 10\'/><line x1=\'12\' y1=\'15\' x2=\'12\' y2=\'3\'/></svg> Export CSV</button>';
+    html += '<button class="btn" style="font-size:12px;padding:5px 12px;gap:6px;background:transparent;border:1px solid var(--danger);color:var(--danger)" onclick="event.stopPropagation();confirmDeleteOpening(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'3 6 5 6 21 6\'/><path d=\'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\'/></svg> Delete</button>';
+    html += '</div>';
     html += '</div>';
     html += '<div id="' + openingId + '" style="display:none">';
     html += '<div style="padding:20px;border-top:1px solid var(--border-light)">';
@@ -1877,10 +1875,7 @@ async function renderAdminPage() {
 
   container.innerHTML = html;
 
-  // User Management section (admin only)
-  if (state.userRole === 'admin') {
-    renderUserManagement();
-  }
+  renderUserManagement();
 }
 
 function confirmDeleteOpening(openingId, storeName) {
