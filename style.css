@@ -788,6 +788,16 @@
 
   .recap-chip:hover { background: var(--trigger-light); border-color: var(--trigger); color: var(--trigger); }
 
+  /* OSC Report rating buttons */
+  .osc-rating-btn {
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    border: 2px solid var(--border); background: var(--surface);
+    font-size: 16px; font-weight: 700; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .osc-rating-btn:hover { border-color: var(--trigger); color: var(--trigger); background: var(--trigger-light); }
+  .osc-rating-btn.active { border-color: var(--hb); background: var(--hb); color: #fff; }
+
   .recap-preview {
     background: var(--hb);
     border-radius: var(--radius-lg);

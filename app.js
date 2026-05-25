@@ -15,16 +15,17 @@ let state = {
   signoffs: {},
   recaps: {},
   franchiseChecks: {},
-  overrides: {}
+  overrides: {},
+  oscReport: {}
 };
 
 // ============================================================
 // CONTENT EDITING
 // ============================================================
-const EDIT_EMAIL = 'danielle.beram1@gmail.com';
+const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'tyler.franz-grunwald@sandboxvr.com'];
 
 function canEdit() {
-  return state.userEmail === EDIT_EMAIL;
+  return EDIT_EMAILS.includes(state.userEmail);
 }
 
 function getContent(type, id, field, defaultVal) {
@@ -863,7 +864,8 @@ function navigate(view) {
     franchisee: 'Day 4 – Franchise Partner Review',
     leadership: 'Leadership Lens',
     admin: 'All Openings',
-    videos: 'Training Videos'
+    videos: 'Training Videos',
+    osc: 'OSC Closing Report'
   };
   document.getElementById('topbarTitle').textContent = titles[view] || view;
   state.currentView = view;
@@ -879,7 +881,8 @@ function navigate(view) {
     franchisee: 'nav-franchisee',
     leadership: 'nav-leadership',
     admin: 'nav-admin',
-    videos: 'nav-videos'
+    videos: 'nav-videos',
+    osc: 'nav-osc'
   };
   const navEl = document.getElementById(navIdMap[view]);
   if (navEl) navEl.classList.add('active');
@@ -894,6 +897,7 @@ function navigate(view) {
   if (view === 'leadership') renderLeadershipLens();
   if (view === 'admin') renderAdminPage();
   if (view === 'videos') renderVideosPage();
+  if (view === 'osc') loadOSCReportFields();
 }
 
 // ============================================================
@@ -2091,6 +2095,82 @@ function confirmDeleteOpening(openingId, storeName) {
   });
 }
 
+// ============================================================
+// OSC CLOSING REPORT
+// ============================================================
+var _oscTeamRating = 0;
+var _oscSMRating = 0;
+
+function setOSCRating(type, val) {
+  if (type === 'team') {
+    _oscTeamRating = val;
+    document.querySelectorAll('#osc-team-rating-btns .osc-rating-btn').forEach(function(b, i) {
+      b.classList.toggle('active', i + 1 === val);
+    });
+  } else {
+    _oscSMRating = val;
+    document.querySelectorAll('#osc-sm-rating-btns .osc-rating-btn').forEach(function(b, i) {
+      b.classList.toggle('active', i + 1 === val);
+    });
+  }
+}
+
+function toggleTSName() {
+  var v = document.getElementById('osc-ts-present').value;
+  var row = document.getElementById('osc-ts-name-row');
+  if (row) row.style.display = v === 'Yes' ? '' : 'none';
+}
+
+function loadOSCReportFields() {
+  var r = state.oscReport || {};
+  var get = function(id) { return document.getElementById(id); };
+  if (!get('osc-ff-headcount')) return;
+  get('osc-ff-headcount').value       = r.ff_headcount != null ? r.ff_headcount : '';
+  get('osc-weekend-bookings').value    = r.weekend_bookings != null ? r.weekend_bookings : '';
+  get('osc-t1-count').value           = r.t1_ticket_count != null ? r.t1_ticket_count : '';
+  get('osc-tech-type').value          = r.tech_type || '';
+  get('osc-team-resolvable').value    = r.team_resolvable || '';
+  get('osc-biz-impact').value         = r.biz_impact_notes || '';
+  get('osc-deployed-by').value        = r.deployed_by || '';
+  get('osc-deployment-rating').value  = r.deployment_rating || '';
+  get('osc-deployment-notes').value   = r.deployment_notes || '';
+  get('osc-ts-present').value         = r.tech_specialist === true ? 'Yes' : (r.tech_specialist === false ? 'No' : '');
+  toggleTSName();
+  get('osc-ts-name').value            = r.tech_specialist_name || '';
+  get('osc-ts-notes').value           = r.tech_specialist_notes || '';
+  get('osc-team-notes').value         = r.team_notes || '';
+  get('osc-sm-notes').value           = r.sm_notes || '';
+  _oscTeamRating = 0; _oscSMRating = 0;
+  setOSCRating('team', r.team_rating || 0);
+  setOSCRating('sm',   r.sm_rating  || 0);
+}
+
+async function saveOSCReport() {
+  if (!state.openingId) { showToast('No opening loaded. Set up an opening first.', 'error'); return; }
+  var r = {
+    ff_headcount:          parseInt(document.getElementById('osc-ff-headcount').value)    || null,
+    weekend_bookings:      parseInt(document.getElementById('osc-weekend-bookings').value) || null,
+    t1_ticket_count:       parseInt(document.getElementById('osc-t1-count').value)         || null,
+    tech_type:             document.getElementById('osc-tech-type').value                  || null,
+    team_resolvable:       document.getElementById('osc-team-resolvable').value            || null,
+    biz_impact_notes:      document.getElementById('osc-biz-impact').value                 || null,
+    deployed_by:           document.getElementById('osc-deployed-by').value                || null,
+    deployment_rating:     document.getElementById('osc-deployment-rating').value          || null,
+    deployment_notes:      document.getElementById('osc-deployment-notes').value           || null,
+    tech_specialist:       document.getElementById('osc-ts-present').value === 'Yes',
+    tech_specialist_name:  document.getElementById('osc-ts-name').value                   || null,
+    tech_specialist_notes: document.getElementById('osc-ts-notes').value                  || null,
+    team_rating:           _oscTeamRating || null,
+    team_notes:            document.getElementById('osc-team-notes').value                 || null,
+    sm_rating:             _oscSMRating   || null,
+    sm_notes:              document.getElementById('osc-sm-notes').value                   || null
+  };
+  state.oscReport = r;
+  const err = await dbSaveOSCReport(r);
+  if (err) { showToast('Save failed: ' + (err.message || 'DB error'), 'error'); return; }
+  showToast('Closing report saved!', 'success');
+}
+
 async function exportOpeningCSV(openingId, storeName) {
   showToast('Preparing export…', 'info');
   // Load full opening data
@@ -2118,8 +2198,13 @@ async function exportOpeningCSV(openingId, storeName) {
   rows.push(['TEAM ROSTER', '', '']);
   rows.push(['Name', 'Role', 'Signed Off', 'Progress %']);
   (trainees || []).forEach(function(t) {
-    var tSigned = (signoffs || []).filter(function(s){ return s.trainee_id === t.id && s.status === 'signed' && !s.competency_id.startsWith('attendance-'); }).length;
-    var total = COMPETENCIES.length;
+    var isLeader = t.role === 'SM' || t.role === 'ASM';
+    var applicable = COMPETENCIES.filter(function(c) { return !c.smOnly || isLeader; });
+    var applicableIds = applicable.map(function(c) { return c.id; });
+    var tSigned = (signoffs || []).filter(function(s) {
+      return s.trainee_id === t.id && s.status === 'signed' && !s.competency_id.startsWith('attendance-') && applicableIds.indexOf(s.competency_id) !== -1;
+    }).length;
+    var total = applicable.length;
     rows.push([esc(t.name), esc(t.role), tSigned + '/' + total, Math.round((tSigned/total)*100) + '%']);
   });
   rows.push(['', '', '']);

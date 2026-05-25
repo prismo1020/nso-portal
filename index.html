@@ -144,6 +144,10 @@
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14a6 6 0 0112 0"/><path d="M8 10v4M6 12h4"/></svg>
         Leadership Lens
       </button>
+      <button class="nav-item" id="nav-osc" onclick="navigate('osc')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/><path d="M11 12l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        OSC Report
+      </button>
       <button class="nav-item" id="nav-admin" onclick="navigate('admin')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M1 14s1-4 7-4 7 4 7 4"/><path d="M12 1l1 1-5 5-2-2 5-5 1 1z"/></svg>
         Admin View
@@ -688,6 +692,186 @@
     <!-- TRAINING VIDEOS VIEW -->
     <div id="view-videos" class="view page-content">
       <div id="pageContent"></div>
+    </div>
+
+    <!-- OSC CLOSING REPORT VIEW -->
+    <div id="view-osc" class="view page-content">
+      <div class="page-header">
+        <div class="eyebrow">CLOSING REPORT</div>
+        <div class="page-title">OSC Closing Report</div>
+        <div class="page-subtitle">Complete this report at the close of the NSO program to summarize outcomes for Ops &amp; L&amp;D.</div>
+      </div>
+
+      <!-- Section 1: Opening Weekend Bookings -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📅 Opening Weekend Bookings</div>
+            <div class="card-subtitle">Headcount and booking data from F&amp;F Day and the first public weekend</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <div class="form-row">
+              <label class="form-label">Friends &amp; Family Headcount</label>
+              <input class="input" type="number" id="osc-ff-headcount" min="0" placeholder="Total guests on F&amp;F Day">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Opening Weekend Total Bookings</label>
+              <input class="input" type="number" id="osc-weekend-bookings" min="0" placeholder="Total bookings (Sat–Sun)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Technology Summary -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🔧 Technology Summary</div>
+            <div class="card-subtitle">Tech issues encountered during the opening program</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="margin-bottom:16px">
+            <div class="form-row">
+              <label class="form-label">T1 Tickets Opened (Total)</label>
+              <input class="input" type="number" id="osc-t1-count" min="0" placeholder="Number of T1 tickets">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Issue Type</label>
+              <select class="input" id="osc-tech-type">
+                <option value="">Select...</option>
+                <option value="None">None — no significant issues</option>
+                <option value="Software">Software only</option>
+                <option value="Hardware">Hardware only</option>
+                <option value="Both">Both software and hardware</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Team-Resolvable?</label>
+              <select class="input" id="osc-team-resolvable">
+                <option value="">Select...</option>
+                <option value="Yes">Yes — team resolved independently</option>
+                <option value="Partially">Partially — some T1 support required</option>
+                <option value="No">No — required sustained T1/T2 support</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Business Impact Notes</label>
+            <textarea class="recap-textarea" id="osc-biz-impact" placeholder="Describe any guest-facing impact from tech issues. Note unresolved items or open tickets..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Deployment Review -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🚀 Deployment Review</div>
+            <div class="card-subtitle">Assessment of store readiness and deployment quality</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="margin-bottom:16px">
+            <div class="form-row">
+              <label class="form-label">Deployed By</label>
+              <input class="input" type="text" id="osc-deployed-by" placeholder="Name of OSC / deploying coach">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Deployment Rating</label>
+              <select class="input" id="osc-deployment-rating">
+                <option value="">Select...</option>
+                <option value="Complete">Complete — store fully ready</option>
+                <option value="Incomplete">Incomplete — items outstanding</option>
+                <option value="Concerns">Concerns — significant gaps noted</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Observations &amp; Notes</label>
+            <textarea class="recap-textarea" id="osc-deployment-notes" placeholder="Overall deployment quality, outstanding items, risks, or wins..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Tech Specialist -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div>
+            <div class="card-title">💻 Tech Specialist</div>
+            <div class="card-subtitle">Was a Tech Specialist on-site during this opening?</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="margin-bottom:16px">
+            <div class="form-row">
+              <label class="form-label">Tech Specialist On-Site?</label>
+              <select class="input" id="osc-ts-present" onchange="toggleTSName()">
+                <option value="">Select...</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div class="form-row" id="osc-ts-name-row" style="display:none">
+              <label class="form-label">Tech Specialist Name</label>
+              <input class="input" type="text" id="osc-ts-name" placeholder="Full name">
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Notes</label>
+            <textarea class="recap-textarea" id="osc-ts-notes" placeholder="What did the Tech Specialist work on? Any open items or follow-ups?"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Team & Leadership Assessment -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div>
+            <div class="card-title">👥 Team &amp; Leadership Assessment</div>
+            <div class="card-subtitle">Rate the team and leadership readiness on a 1–4 scale</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:24px;font-size:12px;color:var(--text-secondary)">
+            <strong style="color:var(--hb)">Rating Scale:</strong>&nbsp;&nbsp;
+            <strong>1</strong> = Needs significant development &nbsp;·&nbsp;
+            <strong>2</strong> = Developing, requires ongoing support &nbsp;·&nbsp;
+            <strong>3</strong> = Solid, meeting expectations &nbsp;·&nbsp;
+            <strong>4</strong> = Exceeding expectations
+          </div>
+          <div class="grid-2" style="margin-bottom:24px">
+            <div>
+              <div class="form-label" style="margin-bottom:8px">Overall Team Rating</div>
+              <div style="display:flex;gap:8px;margin-bottom:14px" id="osc-team-rating-btns">
+                <button class="osc-rating-btn" onclick="setOSCRating('team',1)">1</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('team',2)">2</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('team',3)">3</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('team',4)">4</button>
+              </div>
+              <div class="form-label" style="margin-bottom:6px">Team Notes</div>
+              <textarea class="recap-textarea" id="osc-team-notes" placeholder="What stood out? Standout GEGs? Any areas of concern for the broader team?"></textarea>
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:8px">SM / ASM Rating</div>
+              <div style="display:flex;gap:8px;margin-bottom:14px" id="osc-sm-rating-btns">
+                <button class="osc-rating-btn" onclick="setOSCRating('sm',1)">1</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('sm',2)">2</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('sm',3)">3</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('sm',4)">4</button>
+              </div>
+              <div class="form-label" style="margin-bottom:6px">SM / ASM Notes</div>
+              <textarea class="recap-textarea" id="osc-sm-notes" placeholder="Leadership readiness, coaching gaps, development needs, recommended follow-up..."></textarea>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveOSCReport()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
+            Save Closing Report
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- ADMIN VIEW -->

@@ -74,7 +74,46 @@ async function dbLoadState() {
   (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; });
 
   await dbLoadOverrides();
+  await dbLoadOSCReport();
   return true;
+}
+
+async function dbLoadOSCReport() {
+  if (!state.openingId) return;
+  const { data, error } = await supabase
+    .from('osc_reports')
+    .select('*')
+    .eq('opening_id', state.openingId)
+    .single();
+  // PGRST116 = "no rows found" — not an error
+  if (error && error.code !== 'PGRST116') { console.error('dbLoadOSCReport:', error); return; }
+  state.oscReport = data || {};
+}
+
+async function dbSaveOSCReport(report) {
+  if (!state.openingId) return { message: 'No opening loaded' };
+  const { error } = await supabase.from('osc_reports').upsert({
+    opening_id:            state.openingId,
+    ff_headcount:          report.ff_headcount,
+    weekend_bookings:      report.weekend_bookings,
+    t1_ticket_count:       report.t1_ticket_count,
+    tech_type:             report.tech_type,
+    team_resolvable:       report.team_resolvable,
+    biz_impact_notes:      report.biz_impact_notes,
+    deployed_by:           report.deployed_by,
+    deployment_rating:     report.deployment_rating,
+    deployment_notes:      report.deployment_notes,
+    tech_specialist:       report.tech_specialist,
+    tech_specialist_name:  report.tech_specialist_name,
+    tech_specialist_notes: report.tech_specialist_notes,
+    team_rating:           report.team_rating,
+    team_notes:            report.team_notes,
+    sm_rating:             report.sm_rating,
+    sm_notes:              report.sm_notes,
+    updated_at:            new Date().toISOString()
+  }, { onConflict: 'opening_id' });
+  if (error) console.error('dbSaveOSCReport:', error);
+  return error || null;
 }
 
 async function dbLoadOverrides() {
