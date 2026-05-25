@@ -735,6 +735,7 @@ function navigate(view) {
     recap: 'Daily Recap',
     knowledge: 'Knowledge Base',
     franchise: 'Day 0 Checks',
+    franchisee: 'Day 4 – Franchise Partner Review',
     leadership: 'Leadership Lens',
     admin: 'All Openings',
     videos: 'Training Videos'
@@ -750,6 +751,7 @@ function navigate(view) {
     recap: 'nav-recap',
     knowledge: 'nav-kb',
     franchise: 'nav-franchise',
+    franchisee: 'nav-franchisee',
     leadership: 'nav-leadership',
     admin: 'nav-admin',
     videos: 'nav-videos'
@@ -763,6 +765,7 @@ function navigate(view) {
   if (view === 'team') renderTeamRoster();
   if (view === 'recap') loadRecapFields(state.currentRecapDay);
   if (view === 'franchise') renderFranchiseChecks();
+  if (view === 'franchisee') renderFranchisePartnerReview();
   if (view === 'leadership') renderLeadershipLens();
   if (view === 'admin') renderAdminPage();
   if (view === 'videos') renderVideosPage();
@@ -924,7 +927,10 @@ function renderCompetencyTable(day) {
         <th style="width:160px">Trainee</th>
         <th style="width:80px">Role</th>
         <th style="width:90px;text-align:center">Attendance</th>
-        ${comps.map(c => `<th class="competency-col">${c.name}</th>`).join('')}
+        ${comps.map(c => `<th class="competency-col">
+  <div>${c.name}</div>
+  <button onclick="markCompAllDemonstrated('${c.id}', ${day})" style="margin-top:4px;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap" title="Mark all trainees as demonstrated">✓ All</button>
+</th>`).join('')}
         <th style="text-align:center;width:80px">Progress</th>
       </tr>
     </thead>
@@ -970,6 +976,7 @@ function renderCompetencyTable(day) {
         <div class="progress-bar-wrap" style="width:60px;margin:0 auto">
           <div class="progress-bar-fill ${pct === 100 ? 'green' : 'blue'}" style="width:${pct}%"></div>
         </div>
+        <button onclick="markTraineeAllDemonstrated('${trainee.id}', ${day})" style="margin-top:6px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:block;margin-left:auto;margin-right:auto" title="Mark all competencies as demonstrated for this trainee">✓ All</button>
       </td>
     </tr>`;
   });
@@ -991,6 +998,37 @@ function toggleAttendance(traineeId, day, newStatus) {
     dbSaveSignoff(traineeId, 'attendance-d' + day, newStatus);
   }
   renderCompetencyTable(day);
+}
+
+function markCompAllDemonstrated(compId, day) {
+  if (!confirm('Mark ALL trainees as Demonstrated for this competency?')) return;
+  state.trainees.forEach(function(trainee) {
+    var isLeader = trainee.role === 'SM' || trainee.role === 'ASM';
+    var comp = COMPETENCIES.find(function(c){ return c.id === compId; });
+    if (comp && comp.smOnly && !isLeader) return; // skip N/A cells
+    var key = trainee.id + '_' + compId;
+    state.signoffs[key] = 'signed';
+    dbSaveSignoff(trainee.id, compId, 'signed');
+  });
+  renderCompetencyTable(day);
+  updateDashboardStats();
+  showToast('All trainees marked as Demonstrated', 'success');
+}
+
+function markTraineeAllDemonstrated(traineeId, day) {
+  if (!confirm('Mark ALL competencies as Demonstrated for this trainee today?')) return;
+  var trainee = state.trainees.find(function(t){ return t.id === traineeId; });
+  var isLeader = trainee && (trainee.role === 'SM' || trainee.role === 'ASM');
+  var dayComps = COMPETENCIES.filter(function(c){ return c.day === day; });
+  dayComps.forEach(function(comp) {
+    if (comp.smOnly && !isLeader) return; // skip N/A cells
+    var key = traineeId + '_' + comp.id;
+    state.signoffs[key] = 'signed';
+    dbSaveSignoff(traineeId, comp.id, 'signed');
+  });
+  renderCompetencyTable(day);
+  updateDashboardStats();
+  showToast('All competencies marked as Demonstrated', 'success');
 }
 
 function updateCompProgress(day) {
@@ -2380,7 +2418,10 @@ function renderFranchiseChecks() {
           <div class="card-title">${group.group}</div>
           <div class="card-subtitle">${group.desc}</div>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary)">${groupDone}/${group.checks.length}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:var(--text-secondary)">${groupDone}/${group.checks.length}</span>
+          <button onclick="markGroupAllComplete(${JSON.stringify(group.checks.map(c=>c.key))})" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;border:1px solid var(--trigger);background:transparent;color:var(--trigger);cursor:pointer;white-space:nowrap">✓ Mark All</button>
+        </div>
       </div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:0">`;
     group.checks.forEach(check => {
@@ -2394,7 +2435,23 @@ function renderFranchiseChecks() {
     html += `</div></div>`;
   });
 
-  // ── Franchisee Partner Sign-Off ──────────────────────────────
+  container.innerHTML = html;
+}
+
+function renderFranchisePartnerReview() {
+  const container = document.getElementById('franchiseeContent');
+  if (!container) return;
+
+  if (!state.openingId) {
+    container.innerHTML = `<div class="card" style="padding:32px;text-align:center;border:2px dashed var(--border)">
+      <div style="font-size:13px;color:var(--text-muted)">Set up an opening first.</div>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="openSetupModal(true)">Set Up Opening</button>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+
   const FSIGNOFF_SECTIONS = [
     {
       key_prefix: 'fsignoff-training',
@@ -2460,15 +2517,6 @@ function renderFranchiseChecks() {
   const fsPct = fsTotal > 0 ? Math.round((fsDone / fsTotal) * 100) : 0;
   const fsComplete = FSIGNOFF_SECTIONS[FSIGNOFF_SECTIONS.length - 1].items.every(i => state.franchiseChecks[i.key]);
 
-  html += `<div style="display:flex;align-items:center;gap:16px;margin:32px 0 20px;padding-top:24px;border-top:2px solid var(--border)">
-    <div style="flex:1;height:1px;background:transparent"></div>
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 16px;background:${fsComplete ? 'var(--success)' : 'var(--hb)'};border-radius:20px">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-      <span style="font-size:12px;font-weight:700;color:white;letter-spacing:0.04em">DAY 4 — FRANCHISEE PARTNER REVIEW</span>
-    </div>
-    <div style="flex:1;height:1px;background:transparent"></div>
-  </div>`;
-
   html += `<div class="card mb-20">
     <div class="card-header">
       <div>
@@ -2498,7 +2546,7 @@ function renderFranchiseChecks() {
     section.items.forEach(item => {
       const checked = !!state.franchiseChecks[item.key];
       html += `<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-light);cursor:pointer">
-        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${item.key}', this.checked); renderFranchiseChecks()"
+        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${item.key}', this.checked); renderFranchisePartnerReview()"
           style="margin-top:2px;width:16px;height:16px;accent-color:${isSignOff ? 'var(--success)' : 'var(--trigger)'};flex-shrink:0">
         <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${item.label}</span>
       </label>`;
@@ -2512,6 +2560,15 @@ function renderFranchiseChecks() {
 function toggleFranchiseCheck(key, checked) {
   state.franchiseChecks[key] = checked;
   dbSaveFranchiseCheck(key, checked);
+}
+
+function markGroupAllComplete(keys) {
+  keys.forEach(function(key) {
+    state.franchiseChecks[key] = true;
+    dbSaveFranchiseCheck(key, true);
+  });
+  renderFranchiseChecks();
+  showToast('All items marked complete', 'success');
 }
 
 // ============================================================
