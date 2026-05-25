@@ -896,8 +896,8 @@
     <div id="addPane-bulk" style="display:none">
       <div class="form-row">
         <label class="form-label">Paste Names (one per line)</label>
-        <textarea class="recap-textarea" id="bulk-names" style="min-height:140px" placeholder="Alex Johnson&#10;Maria Garcia&#10;Tyler Smith&#10;..."></textarea>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">One name per line. Up to 12 total trainees.</div>
+        <textarea class="recap-textarea" id="bulk-names" style="min-height:140px" placeholder="Alex Johnson&#10;Maria Garcia&#10;Tyler Smith&#10;..." onkeydown="event.stopPropagation()"></textarea>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">One name per line. Up to 25 total trainees.</div>
       </div>
       <div class="form-row">
         <label class="form-label">Default Role for All</label>

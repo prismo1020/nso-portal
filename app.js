@@ -923,6 +923,7 @@ function renderCompetencyTable(day) {
       <tr>
         <th style="width:160px">Trainee</th>
         <th style="width:80px">Role</th>
+        <th style="width:90px;text-align:center">Attendance</th>
         ${comps.map(c => `<th class="competency-col">${c.name}</th>`).join('')}
         <th style="text-align:center;width:80px">Progress</th>
       </tr>
@@ -955,6 +956,14 @@ function renderCompetencyTable(day) {
     html += `<tr>
       <td><div class="trainee-name">${trainee.name}</div></td>
       <td><span class="badge badge-gray" style="font-size:10px">${trainee.role}</span></td>
+      <td style="text-align:center">
+        <div style="display:flex;gap:4px;justify-content:center">
+          <button onclick="toggleAttendance('${trainee.id}', ${day}, 'signed')"
+            style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid ${state.signoffs[trainee.id + '_attendance-d' + day] === 'signed' ? 'var(--success)' : 'var(--border)'};background:${state.signoffs[trainee.id + '_attendance-d' + day] === 'signed' ? 'var(--success)' : 'transparent'};color:${state.signoffs[trainee.id + '_attendance-d' + day] === 'signed' ? '#fff' : 'var(--text-muted)'};cursor:pointer;transition:all 0.15s">Y</button>
+          <button onclick="toggleAttendance('${trainee.id}', ${day}, 'not-met')"
+            style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid ${state.signoffs[trainee.id + '_attendance-d' + day] === 'not-met' ? 'var(--danger)' : 'var(--border)'};background:${state.signoffs[trainee.id + '_attendance-d' + day] === 'not-met' ? 'var(--danger)' : 'transparent'};color:${state.signoffs[trainee.id + '_attendance-d' + day] === 'not-met' ? '#fff' : 'var(--text-muted)'};cursor:pointer;transition:all 0.15s">N</button>
+        </div>
+      </td>
       ${traineeComps.join('')}
       <td style="text-align:center">
         <div style="font-size:11px;font-weight:600;color:${pct === 100 ? 'var(--success)' : 'var(--text-secondary)'}; margin-bottom:4px">${pct}%</div>
@@ -968,6 +977,20 @@ function renderCompetencyTable(day) {
   html += '</tbody></table>';
   container.innerHTML = html;
   updateCompProgress(day);
+}
+
+function toggleAttendance(traineeId, day, newStatus) {
+  const key = traineeId + '_attendance-d' + day;
+  const current = state.signoffs[key];
+  // Clicking the same button again clears it
+  if (current === newStatus) {
+    delete state.signoffs[key];
+    dbSaveSignoff(traineeId, 'attendance-d' + day, 'pending');
+  } else {
+    state.signoffs[key] = newStatus;
+    dbSaveSignoff(traineeId, 'attendance-d' + day, newStatus);
+  }
+  renderCompetencyTable(day);
 }
 
 function updateCompProgress(day) {
@@ -991,7 +1014,7 @@ function updateCompProgress(day) {
 
   // Update all signoffs badge
   const allTotal = COMPETENCIES.length * state.trainees.length;
-  const allSigned = Object.values(state.signoffs).filter(v => v === 'signed').length;
+  const allSigned = Object.entries(state.signoffs).filter(([k, v]) => v === 'signed' && !k.includes('_attendance-')).length;
   document.getElementById('navSignoffBadge').textContent = allSigned;
   document.getElementById('statSignoffs').textContent = allSigned;
   document.getElementById('statSignoffsDetail').textContent = `of ${allTotal} total`;
@@ -1577,7 +1600,7 @@ function addTrainee() {
   const name = document.getElementById('trainee-name').value.trim();
   const role = document.getElementById('trainee-role').value;
   if (!name) { showToast('Please enter a name', 'info'); return; }
-  if (state.trainees.length >= 12) { showToast('Maximum 12 trainees per opening', 'info'); return; }
+  if (state.trainees.length >= 25) { showToast('Maximum 25 trainees per opening', 'info'); return; }
 
   const trainee = { id: crypto.randomUUID(), name, role };
   state.trainees.push(trainee);
@@ -1595,7 +1618,7 @@ function bulkAddTrainees() {
   if (!raw) { showToast('Please enter at least one name', 'info'); return; }
 
   const names = raw.split('\n').map(n => n.trim()).filter(n => n.length > 0);
-  const available = 12 - state.trainees.length;
+  const available = 25 - state.trainees.length;
   if (names.length > available) {
     showToast(`Only ${available} spots left. First ${available} names will be added.`, 'info');
   }
@@ -2221,6 +2244,118 @@ function renderFranchiseChecks() {
         <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${check.key}', this.checked); renderFranchiseChecks()"
           style="margin-top:2px;width:16px;height:16px;accent-color:var(--trigger);flex-shrink:0">
         <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${check.label}</span>
+      </label>`;
+    });
+    html += `</div></div>`;
+  });
+
+  // ── Franchisee Partner Sign-Off ──────────────────────────────
+  const FSIGNOFF_SECTIONS = [
+    {
+      key_prefix: 'fsignoff-training',
+      title: 'Training Summary',
+      subtitle: 'Confirm what took place during the opening training program.',
+      items: [
+        { key: 'fsignoff-training-days', label: 'All 5 training days were completed as scheduled' },
+        { key: 'fsignoff-training-elearning', label: 'All trainees completed required Delightree eLearning modules' },
+        { key: 'fsignoff-training-signoffs', label: 'Competency sign-offs were reviewed and discussed with the franchise partner' },
+        { key: 'fsignoff-training-attendance', label: 'Attendance was consistent — any absences were discussed' },
+      ]
+    },
+    {
+      key_prefix: 'fsignoff-readiness',
+      title: 'Team Readiness',
+      subtitle: 'Select all areas where the team demonstrated readiness.',
+      items: [
+        { key: 'fsignoff-ready-guest', label: 'Team can deliver the full Guest Journey confidently and consistently' },
+        { key: 'fsignoff-ready-tech', label: 'Team can operate all technology independently (trackers, vests, props, wireless)' },
+        { key: 'fsignoff-ready-sales', label: 'Team understands and can execute Repeatability and upsell moments' },
+        { key: 'fsignoff-ready-ops', label: 'Team can complete open and close procedures without guidance' },
+        { key: 'fsignoff-ready-sm', label: 'Store Manager is ready to independently lead the store' },
+      ]
+    },
+    {
+      key_prefix: 'fsignoff-opportunities',
+      title: 'Development Opportunities',
+      subtitle: 'Identify areas that need continued attention during opening weekend.',
+      items: [
+        { key: 'fsignoff-dev-guest', label: 'Guest experience and service delivery' },
+        { key: 'fsignoff-dev-tech', label: 'Technology operations and troubleshooting' },
+        { key: 'fsignoff-dev-sales', label: 'Sales, Repeatability, and walk-in conversion' },
+        { key: 'fsignoff-dev-ops', label: 'Operational procedures and execution speed' },
+        { key: 'fsignoff-dev-sm', label: 'Store Manager\'s leadership and team direction' },
+        { key: 'fsignoff-dev-none', label: 'No critical gaps identified — team is ready to operate' },
+      ]
+    },
+    {
+      key_prefix: 'fsignoff-plan',
+      title: 'Opening Weekend Action Plan',
+      subtitle: 'What happens next — agreed upon by OSC and franchise partner.',
+      items: [
+        { key: 'fsignoff-plan-coach-present', label: 'Coach will be present for Friends & Family Day' },
+        { key: 'fsignoff-plan-sm-leads', label: 'SM will lead F&F Day independently with coach in an observing role' },
+        { key: 'fsignoff-plan-debrief', label: 'End-of-day debrief scheduled for each opening weekend day' },
+        { key: 'fsignoff-plan-areas', label: 'Specific coaching focus areas have been communicated to the SM' },
+        { key: 'fsignoff-plan-followup', label: 'Follow-up plan is in place for any critical development areas' },
+      ]
+    },
+    {
+      key_prefix: 'fsignoff-confirm',
+      title: 'Formal Sign-Off',
+      subtitle: 'Both parties confirm this review is accurate and complete.',
+      items: [
+        { key: 'fsignoff-osc-confirms', label: 'OSC confirms: This summary accurately reflects the training program and outcomes' },
+        { key: 'fsignoff-franchisee-confirms', label: 'Franchise Partner confirms: I have reviewed this summary and acknowledge the plan for opening weekend' },
+      ]
+    },
+  ];
+
+  const fsTotal = FSIGNOFF_SECTIONS.reduce((s, sec) => s + sec.items.length, 0);
+  const fsDone = FSIGNOFF_SECTIONS.reduce((s, sec) => s + sec.items.filter(i => state.franchiseChecks[i.key]).length, 0);
+  const fsPct = fsTotal > 0 ? Math.round((fsDone / fsTotal) * 100) : 0;
+  const fsComplete = FSIGNOFF_SECTIONS[FSIGNOFF_SECTIONS.length - 1].items.every(i => state.franchiseChecks[i.key]);
+
+  html += `<div style="display:flex;align-items:center;gap:16px;margin:32px 0 20px;padding-top:24px;border-top:2px solid var(--border)">
+    <div style="flex:1;height:1px;background:transparent"></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 16px;background:${fsComplete ? 'var(--success)' : 'var(--hb)'};border-radius:20px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      <span style="font-size:12px;font-weight:700;color:white;letter-spacing:0.04em">DAY 4 — FRANCHISEE PARTNER REVIEW</span>
+    </div>
+    <div style="flex:1;height:1px;background:transparent"></div>
+  </div>`;
+
+  html += `<div class="card mb-20">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Partner Review Sign-Off</div>
+        <div class="card-subtitle">Complete this together with the franchise partner on Day 4 — takes 5–7 minutes. Both parties confirm before F&F Day.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        ${fsComplete ? '<span class="badge badge-green">Signed Off</span>' : ''}
+        <div style="font-size:14px;font-weight:700;color:` + (fsPct===100?'var(--success)':'var(--hb)') + `">${fsPct}%</div>
+        <div style="width:100px"><div class="progress-bar-wrap"><div class="progress-bar-fill ${fsPct===100?'green':'blue'}" style="width:${fsPct}%"></div></div></div>
+      </div>
+    </div>
+  </div>`;
+
+  FSIGNOFF_SECTIONS.forEach(section => {
+    const secDone = section.items.filter(i => state.franchiseChecks[i.key]).length;
+    const isSignOff = section.key_prefix === 'fsignoff-confirm';
+    html += `<div class="card mb-20" ${isSignOff ? 'style="border:2px solid ' + (secDone === section.items.length ? 'var(--success)' : 'var(--trigger)') + '"' : ''}>
+      <div class="card-header">
+        <div>
+          <div class="card-title">${section.title}</div>
+          <div class="card-subtitle">${section.subtitle}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary)">${secDone}/${section.items.length}</div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:0">`;
+    section.items.forEach(item => {
+      const checked = !!state.franchiseChecks[item.key];
+      html += `<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-light);cursor:pointer">
+        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${item.key}', this.checked); renderFranchiseChecks()"
+          style="margin-top:2px;width:16px;height:16px;accent-color:${isSignOff ? 'var(--success)' : 'var(--trigger)'};flex-shrink:0">
+        <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${item.label}</span>
       </label>`;
     });
     html += `</div></div>`;
