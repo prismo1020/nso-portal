@@ -1095,8 +1095,7 @@ function selectRecapDay(day) {
   loadRecapFields(day);
 }
 
-const RECAP_FIELDS = ['ld-topics', 'ld-team', 'tech', 'ops', 'sm', 'tomorrow', 'actions',
-  'biz-goal', 'biz-vs-goal', 'biz-ly', 'biz-labor', 'biz-staffing', 'biz-14day', 'biz-risks', 'biz-leader'];
+const RECAP_FIELDS = ['ld-topics', 'ld-team', 'tech', 'ops', 'sm', 'tomorrow', 'actions'];
 
 function loadRecapFields(day) {
   const r = state.recaps[day] || {};
@@ -1148,27 +1147,6 @@ function updateRecapPreview() {
   const sm = get('sm');
   if (sm) {
     preview += `🏪 SM NOTES\n${sm}\n\n`;
-  }
-
-  const bizGoal = get('biz-goal');
-  const bizVsGoal = get('biz-vs-goal');
-  const bizLy = get('biz-ly');
-  const bizLabor = get('biz-labor');
-  const bizStaffing = get('biz-staffing');
-  const biz14day = get('biz-14day');
-  const bizRisks = get('biz-risks');
-  const bizLeader = get('biz-leader');
-  if (bizGoal || bizVsGoal || bizLy || bizLabor || bizStaffing || biz14day || bizRisks || bizLeader) {
-    preview += `💼 BUSINESS READINESS\n`;
-    if (bizGoal) preview += `Goal: ${bizGoal}\n`;
-    if (bizVsGoal) preview += `Performance: ${bizVsGoal}\n`;
-    if (bizLy) preview += `LY: ${bizLy}\n`;
-    if (bizLabor) preview += `Labor/Booking Trends: ${bizLabor}\n`;
-    if (bizStaffing) preview += `Staffing: ${bizStaffing}\n`;
-    if (biz14day) preview += `14-Day Outlook: ${biz14day}\n`;
-    if (bizRisks) preview += `Risks/Peaks: ${bizRisks}\n`;
-    if (bizLeader) preview += `Leader Focus Tomorrow: ${bizLeader}\n`;
-    preview += '\n';
   }
 
   const tomorrow = get('tomorrow');
@@ -2564,13 +2542,17 @@ function renderFranchisePartnerReview() {
   FSIGNOFF_SECTIONS.forEach(section => {
     const secDone = section.items.filter(i => state.franchiseChecks[i.key]).length;
     const isSignOff = section.key_prefix === 'fsignoff-confirm';
+    const sectionKeys = '[' + section.items.map(i => "'" + i.key + "'").join(',') + ']';
     html += `<div class="card mb-20" ${isSignOff ? 'style="border:2px solid ' + (secDone === section.items.length ? 'var(--success)' : 'var(--trigger)') + '"' : ''}>
       <div class="card-header">
         <div>
           <div class="card-title">${section.title}</div>
           <div class="card-subtitle">${section.subtitle}</div>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary)">${secDone}/${section.items.length}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:12px;color:var(--text-secondary)">${secDone}/${section.items.length}</div>
+          ${secDone < section.items.length ? `<button class="btn btn-sm btn-secondary" onclick="markFranchiseeAllComplete(${sectionKeys})" style="font-size:11px;padding:4px 10px">✓ Mark All</button>` : ''}
+        </div>
       </div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:0">`;
     section.items.forEach(item => {
@@ -2590,6 +2572,14 @@ function renderFranchisePartnerReview() {
 function toggleFranchiseCheck(key, checked) {
   state.franchiseChecks[key] = checked;
   dbSaveFranchiseCheck(key, checked);
+}
+
+function markFranchiseeAllComplete(keys) {
+  keys.forEach(function(key) {
+    state.franchiseChecks[key] = true;
+    dbSaveFranchiseCheck(key, true);
+  });
+  renderFranchisePartnerReview();
 }
 
 function markGroupAllComplete(keys) {

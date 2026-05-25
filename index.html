@@ -137,7 +137,7 @@
       </button>
       <button class="nav-item" id="nav-franchisee" onclick="navigate('franchisee')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 11a6 6 0 00-12 0"/><circle cx="8" cy="5" r="3"/><path d="M1 14h14"/></svg>
-        Day 4 – Partner Review
+        Day 4: Partner Review
       </button>
       <button class="nav-item" id="nav-leadership" onclick="navigate('leadership')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14a6 6 0 0112 0"/><path d="M8 10v4M6 12h4"/></svg>
@@ -334,8 +334,8 @@
       </div>
       <div class="card">
         <div class="card-header flex-between">
-          <div class="card-title">Trainees (<span id="traineeCount">0</span> / 12)</div>
-          <div class="text-xs" id="traineeCapacityNote">Up to 12 trainees per opening</div>
+          <div class="card-title">Trainees (<span id="traineeCount">0</span> / 25)</div>
+          <div class="text-xs" id="traineeCapacityNote">Up to 25 trainees per opening</div>
         </div>
         <div class="card-body" id="traineeListBody">
           <div class="empty-state">
@@ -490,7 +490,7 @@
                   <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Role-play scenarios completed.')">Role-Play</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Opening & closing checklists practiced.')">Checklists</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Checkfront and Silica software walkthrough completed.')">Checkfront/Silica</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Tracker build completed — all rooms.')">Tracker Build</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Tracker build completed: all rooms.')">Tracker Build</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Repeatability and conversion selling practice completed.')">Sales Practice</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'T1 ticket workflow practiced.')">T1 Workflow</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Room calibration completed for all rooms.')">Calibration</button>
@@ -501,16 +501,16 @@
                 <div class="form-label">Team Observations</div>
                 <textarea class="recap-textarea" id="recap-ld-team" placeholder="Energy level, engagement, standout moments, individuals showing leadership potential, anyone who needs extra support..." oninput="updateRecapPreview()"></textarea>
                 <div class="recap-chips">
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team energy is excellent — highly engaged throughout.')">High energy</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Leadership identified — ASM/SM showing strong initiative.')">Leadership noted</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team energy is excellent: highly engaged throughout.')">High energy</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Leadership identified: ASM/SM showing strong initiative.')">Leadership noted</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-team', '100% e-learning completion confirmed on Delightree.')">E-learnings done</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-team', 'A few team members need additional support with tech procedures.')">Support needed</button>
                   <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team is absorbing content well and retaining key concepts.')">Strong retention</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team is embodying core values — egoless, collaborative, motivated.')">Core values present</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Guest Journey scripts feel natural — good confidence at touchpoints.')">Scripts natural</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Tech confidence is building — team is less hesitant with equipment.')">Tech confidence up</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Repeatability pitch needs more reps — team is hesitant on the ask.')">Repeatability weak</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team pace is good — no one falling significantly behind.')">Good pace</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team is embodying core values: egoless, collaborative, motivated.')">Core values present</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Guest Journey scripts feel natural: good confidence at touchpoints.')">Scripts natural</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Tech confidence is building: team is less hesitant with equipment.')">Tech confidence up</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Repeatability pitch needs more reps: team is hesitant on the ask.')">Repeatability weak</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team pace is good: no one falling significantly behind.')">Good pace</button>
                 </div>
               </div>
             </div>
@@ -529,30 +529,30 @@
                 <textarea class="recap-textarea" id="recap-tech" placeholder="Hardware issues, T1 tickets opened, software bugs, items escalated to T2..." oninput="updateRecapPreview()"></textarea>
                 <div class="recap-chips">
                   <button class="recap-chip" onclick="appendChip('recap-tech', 'No tech issues to report today.')">No issues</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'T1 ticket created — ')">T1 ticket</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'T1 ticket created: ')">T1 ticket</button>
                   <button class="recap-chip" onclick="appendChip('recap-tech', 'Latency issues observed in Room ')">Latency</button>
                   <button class="recap-chip" onclick="appendChip('recap-tech', 'Vest pairing issues encountered and resolved.')">Vest pairing</button>
                   <button class="recap-chip" onclick="appendChip('recap-tech', 'Tracker calibration required in Room ')">Calibration</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Prop not tracking in Room — resolved with re-pair.')">Prop tracking</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'HTC headset swapped out in Room  — T1 notified.')">Headset swap</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'KVM switch issue in Room  — resolved.')">KVM switch</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Silica session creation error — resolved with T1.')">Silica error</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Audio issue in Room  — resolved.')">Audio issue</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'ATH red LED status on headset  — resolved via Kiosk Mode restart.')">ATH issue</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Evoke tracker assets missing — reloaded Vicon profile.')">Evoke assets</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Prop not tracking in Room: resolved with re-pair.')">Prop tracking</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'HTC headset swapped out in Room: T1 notified.')">Headset swap</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'KVM switch issue in Room: resolved.')">KVM switch</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Silica session creation error: resolved with T1.')">Silica error</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Audio issue in Room: resolved.')">Audio issue</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'ATH red LED status on headset: resolved via Kiosk Mode restart.')">ATH issue</button>
+                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Evoke tracker assets missing: reloaded Vicon profile.')">Evoke assets</button>
                 </div>
               </div>
               <div class="recap-section">
                 <div class="form-label">Building / Ops</div>
                 <textarea class="recap-textarea" id="recap-ops" style="min-height:70px" placeholder="CO status, inspections, replen needs, cleaning, outstanding build items..." oninput="updateRecapPreview()"></textarea>
                 <div class="recap-chips">
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'CO received — store cleared for operations.')">CO received</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'CO received: store cleared for operations.')">CO received</button>
                   <button class="recap-chip" onclick="appendChip('recap-ops', 'Health & safety inspection pending.')">H&amp;S pending</button>
                   <button class="recap-chip" onclick="appendChip('recap-ops', 'Replen items needed: ')">Replen needed</button>
                   <button class="recap-chip" onclick="appendChip('recap-ops', 'Cleaning crew confirmed for ')">Cleaning</button>
                   <button class="recap-chip" onclick="appendChip('recap-ops', 'Store is clean and guest-ready.')">Store ready</button>
                   <button class="recap-chip" onclick="appendChip('recap-ops', 'Fire inspection completed.')">Fire inspection</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Build still in progress — polywall/fixtures outstanding.')">Build incomplete</button>
+                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Build still in progress: polywall/fixtures outstanding.')">Build incomplete</button>
                   <button class="recap-chip" onclick="appendChip('recap-ops', 'All holodecks operational and calibrated.')">All rooms ready</button>
                 </div>
               </div>
@@ -572,58 +572,15 @@
                 <textarea class="recap-textarea" id="recap-sm" placeholder="SM's ability to run training independently, delivery quality, team management, areas of strength, areas for coaching..." oninput="updateRecapPreview()"></textarea>
                 <div class="recap-chips">
                   <button class="recap-chip" onclick="appendChip('recap-sm', 'SM ran training independently with minimal coaching needed.')">Independent delivery</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needed support with training video sequencing — now corrected.')">Video sequencing</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needed support with training video sequencing: now corrected.')">Video sequencing</button>
                   <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is highly motivated and leading the team well.')">Strong leadership</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needs reminders to stay on plan — improving with coaching.')">Needs reminders</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needs reminders to stay on plan: improving with coaching.')">Needs reminders</button>
                   <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is building strong rapport with the team.')">Good rapport</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is developing their coaching voice — growing each day.')">Coach voice developing</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is developing their coaching voice: growing each day.')">Coach voice developing</button>
                   <button class="recap-chip" onclick="appendChip('recap-sm', 'ASM is standing out as a strong operational leader.')">ASM standout</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is solid on guest journey delivery — tech confidence still building.')">GJ strong, tech developing</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM ran the Day 4 rotation brief independently — excellent.')">Day 4 brief owned</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is solid on guest journey delivery: tech confidence still building.')">GJ strong, tech developing</button>
+                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM ran the Day 4 rotation brief independently: excellent.')">Day 4 brief owned</button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card mb-20">
-            <div class="card-header">
-              <div>
-                <div class="card-title">💼 Business Readiness Recap</div>
-                <div class="card-subtitle">Build the habit of knowing the numbers — every day, not just the good ones</div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="recap-section">
-                <div class="form-label">What was today's Daily Budgeted Goal?</div>
-                <textarea class="recap-textarea" id="recap-biz-goal" style="min-height:56px" placeholder="e.g. $4,200 — based on LY + seasonal adjustment..." oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">How did the store perform against goal?</div>
-                <textarea class="recap-textarea" id="recap-biz-vs-goal" style="min-height:56px" placeholder="e.g. Finished at $3,950 — 94% to goal. Two no-shows in the afternoon pulled us under..." oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">What was LY Performance for this day?</div>
-                <textarea class="recap-textarea" id="recap-biz-ly" style="min-height:56px" placeholder="e.g. LY was $3,600 — we outperformed LY by $350 despite the no-shows..." oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">What booking or labor trends stood out today?</div>
-                <textarea class="recap-textarea" id="recap-biz-labor" style="min-height:64px" placeholder="e.g. Walk-in traffic was stronger than expected mid-afternoon. Friday evening slots are nearly full for the next two weeks..." oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">Were staffing adjustments made? Why?</div>
-                <textarea class="recap-textarea" id="recap-biz-staffing" style="min-height:64px" placeholder="e.g. Called in an extra GEG for the 3pm–7pm window based on booking density. SM made the call independently — good instinct..." oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">What does the next 14 days of bookings suggest?</div>
-                <textarea class="recap-textarea" id="recap-biz-14day" style="min-height:64px" placeholder="e.g. Two high-volume weekends ahead. July 4th weekend is nearly sold out. Mid-week is light — opportunity to run training blocks..." oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">Upcoming peak periods, training blocks, or operational risks?</div>
-                <textarea class="recap-textarea" id="recap-biz-risks" style="min-height:64px" placeholder="e.g. School group booked for Tuesday — 24 guests across 3 consecutive sessions. SM needs to plan staffing and gear rotation in advance..." oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">What should tomorrow's leader pay attention to?</div>
-                <textarea class="recap-textarea" id="recap-biz-leader" style="min-height:64px" placeholder="e.g. Friday open is heavy — first session at 10am. ASM is opening. Make sure they've reviewed the booking count and planned gear rotation before team arrives..." oninput="updateRecapPreview()"></textarea>
               </div>
             </div>
           </div>

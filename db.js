@@ -156,14 +156,6 @@ async function dbSaveRecap(day) {
     sm_notes:     r['sm']           || null,
     tomorrow:     r['tomorrow']     || null,
     actions:      r['actions']      || null,
-    biz_goal:     r['biz-goal']     || null,
-    biz_vs_goal:  r['biz-vs-goal']  || null,
-    biz_ly:       r['biz-ly']       || null,
-    biz_labor:    r['biz-labor']    || null,
-    biz_staffing: r['biz-staffing'] || null,
-    biz_14day:    r['biz-14day']    || null,
-    biz_risks:    r['biz-risks']    || null,
-    biz_leader:   r['biz-leader']   || null,
     updated_at:   new Date().toISOString()
   }, { onConflict: 'opening_id,day_num' });
   if (error) console.error('dbSaveRecap:', error);
