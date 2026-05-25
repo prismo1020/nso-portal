@@ -192,6 +192,11 @@ async function dbLoadOpeningsForCoach() {
   return data || [];
 }
 
+async function dbDeleteOpening(openingId) {
+  const { error } = await supabase.from('openings').delete().eq('id', openingId);
+  return error || null;
+}
+
 async function dbLoadAllOpenings() {
   // Fetch openings first, then related data per opening separately.
   // Avoids nested-join RLS issues that can silently return empty.

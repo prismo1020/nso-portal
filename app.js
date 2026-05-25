@@ -1786,7 +1786,14 @@ async function renderAdminPage() {
     html += '<span class="badge ' + pctBadge + '">' + pct + '% signed off</span>';
     html += '<span class="badge ' + recapBadge + '">' + recapCount + '/5 recaps</span>';
     html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" id="chevron-' + openingId + '" style="transition:transform 0.2s"><path d="M2 5l5 5 5-5"/></svg>';
-    html += '</div></div>';
+    html += '</div>';
+    if (state.userRole === 'admin') {
+      html += '<div style="display:flex;gap:8px;padding:8px 20px 12px;border-top:1px solid var(--border-light)">';
+      html += '<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;gap:6px" onclick="event.stopPropagation();exportOpeningCSV(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\'/><polyline points=\'7 10 12 15 17 10\'/><line x1=\'12\' y1=\'15\' x2=\'12\' y2=\'3\'/></svg> Export CSV</button>';
+      html += '<button class="btn" style="font-size:12px;padding:5px 12px;gap:6px;background:transparent;border:1px solid var(--danger);color:var(--danger)" onclick="event.stopPropagation();confirmDeleteOpening(\'' + o.id + '\', ' + JSON.stringify(o.store_name) + ')"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'3 6 5 6 21 6\'/><path d=\'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\'/></svg> Delete</button>';
+      html += '</div>';
+    }
+    html += '</div>';
     html += '<div id="' + openingId + '" style="display:none">';
     html += '<div style="padding:20px;border-top:1px solid var(--border-light)">';
 
@@ -1862,6 +1869,139 @@ async function renderAdminPage() {
   });
 
   container.innerHTML = html;
+
+  // User Management section (admin only)
+  if (state.userRole === 'admin') {
+    renderUserManagement();
+  }
+}
+
+function confirmDeleteOpening(openingId, storeName) {
+  if (!confirm('Permanently delete "' + storeName + '"?\n\nThis will delete all trainees, sign-offs, recaps, and franchise checks for this opening. This cannot be undone.')) return;
+  dbDeleteOpening(openingId).then(function(err) {
+    if (err) { showToast('Error deleting opening: ' + err.message, 'error'); return; }
+    showToast('"' + storeName + '" deleted.', 'success');
+    renderAdminPage();
+  });
+}
+
+async function exportOpeningCSV(openingId, storeName) {
+  showToast('Preparing export…', 'info');
+  // Load full opening data
+  const [{ data: opening }, { data: trainees }, { data: signoffs }, { data: recaps }, { data: fchecks }] = await Promise.all([
+    supabase.from('openings').select('*').eq('id', openingId).single(),
+    supabase.from('trainees').select('*').eq('opening_id', openingId).order('created_at'),
+    supabase.from('signoffs').select('*').eq('opening_id', openingId),
+    supabase.from('recaps').select('*').eq('opening_id', openingId).order('day_num'),
+    supabase.from('franchise_checks').select('*').eq('opening_id', openingId)
+  ]);
+
+  var rows = [];
+  var esc = function(v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; };
+
+  // Opening info
+  rows.push(['OPENING INFORMATION', '', '']);
+  rows.push(['Store Name', esc(opening.store_name), '']);
+  rows.push(['Coach', esc(opening.coach_name), '']);
+  rows.push(['Start Date', esc(opening.start_date), '']);
+  rows.push(['Current Day', esc(opening.current_day), '']);
+  rows.push(['Status', esc(opening.status), '']);
+  rows.push(['', '', '']);
+
+  // Roster
+  rows.push(['TEAM ROSTER', '', '']);
+  rows.push(['Name', 'Role', 'Signed Off', 'Progress %']);
+  (trainees || []).forEach(function(t) {
+    var tSigned = (signoffs || []).filter(function(s){ return s.trainee_id === t.id && s.status === 'signed' && !s.competency_id.startsWith('attendance-'); }).length;
+    var total = COMPETENCIES.length;
+    rows.push([esc(t.name), esc(t.role), tSigned + '/' + total, Math.round((tSigned/total)*100) + '%']);
+  });
+  rows.push(['', '', '']);
+
+  // Attendance
+  rows.push(['ATTENDANCE', 'Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5']);
+  (trainees || []).forEach(function(t) {
+    var atRow = [esc(t.name)];
+    [1,2,3,4,5].forEach(function(d) {
+      var rec = (signoffs || []).find(function(s){ return s.trainee_id === t.id && s.competency_id === 'attendance-d' + d; });
+      atRow.push(rec ? (rec.status === 'signed' ? 'Present' : 'Absent') : 'Not recorded');
+    });
+    rows.push(atRow);
+  });
+  rows.push(['', '', '']);
+
+  // Sign-off matrix
+  rows.push(['SIGN-OFF MATRIX', '']);
+  var compHeaders = ['Trainee', 'Role'].concat(COMPETENCIES.map(function(c){ return esc(c.name); }));
+  rows.push(compHeaders);
+  (trainees || []).forEach(function(t) {
+    var row = [esc(t.name), esc(t.role)];
+    COMPETENCIES.forEach(function(c) {
+      var s = (signoffs || []).find(function(x){ return x.trainee_id === t.id && x.competency_id === c.id; });
+      row.push(s ? esc(s.status) : 'pending');
+    });
+    rows.push(row);
+  });
+  rows.push(['', '']);
+
+  // Recaps
+  rows.push(['DAILY RECAPS', '']);
+  rows.push(['Day', 'L&D Topics', 'Team Notes', 'Tech', 'Ops', 'SM Notes', 'Tomorrow', 'Actions']);
+  [1,2,3,4,5].forEach(function(d) {
+    var r = (recaps || []).find(function(x){ return x.day_num === d; });
+    rows.push([d, esc(r && r.ld_topics), esc(r && r.ld_team), esc(r && r.tech), esc(r && r.ops), esc(r && r.sm_notes), esc(r && r.tomorrow), esc(r && r.actions)]);
+  });
+
+  var csv = rows.map(function(r){ return r.join(','); }).join('\r\n');
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = (storeName || 'opening').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '-export.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Export downloaded!', 'success');
+}
+
+async function renderUserManagement() {
+  var container = document.getElementById('adminUsersList');
+  if (!container) return;
+  container.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:13px">Loading users…</div>';
+
+  const { data: profiles, error } = await supabase.from('profiles').select('*').order('created_at');
+  if (error || !profiles) {
+    container.innerHTML = '<div style="padding:16px;color:var(--danger);font-size:13px">Could not load users. Check RLS policies allow admin to select all profiles.</div>';
+    return;
+  }
+
+  var html = profiles.map(function(p) {
+    var isAdmin = p.role === 'admin';
+    var isSelf = p.email === state.userEmail;
+    return '<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-light)">' +
+      '<div style="width:36px;height:36px;border-radius:50%;background:' + (isAdmin ? 'var(--hb)' : 'var(--surface)') + ';border:1px solid ' + (isAdmin ? 'var(--hb)' : 'var(--border)') + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:' + (isAdmin ? '#fff' : 'var(--text-secondary)') + '">' + (p.full_name || p.email || '?').charAt(0).toUpperCase() + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:14px;font-weight:600;color:var(--hb)">' + (p.full_name || '—') + (isSelf ? ' <span style="font-size:11px;color:var(--trigger);font-weight:700">(you)</span>' : '') + '</div>' +
+        '<div style="font-size:12px;color:var(--text-secondary);margin-top:1px">' + (p.email || '—') + '</div>' +
+      '</div>' +
+      '<span class="badge ' + (isAdmin ? 'badge-blue' : 'badge-gray') + '">' + (isAdmin ? 'Admin' : 'Coach') + '</span>' +
+      (!isSelf ? '<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="toggleUserRole(\'' + p.id + '\', \'' + p.email + '\', \'' + p.role + '\')">' + (isAdmin ? 'Make Coach' : 'Make Admin') + '</button>' : '<div style="width:95px"></div>') +
+    '</div>';
+  }).join('');
+
+  container.innerHTML = html || '<div style="padding:16px;color:var(--text-muted);font-size:13px">No users found.</div>';
+}
+
+async function toggleUserRole(profileId, email, currentRole) {
+  var newRole = currentRole === 'admin' ? 'coach' : 'admin';
+  var label = newRole === 'admin' ? 'admin' : 'coach';
+  if (!confirm('Change ' + email + ' to ' + label + '?')) return;
+  const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', profileId);
+  if (error) {
+    showToast('Error: ' + error.message, 'error');
+    return;
+  }
+  showToast(email + ' is now a ' + label + '.', 'success');
+  renderUserManagement();
 }
 
 function toggleAdminOpening(id) {
