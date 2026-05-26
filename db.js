@@ -51,23 +51,7 @@ async function dbLoadState() {
 
   state.recaps = {};
   (recaps || []).forEach(r => {
-    state.recaps[r.day_num] = {
-      'ld-topics':    r.ld_topics    || '',
-      'ld-team':      r.ld_team      || '',
-      'tech':         r.tech         || '',
-      'ops':          r.ops          || '',
-      'sm':           r.sm_notes     || '',
-      'tomorrow':     r.tomorrow     || '',
-      'actions':      r.actions      || '',
-      'biz-goal':     r.biz_goal     || '',
-      'biz-vs-goal':  r.biz_vs_goal  || '',
-      'biz-ly':       r.biz_ly       || '',
-      'biz-labor':    r.biz_labor    || '',
-      'biz-staffing': r.biz_staffing || '',
-      'biz-14day':    r.biz_14day    || '',
-      'biz-risks':    r.biz_risks    || '',
-      'biz-leader':   r.biz_leader   || '',
-    };
+    state.recaps[r.day_num] = r.recap_data || {};
   });
 
   state.franchiseChecks = {};
@@ -209,16 +193,10 @@ async function dbSaveRecap(day) {
   if (!state.openingId) return { message: 'No opening loaded' };
   const r = state.recaps[day] || {};
   const { error } = await supabase.from('recaps').upsert({
-    opening_id:   state.openingId,
-    day_num:      day,
-    ld_topics:    r['ld-topics']    || null,
-    ld_team:      r['ld-team']      || null,
-    tech:         r['tech']         || null,
-    ops:          r['ops']          || null,
-    sm_notes:     r['sm']           || null,
-    tomorrow:     r['tomorrow']     || null,
-    actions:      r['actions']      || null,
-    updated_at:   new Date().toISOString()
+    opening_id:  state.openingId,
+    day_num:     day,
+    recap_data:  r,
+    updated_at:  new Date().toISOString()
   }, { onConflict: 'opening_id,day_num' });
   if (error) console.error('dbSaveRecap:', error);
   return error || null;

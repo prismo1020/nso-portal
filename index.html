@@ -462,8 +462,8 @@
     <div id="view-recap" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">DAILY RECAP</div>
-        <div class="page-title">Write Today's Recap</div>
-        <div class="page-subtitle">Structured recap for Ops &amp; L&amp;D. Copy to Slack when complete.</div>
+        <div class="page-title">Daily Training Recap</div>
+        <div class="page-subtitle">Structured end-of-day summary for Ops &amp; L&amp;D. Save and copy to Slack when complete.</div>
       </div>
 
       <div class="tabs" id="recapDayTabs">
@@ -476,141 +476,306 @@
 
       <div class="grid-2">
         <div>
+
+          <!-- BUILDING -->
           <div class="card mb-20">
             <div class="card-header">
               <div>
-                <div class="card-title">📋 L&amp;D Summary</div>
-                <div class="card-subtitle">What was covered, how the team absorbed it</div>
+                <div class="card-title">&#127959; Building</div>
+                <div class="card-subtitle">Permits, construction progress, and physical site issues</div>
               </div>
+              <span class="badge badge-gray">As-Opens</span>
             </div>
             <div class="card-body">
               <div class="recap-section">
-                <div class="form-label">Topics Covered</div>
-                <textarea class="recap-textarea" id="recap-ld-topics" placeholder="What content was delivered today? Note any videos watched, discussions held, practice activities completed..." oninput="updateRecapPreview()"></textarea>
-                <div class="recap-chips">
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Reviewed mission, core values & vocabulary.')">Mission &amp; Values</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Guest Journey walkthrough completed.')">Guest Journey</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Technology essentials covered (trackers, vests, props).')">Tech Essentials</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Policies & procedures reviewed.')">Policies</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Role-play scenarios completed.')">Role-Play</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Opening & closing checklists practiced.')">Checklists</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Checkfront and Silica software walkthrough completed.')">Checkfront/Silica</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Tracker build completed: all rooms.')">Tracker Build</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Repeatability and conversion selling practice completed.')">Sales Practice</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'T1 ticket workflow practiced.')">T1 Workflow</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Room calibration completed for all rooms.')">Calibration</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-topics', 'Experience overviews and trailer videos watched.')">Experiences</button>
-                </div>
+                <div class="form-label">Permits &amp; Inspections</div>
+                <textarea class="recap-textarea" id="recap-building-permits" placeholder="Status of any outstanding permits or upcoming inspections..." oninput="updateRecapPreview()"></textarea>
               </div>
               <div class="recap-section">
-                <div class="form-label">Team Observations</div>
-                <textarea class="recap-textarea" id="recap-ld-team" placeholder="Energy level, engagement, standout moments, individuals showing leadership potential, anyone who needs extra support..." oninput="updateRecapPreview()"></textarea>
-                <div class="recap-chips">
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team energy is excellent: highly engaged throughout.')">High energy</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Leadership identified: ASM/SM showing strong initiative.')">Leadership noted</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', '100% e-learning completion confirmed on Delightree.')">E-learnings done</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'A few team members need additional support with tech procedures.')">Support needed</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team is absorbing content well and retaining key concepts.')">Strong retention</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team is embodying core values: egoless, collaborative, motivated.')">Core values present</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Guest Journey scripts feel natural: good confidence at touchpoints.')">Scripts natural</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Tech confidence is building: team is less hesitant with equipment.')">Tech confidence up</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Repeatability pitch needs more reps: team is hesitant on the ask.')">Repeatability weak</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ld-team', 'Team pace is good: no one falling significantly behind.')">Good pace</button>
+                <div class="form-label">Construction / HVAC Progress</div>
+                <textarea class="recap-textarea" id="recap-building-construction" placeholder="What was completed today, what is outstanding..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-problem-wrap">
+                <button class="recap-problem-toggle" id="problem-toggle-building" onclick="toggleProblem('building')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4v4M8 11v1" stroke-linecap="round"/><circle cx="8" cy="8" r="7"/></svg>
+                  Problem Identified
+                </button>
+                <div class="recap-problem-body" id="problem-body-building" style="display:none">
+                  <textarea class="recap-textarea" id="recap-building-problem" placeholder="Describe the issue (e.g. HVAC unit delayed, permit hold from inspector)..." oninput="updateRecapPreview()"></textarea>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Priority</div>
+                  <div class="recap-priority-row" id="priority-btns-building">
+                    <button class="recap-priority-btn low" onclick="setRecapPriority('building','Low')">Low</button>
+                    <button class="recap-priority-btn medium" onclick="setRecapPriority('building','Medium')">Medium</button>
+                    <button class="recap-priority-btn high" onclick="setRecapPriority('building','High')">High</button>
+                  </div>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Actions to Resolve</div>
+                  <textarea class="recap-textarea" id="recap-building-actions" placeholder="Who owns this, what is the next step, and by when..." oninput="updateRecapPreview()"></textarea>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- TECH -->
           <div class="card mb-20">
             <div class="card-header">
               <div>
-                <div class="card-title">🔧 Tech &amp; Ops Issues</div>
-                <div class="card-subtitle">Issues logged, tickets created, outstanding items</div>
+                <div class="card-title">&#128295; Tech</div>
+                <div class="card-subtitle">Tracking, cameras, tickets, recurring issues, damaged equipment</div>
               </div>
+              <span class="badge badge-amber">Reliability</span>
             </div>
             <div class="card-body">
               <div class="recap-section">
-                <div class="form-label">Tech Issues</div>
-                <textarea class="recap-textarea" id="recap-tech" placeholder="Hardware issues, T1 tickets opened, software bugs, items escalated to T2..." oninput="updateRecapPreview()"></textarea>
-                <div class="recap-chips">
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'No tech issues to report today.')">No issues</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'T1 ticket created: ')">T1 ticket</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Latency issues observed in Room ')">Latency</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Vest pairing issues encountered and resolved.')">Vest pairing</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Tracker calibration required in Room ')">Calibration</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Prop not tracking in Room: resolved with re-pair.')">Prop tracking</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'HTC headset swapped out in Room: T1 notified.')">Headset swap</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'KVM switch issue in Room: resolved.')">KVM switch</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Silica session creation error: resolved with T1.')">Silica error</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Audio issue in Room: resolved.')">Audio issue</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'ATH red LED status on headset: resolved via Kiosk Mode restart.')">ATH issue</button>
-                  <button class="recap-chip" onclick="appendChip('recap-tech', 'Evoke tracker assets missing: reloaded Vicon profile.')">Evoke assets</button>
-                </div>
+                <div class="form-label">MSCAP / Camera Issues</div>
+                <textarea class="recap-textarea" id="recap-tech-mscap" placeholder="Any tracking or camera problems observed today..." oninput="updateRecapPreview()"></textarea>
               </div>
               <div class="recap-section">
-                <div class="form-label">Building / Ops</div>
-                <textarea class="recap-textarea" id="recap-ops" style="min-height:70px" placeholder="CO status, inspections, replen needs, cleaning, outstanding build items..." oninput="updateRecapPreview()"></textarea>
-                <div class="recap-chips">
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'CO received: store cleared for operations.')">CO received</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Health & safety inspection pending.')">H&amp;S pending</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Replen items needed: ')">Replen needed</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Cleaning crew confirmed for ')">Cleaning</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Store is clean and guest-ready.')">Store ready</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Fire inspection completed.')">Fire inspection</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'Build still in progress: polywall/fixtures outstanding.')">Build incomplete</button>
-                  <button class="recap-chip" onclick="appendChip('recap-ops', 'All holodecks operational and calibrated.')">All rooms ready</button>
+                <div class="form-label">Tickets Created</div>
+                <textarea class="recap-textarea" id="recap-tech-tickets" placeholder="List ticket #s with a one-line description for each..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Recurring Issues</div>
+                <textarea class="recap-textarea" id="recap-tech-recurring" placeholder="Issues that have appeared more than once — flag for reliability team if 2+ occurrences..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Damaged or Faulty Equipment</div>
+                <textarea class="recap-textarea" id="recap-tech-damaged" placeholder="Item, location, severity, and whether an RMA has been initiated..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Anything Out of the Ordinary</div>
+                <textarea class="recap-textarea" id="recap-tech-unusual" placeholder="One-off anomalies that don't fit the above..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-problem-wrap">
+                <button class="recap-problem-toggle" id="problem-toggle-tech" onclick="toggleProblem('tech')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4v4M8 11v1" stroke-linecap="round"/><circle cx="8" cy="8" r="7"/></svg>
+                  Problem Identified
+                </button>
+                <div class="recap-problem-body" id="problem-body-tech" style="display:none">
+                  <textarea class="recap-textarea" id="recap-tech-problem" placeholder="Summarize the most critical tech issue today..." oninput="updateRecapPreview()"></textarea>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Priority</div>
+                  <div class="recap-priority-row" id="priority-btns-tech">
+                    <button class="recap-priority-btn low" onclick="setRecapPriority('tech','Low')">Low</button>
+                    <button class="recap-priority-btn medium" onclick="setRecapPriority('tech','Medium')">Medium</button>
+                    <button class="recap-priority-btn high" onclick="setRecapPriority('tech','High')">High</button>
+                  </div>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Actions to Resolve</div>
+                  <textarea class="recap-textarea" id="recap-tech-actions" placeholder="e.g. Filed reliability ticket #___, escalate to T2 if unresolved by tomorrow, document for recurring issue log..." oninput="updateRecapPreview()"></textarea>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- LEARNING & DEVELOPMENT -->
           <div class="card mb-20">
             <div class="card-header">
               <div>
-                <div class="card-title">🏪 Store Manager Notes</div>
-                <div class="card-subtitle">SM readiness, coaching moments, development notes</div>
+                <div class="card-title">&#128218; Learning &amp; Development</div>
+                <div class="card-subtitle">Training plan progress, delays, and content gaps</div>
               </div>
+              <span class="badge badge-blue">L&amp;D</span>
             </div>
             <div class="card-body">
               <div class="recap-section">
-                <div class="form-label">SM Observations</div>
-                <textarea class="recap-textarea" id="recap-sm" placeholder="SM's ability to run training independently, delivery quality, team management, areas of strength, areas for coaching..." oninput="updateRecapPreview()"></textarea>
-                <div class="recap-chips">
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM ran training independently with minimal coaching needed.')">Independent delivery</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needed support with training video sequencing: now corrected.')">Video sequencing</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is highly motivated and leading the team well.')">Strong leadership</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM needs reminders to stay on plan: improving with coaching.')">Needs reminders</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is building strong rapport with the team.')">Good rapport</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is developing their coaching voice: growing each day.')">Coach voice developing</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'ASM is standing out as a strong operational leader.')">ASM standout</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM is solid on guest journey delivery: tech confidence still building.')">GJ strong, tech developing</button>
-                  <button class="recap-chip" onclick="appendChip('recap-sm', 'SM ran the Day 4 rotation brief independently: excellent.')">Day 4 brief owned</button>
+                <div class="form-label">Learning Plan Progress</div>
+                <textarea class="recap-textarea" id="recap-ld-progress" placeholder="Modules or milestones completed today, what is on deck tomorrow..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Hard GPS / Delays</div>
+                <textarea class="recap-textarea" id="recap-ld-delays" placeholder="Anything that slowed the plan down — content gaps, access issues, etc..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-problem-wrap">
+                <button class="recap-problem-toggle" id="problem-toggle-ld" onclick="toggleProblem('ld')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4v4M8 11v1" stroke-linecap="round"/><circle cx="8" cy="8" r="7"/></svg>
+                  Problem Identified
+                </button>
+                <div class="recap-problem-body" id="problem-body-ld" style="display:none">
+                  <textarea class="recap-textarea" id="recap-ld-problem" placeholder="e.g. Team has not completed guest journey module, 3 staff behind on eLearning track..." oninput="updateRecapPreview()"></textarea>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Priority</div>
+                  <div class="recap-priority-row" id="priority-btns-ld">
+                    <button class="recap-priority-btn low" onclick="setRecapPriority('ld','Low')">Low</button>
+                    <button class="recap-priority-btn medium" onclick="setRecapPriority('ld','Medium')">Medium</button>
+                    <button class="recap-priority-btn high" onclick="setRecapPriority('ld','High')">High</button>
+                  </div>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Actions to Resolve</div>
+                  <textarea class="recap-textarea" id="recap-ld-actions" placeholder="e.g. Allocated 60 min tomorrow morning to close gap, scheduled 1:1 check-in with lagging staff members..." oninput="updateRecapPreview()"></textarea>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- TEAM -->
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">&#128101; Team</div>
+                <div class="card-subtitle">Progress, core values, guest journey comprehension, wins and gaps</div>
+              </div>
+              <span class="badge badge-green">SM</span>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">Progress with Learning Plan</div>
+                <textarea class="recap-textarea" id="recap-team-progress" placeholder="Overall % completion, who is on track, who is behind..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Alignment with Core Values</div>
+                <textarea class="recap-textarea" id="recap-team-values" placeholder="Observations from today — behaviors that reflect or miss core values..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Comprehension of Guest Journey</div>
+                <textarea class="recap-textarea" id="recap-team-guest-journey" placeholder="How well does the team understand and own the guest journey end to end..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Successes</div>
+                <textarea class="recap-textarea" id="recap-team-successes" placeholder="Call out specific wins — individual or team..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Areas of Opportunity</div>
+                <textarea class="recap-textarea" id="recap-team-opportunities" placeholder="Gaps in skill, behavior, or knowledge to address..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-problem-wrap">
+                <button class="recap-problem-toggle" id="problem-toggle-team" onclick="toggleProblem('team')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4v4M8 11v1" stroke-linecap="round"/><circle cx="8" cy="8" r="7"/></svg>
+                  Problem Identified
+                </button>
+                <div class="recap-problem-body" id="problem-body-team" style="display:none">
+                  <textarea class="recap-textarea" id="recap-team-problem" placeholder="e.g. Struggling with upsell conversion, inconsistent pre-experience briefing quality..." oninput="updateRecapPreview()"></textarea>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Priority</div>
+                  <div class="recap-priority-row" id="priority-btns-team">
+                    <button class="recap-priority-btn low" onclick="setRecapPriority('team','Low')">Low</button>
+                    <button class="recap-priority-btn medium" onclick="setRecapPriority('team','Medium')">Medium</button>
+                    <button class="recap-priority-btn high" onclick="setRecapPriority('team','High')">High</button>
+                  </div>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Actions to Resolve</div>
+                  <textarea class="recap-textarea" id="recap-team-actions" placeholder="e.g. Role play upsell scenario at tomorrow's pre-shift, assign additional eLearning module..." oninput="updateRecapPreview()"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SM / LEADERSHIP -->
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">&#127919; SM / Leadership</div>
+                <div class="card-subtitle">SM execution, comprehension, confidence, and leadership development</div>
+              </div>
+              <span class="badge badge-dark">Leadership</span>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">Execution of Training</div>
+                <textarea class="recap-textarea" id="recap-sm-execution" placeholder="How is the SM delivering and facilitating training — strengths and gaps..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Comprehension &amp; Retention</div>
+                <textarea class="recap-textarea" id="recap-sm-comprehension" placeholder="What is the SM retaining from on-site training, what needs reinforcement..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Confidence Level</div>
+                <textarea class="recap-textarea" id="recap-sm-confidence" style="min-height:60px" placeholder="1-10 or qualitative — specifically in tech, guest journey, team management..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Alignment with Core Values</div>
+                <textarea class="recap-textarea" id="recap-sm-values" placeholder="Modeling the values in behavior and decision-making..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Successes</div>
+                <textarea class="recap-textarea" id="recap-sm-successes" placeholder="Specific leadership wins today..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-section">
+                <div class="form-label">Areas of Opportunity</div>
+                <textarea class="recap-textarea" id="recap-sm-opportunities" placeholder="Skill or mindset gaps to close before opening..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-problem-wrap">
+                <button class="recap-problem-toggle" id="problem-toggle-sm" onclick="toggleProblem('sm')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4v4M8 11v1" stroke-linecap="round"/><circle cx="8" cy="8" r="7"/></svg>
+                  Problem Identified
+                </button>
+                <div class="recap-problem-body" id="problem-body-sm" style="display:none">
+                  <textarea class="recap-textarea" id="recap-sm-problem" placeholder="e.g. SM not yet confident running solo tech triage, needs additional reps before opening..." oninput="updateRecapPreview()"></textarea>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Priority</div>
+                  <div class="recap-priority-row" id="priority-btns-sm">
+                    <button class="recap-priority-btn low" onclick="setRecapPriority('sm','Low')">Low</button>
+                    <button class="recap-priority-btn medium" onclick="setRecapPriority('sm','Medium')">Medium</button>
+                    <button class="recap-priority-btn high" onclick="setRecapPriority('sm','High')">High</button>
+                  </div>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Actions to Resolve</div>
+                  <textarea class="recap-textarea" id="recap-sm-actions" placeholder="e.g. Dedicated tech drill block scheduled for Day 5, shadow session with OSC tomorrow..." oninput="updateRecapPreview()"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUPPLIES -->
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">&#128230; Supplies</div>
+                <div class="card-subtitle">Missing or undelivered items, procurement follow-ups</div>
+              </div>
+              <span class="badge badge-gray">Ops</span>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">Missing or Undelivered Items</div>
+                <textarea class="recap-textarea" id="recap-supplies-missing" placeholder="List items, expected arrival date, and who is following up..." oninput="updateRecapPreview()"></textarea>
+              </div>
+              <div class="recap-problem-wrap">
+                <button class="recap-problem-toggle" id="problem-toggle-supplies" onclick="toggleProblem('supplies')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4v4M8 11v1" stroke-linecap="round"/><circle cx="8" cy="8" r="7"/></svg>
+                  Problem Identified
+                </button>
+                <div class="recap-problem-body" id="problem-body-supplies" style="display:none">
+                  <textarea class="recap-textarea" id="recap-supplies-problem" placeholder="e.g. Premium weapons shipment not received, vest straps out of stock..." oninput="updateRecapPreview()"></textarea>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Priority</div>
+                  <div class="recap-priority-row" id="priority-btns-supplies">
+                    <button class="recap-priority-btn low" onclick="setRecapPriority('supplies','Low')">Low</button>
+                    <button class="recap-priority-btn medium" onclick="setRecapPriority('supplies','Medium')">Medium</button>
+                    <button class="recap-priority-btn high" onclick="setRecapPriority('supplies','High')">High</button>
+                  </div>
+                  <div class="form-label" style="margin-top:12px;margin-bottom:6px">Actions to Resolve</div>
+                  <textarea class="recap-textarea" id="recap-supplies-actions" placeholder="e.g. Contacted procurement, escalated to ops coordinator, ETA confirmed for ___" oninput="updateRecapPreview()"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STORE PHOTOS -->
+          <div class="card mb-20">
+            <div class="card-header">
+              <div>
+                <div class="card-title">&#128247; Store Photos</div>
+                <div class="card-subtitle">Daily photo documentation</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="recap-section">
+                <div class="form-label">Photo Links or Descriptions</div>
+                <textarea class="recap-textarea" id="recap-photos" placeholder="Paste links to daily photo folder, or note what was captured and where it was shared..." oninput="updateRecapPreview()"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADDITIONAL COMMENTS -->
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title">🎯 Tomorrow's Focus &amp; Action Items</div>
-                <div class="card-subtitle">What to prioritize, coach's notes for next session</div>
+                <div class="card-title">&#128172; Additional Comments</div>
+                <div class="card-subtitle">Anything that doesn't fit the sections above</div>
               </div>
             </div>
             <div class="card-body">
               <div class="recap-section">
-                <div class="form-label">Tomorrow's Focus</div>
-                <textarea class="recap-textarea" id="recap-tomorrow" style="min-height:70px" placeholder="What needs extra attention tomorrow? Anything to revisit or reinforce?" oninput="updateRecapPreview()"></textarea>
-              </div>
-              <div class="recap-section">
-                <div class="form-label">Coach Action Items</div>
-                <textarea class="recap-textarea" id="recap-actions" style="min-height:70px" placeholder="Tasks for the coach to follow up on (escalations, calls with Ops/L&D, prep work for tomorrow)..." oninput="updateRecapPreview()"></textarea>
+                <textarea class="recap-textarea" id="recap-additional" placeholder="Morale notes, upcoming schedule changes, stakeholder updates..." oninput="updateRecapPreview()"></textarea>
               </div>
               <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="saveRecap()">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
                 Save Recap for Day <span id="saveBtnDay">1</span>
               </button>
             </div>
           </div>
+
         </div>
 
         <div>

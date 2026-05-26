@@ -788,6 +788,35 @@
 
   .recap-chip:hover { background: var(--trigger-light); border-color: var(--trigger); color: var(--trigger); }
 
+  /* Recap problem section */
+  .recap-problem-wrap { margin-top:14px; border-top:1px solid var(--border-light); padding-top:12px; }
+  .recap-problem-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface);
+    font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .recap-problem-toggle:hover { border-color: var(--warning); color: #8A5A00; }
+  .recap-problem-toggle.open { border-color: var(--warning); background: var(--warning-light); color: #8A5A00; }
+  .recap-problem-body {
+    margin-top: 12px; padding: 14px 16px;
+    background: var(--warning-light);
+    border: 1px solid rgba(230,160,0,0.25);
+    border-radius: var(--radius-md);
+  }
+  .recap-priority-row { display: flex; gap: 8px; }
+  .recap-priority-btn {
+    padding: 5px 18px; border-radius: 20px;
+    border: 2px solid var(--border); background: var(--surface);
+    font-size: 12px; font-weight: 700; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .recap-priority-btn:hover { border-color: var(--text-secondary); }
+  .recap-priority-btn.low.active   { border-color: var(--success); background: var(--success-light); color: #0D7A4E; }
+  .recap-priority-btn.medium.active { border-color: var(--warning); background: var(--warning-light); color: #8A5A00; }
+  .recap-priority-btn.high.active  { border-color: var(--danger); background: var(--danger-light); color: var(--danger); }
+
   /* OSC Report rating buttons */
   .osc-rating-btn {
     width: 44px; height: 44px; border-radius: var(--radius-md);

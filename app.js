@@ -1248,19 +1248,63 @@ function selectRecapDay(day) {
   loadRecapFields(day);
 }
 
-const RECAP_FIELDS = ['ld-topics', 'ld-team', 'tech', 'ops', 'sm', 'tomorrow', 'actions'];
+// All textarea field IDs (strip 'recap-' prefix to get state key)
+const RECAP_TEXT_FIELDS = [
+  'building-permits','building-construction','building-problem','building-actions',
+  'tech-mscap','tech-tickets','tech-recurring','tech-damaged','tech-unusual','tech-problem','tech-actions',
+  'ld-progress','ld-delays','ld-problem','ld-actions',
+  'team-progress','team-values','team-guest-journey','team-successes','team-opportunities','team-problem','team-actions',
+  'sm-execution','sm-comprehension','sm-confidence','sm-values','sm-successes','sm-opportunities','sm-problem','sm-actions',
+  'supplies-missing','supplies-problem','supplies-actions',
+  'photos','additional'
+];
+const RECAP_PROBLEM_SECTIONS = ['building','tech','ld','team','sm','supplies'];
 
 function loadRecapFields(day) {
   const r = state.recaps[day] || {};
-  RECAP_FIELDS.forEach(f => {
-    const el = document.getElementById('recap-' + f);
-    if (el) el.value = r[f] || '';
+  RECAP_TEXT_FIELDS.forEach(function(field) {
+    var el = document.getElementById('recap-' + field);
+    if (el) el.value = r[field] || '';
+  });
+  RECAP_PROBLEM_SECTIONS.forEach(function(section) {
+    var priority = r[section + '-priority'] || '';
+    setPriorityBtns(section, priority);
+    var hasProblem = r[section + '-problem'] || r[section + '-priority'] || r[section + '-actions'];
+    var body = document.getElementById('problem-body-' + section);
+    var toggle = document.getElementById('problem-toggle-' + section);
+    if (body) body.style.display = hasProblem ? '' : 'none';
+    if (toggle) toggle.classList.toggle('open', !!hasProblem);
   });
   updateRecapPreview();
 }
 
+function toggleProblem(section) {
+  var body = document.getElementById('problem-body-' + section);
+  var toggle = document.getElementById('problem-toggle-' + section);
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  if (toggle) toggle.classList.toggle('open', !isOpen);
+}
+
+function setRecapPriority(section, level) {
+  var day = state.currentRecapDay;
+  if (!state.recaps[day]) state.recaps[day] = {};
+  state.recaps[day][section + '-priority'] = level;
+  setPriorityBtns(section, level);
+  updateRecapPreview();
+}
+
+function setPriorityBtns(section, active) {
+  var container = document.getElementById('priority-btns-' + section);
+  if (!container) return;
+  container.querySelectorAll('.recap-priority-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.textContent.trim() === active);
+  });
+}
+
 function appendChip(fieldId, text) {
-  const el = document.getElementById(fieldId);
+  var el = document.getElementById(fieldId);
   if (!el) return;
   if (el.value && !el.value.endsWith('\n') && el.value.trim()) el.value += '\n';
   el.value += text;
@@ -1268,77 +1312,78 @@ function appendChip(fieldId, text) {
 }
 
 function updateRecapPreview() {
-  const get = id => (document.getElementById('recap-' + id) || {}).value || '';
-  const storeName = state.opening ? state.opening.store : '[Store Name]';
-  const coachName = state.opening ? state.opening.coach : '[Coach Name]';
-  const day = state.currentRecapDay;
+  var day = state.currentRecapDay;
+  var r = state.recaps[day] || {};
+  var get = function(field) {
+    var el = document.getElementById('recap-' + field);
+    return el ? el.value.trim() : (r[field] || '');
+  };
+  var store = (state.opening && state.opening.store) ? state.opening.store : '[Store]';
+  var coach = (state.opening && state.opening.coach) ? state.opening.coach : '[Coach]';
+  var dayTitles = ['Guest Experience','Service & Tech','Role-Play & Ops','Full Roleplay','Friends & Family'];
+  var lines = [];
+  lines.push('*NSO Daily Recap — Day ' + day + ': ' + (dayTitles[day-1] || '') + '*');
+  lines.push('*' + store + '*  |  OSC: ' + coach);
+  lines.push('─'.repeat(36));
+  lines.push('');
 
-  const dayTitles = ['Day 1 — Guest Experience', 'Day 2 — Service, Sales & Tech', 'Day 3 — Role-Play & Ops', 'Day 4 — Full Roleplay', 'Day 5 — Friends & Family'];
-
-  let preview = `📍 ${storeName} | ${dayTitles[day - 1]}\n`;
-  preview += `👤 Coach: ${coachName}\n`;
-  preview += `${'─'.repeat(40)}\n\n`;
-
-  const ldTopics = get('ld-topics');
-  const ldTeam = get('ld-team');
-  if (ldTopics || ldTeam) {
-    preview += `📋 L&D SUMMARY\n`;
-    if (ldTopics) preview += `Topics: ${ldTopics}\n`;
-    if (ldTeam) preview += `Team: ${ldTeam}\n`;
-    preview += '\n';
+  function addSection(emoji, title, fields, section) {
+    var body = fields.filter(function(f){ return get(f); }).map(function(f){
+      var label = f.split('-').slice(section ? 1 : 0).join(' ');
+      label = label.charAt(0).toUpperCase() + label.slice(1).replace(/-/g, ' ');
+      return '• *' + label + ':* ' + get(f);
+    });
+    var prob = section && get(section + '-problem');
+    if (!body.length && !prob) return;
+    lines.push(emoji + '  *' + title + '*');
+    body.forEach(function(l){ lines.push(l); });
+    if (prob) {
+      var pri = r[section + '-priority'] ? ' [' + r[section + '-priority'] + ']' : '';
+      lines.push('⚠ *Problem Identified' + pri + ':* ' + prob);
+      var act = get(section + '-actions');
+      if (act) lines.push('    → ' + act);
+    }
+    lines.push('');
   }
 
-  const tech = get('tech');
-  const ops = get('ops');
-  if (tech || ops) {
-    preview += `🔧 TECH & OPS\n`;
-    if (tech) preview += `Tech: ${tech}\n`;
-    if (ops) preview += `Ops: ${ops}\n`;
-    preview += '\n';
-  }
+  addSection('🏗','Building',['building-permits','building-construction'],'building');
+  addSection('🔧','Tech',['tech-mscap','tech-tickets','tech-recurring','tech-damaged','tech-unusual'],'tech');
+  addSection('📚','L&D',['ld-progress','ld-delays'],'ld');
+  addSection('👥','Team',['team-progress','team-values','team-guest-journey','team-successes','team-opportunities'],'team');
+  addSection('🎯','SM / Leadership',['sm-execution','sm-comprehension','sm-confidence','sm-values','sm-successes','sm-opportunities'],'sm');
+  addSection('📦','Supplies',['supplies-missing'],'supplies');
 
-  const sm = get('sm');
-  if (sm) {
-    preview += `🏪 SM NOTES\n${sm}\n\n`;
-  }
+  var photos = get('photos');
+  if (photos) { lines.push('📷  *Store Photos*'); lines.push(photos); lines.push(''); }
+  var additional = get('additional');
+  if (additional) { lines.push('💬  *Additional*'); lines.push(additional); lines.push(''); }
 
-  const tomorrow = get('tomorrow');
-  const actions = get('actions');
-  if (tomorrow || actions) {
-    preview += `🎯 TOMORROW\n`;
-    if (tomorrow) preview += `Focus: ${tomorrow}\n`;
-    if (actions) preview += `Actions: ${actions}\n`;
+  var preview = document.getElementById('recapPreview');
+  if (preview) {
+    var content = lines.join('\n').trim();
+    var empty = lines.slice(4).join('').trim() === '';
+    preview.textContent = empty ? 'Start filling in the fields to see your formatted recap appear here...' : content;
   }
-
-  if (preview.trim() === `📍 ${storeName} | ${dayTitles[day - 1]}\n👤 Coach: ${coachName}\n${'─'.repeat(40)}`) {
-    preview = 'Start filling in the fields to see your formatted recap appear here...';
-  }
-
-  document.getElementById('recapPreview').textContent = preview;
 }
 
 async function saveRecap() {
-  const day = state.currentRecapDay;
-  state.recaps[day] = {};
-  RECAP_FIELDS.forEach(f => {
-    const el = document.getElementById('recap-' + f);
-    if (el) state.recaps[day][f] = el.value;
+  var day = state.currentRecapDay;
+  if (!state.recaps[day]) state.recaps[day] = {};
+  RECAP_TEXT_FIELDS.forEach(function(field) {
+    var el = document.getElementById('recap-' + field);
+    if (el) state.recaps[day][field] = el.value;
   });
+  // Priority values already written to state by setRecapPriority()
   const err = await dbSaveRecap(day);
-  if (err) {
-    console.error('saveRecap failed:', err);
-    showToast(`Save failed: ${err.message || 'DB error'}`, 'error');
-    return;
-  }
-  showToast(`Day ${day} recap saved!`, 'success');
+  if (err) { showToast('Save failed: ' + (err.message || 'DB error'), 'error'); return; }
+  showToast('Day ' + day + ' recap saved!', 'success');
   updateRecapStatusCard();
-  const badge = document.getElementById('navRecapBadge');
-  if (badge) badge.style.display = 'none';
 }
 
 function copyRecap() {
-  const text = document.getElementById('recapPreview').textContent;
-  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard — paste into Slack!', 'success'));
+  var text = document.getElementById('recapPreview').textContent;
+  if (!text || text.startsWith('Start filling')) { showToast('Nothing to copy yet.', 'info'); return; }
+  navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard — paste into Slack!', 'success'); });
 }
 
 function exportSignoffs() {
