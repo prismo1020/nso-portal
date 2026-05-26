@@ -1251,14 +1251,13 @@ function selectRecapDay(day) {
 // All textarea field IDs (strip 'recap-' prefix to get state key)
 const RECAP_TEXT_FIELDS = [
   'building-permits','building-construction','building-problem','building-actions',
-  'tech-mscap','tech-tickets','tech-recurring','tech-damaged','tech-unusual','tech-problem','tech-actions',
+  'tech-mscap','tech-tickets','tech-unusual','tech-problem','tech-actions',
   'ld-progress','ld-delays','ld-problem','ld-actions',
-  'team-progress','team-values','team-guest-journey','team-successes','team-opportunities','team-problem','team-actions',
-  'sm-execution','sm-comprehension','sm-confidence','sm-values','sm-successes','sm-opportunities','sm-problem','sm-actions',
+  'team-progress','team-successes','team-opportunities','team-values','sm-execution','team-problem','team-actions',
   'supplies-missing','supplies-problem','supplies-actions',
-  'photos','additional'
+  'additional'
 ];
-const RECAP_PROBLEM_SECTIONS = ['building','tech','ld','team','sm','supplies'];
+const RECAP_PROBLEM_SECTIONS = ['building','tech','ld','team','supplies'];
 
 function loadRecapFields(day) {
   const r = state.recaps[day] || {};
@@ -1347,10 +1346,9 @@ function updateRecapPreview() {
   }
 
   addSection('🏗','Building',['building-permits','building-construction'],'building');
-  addSection('🔧','Tech',['tech-mscap','tech-tickets','tech-recurring','tech-damaged','tech-unusual'],'tech');
+  addSection('🔧','Tech',['tech-mscap','tech-tickets','tech-unusual'],'tech');
   addSection('📚','L&D',['ld-progress','ld-delays'],'ld');
-  addSection('👥','Team',['team-progress','team-values','team-guest-journey','team-successes','team-opportunities'],'team');
-  addSection('🎯','SM / Leadership',['sm-execution','sm-comprehension','sm-confidence','sm-values','sm-successes','sm-opportunities'],'sm');
+  addSection('🎯','Team & Leadership',['team-progress','team-successes','team-opportunities','team-values','sm-execution'],'team');
   addSection('📦','Supplies',['supplies-missing'],'supplies');
 
   var photos = get('photos');
