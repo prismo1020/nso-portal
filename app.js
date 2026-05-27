@@ -1633,21 +1633,23 @@ async function onSignedIn(session) {
 
   // Pass the session user directly so dbLoadState doesn't need a second auth round-trip
   const loaded = await dbLoadState(session?.user);
-  if (loaded) {
+  if (loaded === true) {
     refreshAfterLoad();
-  } else {
-    // First attempt failed (common on cold load before auth fully resolves).
-    // Retry once after a short delay before showing the refresh banner.
+  } else if (loaded === 'no-user') {
+    // Auth hadn't resolved yet — retry once after a short delay
     setTimeout(async () => {
       const retry = await dbLoadState();
-      if (retry) {
+      if (retry === true) {
         refreshAfterLoad();
         hideLoadBanner();
-      } else {
+        document.getElementById('userEmail').textContent = state.userEmail || '';
+      } else if (retry === 'no-user') {
         showLoadBanner();
       }
+      // 'no-opening' on retry is fine — user just hasn't set up an opening yet
     }, 1500);
   }
+  // 'no-opening' on first load is totally normal — user will use Setup to create one
 
   document.getElementById('userEmail').textContent = state.userEmail || '';
   // Admin nav is always visible; renderAdminPage() handles access control messaging
@@ -1675,13 +1677,14 @@ function hideLoadBanner() {
 async function retryLoad() {
   hideLoadBanner();
   const loaded = await dbLoadState();
-  if (loaded) {
+  if (loaded === true) {
     refreshAfterLoad();
     document.getElementById('userEmail').textContent = state.userEmail || '';
     renderOpeningSwitcherList();
-  } else {
+  } else if (loaded === 'no-user') {
     showLoadBanner();
   }
+  // 'no-opening' means auth worked fine, user just has no opening yet — no banner needed
 }
 
 function showLoginScreen() {

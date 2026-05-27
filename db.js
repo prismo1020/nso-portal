@@ -8,7 +8,7 @@ async function dbLoadState(passedUser) {
     const { data } = await supabase.auth.getUser();
     user = data?.user || null;
   }
-  if (!user) return false;
+  if (!user) return 'no-user';
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -27,7 +27,7 @@ async function dbLoadState(passedUser) {
     .order('updated_at', { ascending: false })
     .limit(1);
 
-  if (!openings || openings.length === 0) return false;
+  if (!openings || openings.length === 0) return 'no-opening';
 
   const o = openings[0];
   state.openingId = o.id;
