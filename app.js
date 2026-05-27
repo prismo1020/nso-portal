@@ -2658,6 +2658,9 @@ function renderResourcesPage() {
         { title: 'Camera Calibration Cheat Sheet', url: 'https://app.delightree.com/chapters/view/6qqwpx259np4hbp3elo232l9' },
         { title: 'MoCap Camera Cheat Sheet', url: 'https://app.delightree.com/chapters/view/6qqwpx259np4hbp3elo232l9' },
         { title: 'Tracker Build Charts', url: 'https://app.delightree.com/chapters/view/6qz3368zn355frn964or844x' }
+      ],
+      images: [
+        { title: 'Tracker Ball Washer Assembly Guide', file: 'tracker washer diagram.png' }
       ]
     },
     {
@@ -2806,6 +2809,21 @@ function renderResourcesPage() {
     if (cat.written.length > 0) {
       html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;padding:8px 10px 4px' + (cat.videos.length ? ';margin-top:4px;border-top:1px solid var(--border-light)' : '') + '">SOPs & Written Materials</div>';
       cat.written.forEach(function(w) { html += linkRow(w, 'written'); });
+    }
+
+    if (cat.images && cat.images.length > 0) {
+      html += '<div style="border-top:1px solid var(--border-light);margin-top:8px;padding:10px 10px 4px">';
+      html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;margin-bottom:10px">Reference Diagrams</div>';
+      cat.images.forEach(function(img) {
+        var src = img.file.split('').map(function(c){ return c === ' ' ? '%20' : c; }).join('');
+        html += '<a href="' + src + '" target="_blank" title="Click to open full size" style="display:block;border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;margin-bottom:8px;text-decoration:none;transition:box-shadow 0.15s" onmouseover="this.style.boxShadow=\'var(--shadow-md)\'" onmouseout="this.style.boxShadow=\'none\'">'
+          + '<img src="' + src + '" alt="' + img.title + '" style="width:100%;display:block">'
+          + '<div style="padding:7px 10px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:8px">'
+          + '<span style="font-size:11.5px;font-weight:500;color:var(--text-secondary)">' + img.title + '</span>'
+          + '<span style="font-size:11px;color:var(--trigger);white-space:nowrap">Open full size →</span>'
+          + '</div></a>';
+      });
+      html += '</div>';
     }
 
     html += '</div></div>';
