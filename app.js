@@ -1408,11 +1408,11 @@ async function saveRecap() {
   updateRecapStatusCard();
 }
 
-function copyRecap() {
+async function copyRecap() {
   var text = document.getElementById('recapPreview').textContent;
   if (!text || text.startsWith('Start filling')) { showToast('Nothing to copy yet.', 'info'); return; }
-  // Write both HTML (bold tags) and plain text so Slack receives formatted content
-  var htmlVersion = text
+  // Write both HTML (bold tags) and plain text so Slack desktop renders bold correctly
+  var htmlVersion = '<meta charset="utf-8">' + text
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')  // escape first
     .replace(/\*(.*?)\*/g, '<b>$1</b>')   // *bold* → <b>bold</b>
     .replace(/\n/g, '<br>');
@@ -1421,10 +1421,16 @@ function copyRecap() {
       'text/html':  new Blob([htmlVersion], { type: 'text/html' }),
       'text/plain': new Blob([text],        { type: 'text/plain' })
     });
-    navigator.clipboard.write([item]).then(function(){ showToast('Copied — paste into Slack!', 'success'); });
+    await navigator.clipboard.write([item]);
+    showToast('Copied — paste into Slack!', 'success');
   } catch(e) {
     // Fallback for browsers that don't support ClipboardItem
-    navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard — paste into Slack!', 'success'); });
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('Copied — paste into Slack!', 'success');
+    } catch(e2) {
+      showToast('Copy failed — try selecting the text manually.', 'error');
+    }
   }
 }
 
