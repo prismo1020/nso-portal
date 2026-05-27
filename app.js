@@ -22,7 +22,7 @@ let state = {
 // ============================================================
 // CONTENT EDITING
 // ============================================================
-const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'tyler.franz-grunwald@sandboxvr.com', 'lex.snyder@sandboxvr.com'];
+const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'danielle.beram@sandboxvr.com', 'tyler.franz-grunwald@sandboxvr.com', 'lex.snyder@sandboxvr.com'];
 
 function canEdit() {
   return EDIT_EMAILS.includes(state.userEmail);
@@ -2928,7 +2928,8 @@ async function renderOpeningSwitcherList() {
   const list = document.getElementById('openingSwitcherList');
   if (!list) return;
   list.innerHTML = '<div style="padding:8px 0;font-size:12px;color:var(--text-muted)">Loading…</div>';
-  const openings = await dbLoadOpeningsForCoach();
+  const isAdmin = canEdit();
+  const openings = isAdmin ? await dbLoadAllOpeningsForSwitcher() : await dbLoadOpeningsForCoach();
   if (openings.length === 0) {
     list.innerHTML = '<div style="padding:8px 0;font-size:12px;color:var(--text-muted)">No openings yet.</div>';
     return;
@@ -2936,8 +2937,10 @@ async function renderOpeningSwitcherList() {
   list.innerHTML = openings.map(o => {
     const isCurrent = o.id === state.openingId;
     const dateStr = o.start_date ? new Date(o.start_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'No date';
+    const coachLine = isAdmin ? `<div style="font-size:11px;color:var(--trigger);font-weight:600;margin-top:1px">Coach: ${o.coach_name || '—'}</div>` : '';
     return `<button onclick="switchToOpening('${o.id}')" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:10px 12px;border-radius:var(--radius-md);border:1px solid ${isCurrent?'var(--trigger)':'var(--border-light)'};background:${isCurrent?'var(--trigger-light)':'var(--white)'};margin-bottom:8px;cursor:pointer;transition:all 0.15s" ${isCurrent?'disabled':''}>
       <div style="font-size:13px;font-weight:600;color:var(--hb)">${o.store_name}</div>
+      ${coachLine}
       <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">${dateStr} · Day ${o.current_day || 1} of 5${isCurrent?' · <strong>Current</strong>':''}</div>
     </button>`;
   }).join('');
@@ -2970,7 +2973,7 @@ async function switchToOpening(openingId) {
   (signoffs || []).forEach(s => { state.signoffs[s.trainee_id + '_' + s.competency_id] = s.status; });
   state.recaps = {};
   (recaps || []).forEach(r => {
-    state.recaps[r.day_num] = { 'ld-topics': r.ld_topics||'', 'ld-team': r.ld_team||'', 'tech': r.tech||'', 'ops': r.ops||'', 'sm': r.sm_notes||'', 'tomorrow': r.tomorrow||'', 'actions': r.actions||'' };
+    state.recaps[r.day_num] = r.recap_data || {};
   });
   state.franchiseChecks = {};
   (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; });

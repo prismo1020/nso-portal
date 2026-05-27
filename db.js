@@ -229,6 +229,15 @@ async function dbLoadOpeningsForCoach() {
   return data || [];
 }
 
+async function dbLoadAllOpeningsForSwitcher() {
+  const { data, error } = await supabase
+    .from('openings')
+    .select('id, store_name, coach_name, start_date, current_day, status, updated_at')
+    .order('updated_at', { ascending: false });
+  if (error) { console.error('dbLoadAllOpeningsForSwitcher:', error); return []; }
+  return data || [];
+}
+
 async function dbDeleteOpening(openingId) {
   const { error } = await supabase.from('openings').delete().eq('id', openingId);
   return error || null;
