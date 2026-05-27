@@ -142,7 +142,7 @@
       </button>
       <button class="nav-item" id="nav-osc" onclick="navigate('osc')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/><path d="M11 12l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        OSC Report
+        Post-Opening OSC Report
       </button>
 
       <div class="nav-section-label">Resources</div>
@@ -822,20 +822,47 @@
 
         <div>
           <div style="position:sticky;top:80px">
-            <div class="card">
+            <div class="card" style="overflow:hidden">
               <div class="card-header">
-                <div>
-                  <div class="card-title">Slack Preview</div>
-                  <div class="card-subtitle">Auto-formatted for your daily update</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <!-- Slack 4-color logo -->
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="flex-shrink:0">
+                    <rect x="0"  y="0"  width="10" height="10" rx="2.5" fill="#E01E5A"/>
+                    <rect x="12" y="0"  width="10" height="10" rx="2.5" fill="#2EB67D"/>
+                    <rect x="0"  y="12" width="10" height="10" rx="2.5" fill="#36C5F0"/>
+                    <rect x="12" y="12" width="10" height="10" rx="2.5" fill="#ECB22E"/>
+                  </svg>
+                  <div>
+                    <div class="card-title">Slack Preview</div>
+                    <div class="card-subtitle">How it looks when pasted into Slack</div>
+                  </div>
                 </div>
-                <button class="btn btn-secondary" onclick="copyRecap()" style="font-size:12px">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 10V2a1 1 0 011-1h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-                  Copy to Slack
-                </button>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px">
+                  <span style="font-size:10px;font-weight:700;letter-spacing:0.06em;color:#fff;background:#E01E5A;padding:3px 8px;border-radius:4px;text-transform:uppercase;white-space:nowrap">⚑ Required Daily</span>
+                  <button class="btn btn-secondary" onclick="copyRecap()" style="font-size:12px">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 10V2a1 1 0 011-1h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    Copy to Slack
+                  </button>
+                </div>
               </div>
-              <div class="card-body">
-                <div class="recap-preview-label">FORMATTED RECAP</div>
-                <div class="recap-preview" id="recapPreview">Start filling in the fields to see your formatted recap appear here...</div>
+              <!-- Slack channel bar -->
+              <div class="slack-sim-header">
+                <span class="slack-sim-hash">#</span>
+                <span class="slack-sim-channel">nso-daily-recap</span>
+                <span class="slack-sim-required">📌 Daily recap required from all OSCs</span>
+              </div>
+              <!-- Slack message -->
+              <div class="slack-sim-msg">
+                <div class="slack-sim-avatar">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.4"><circle cx="8" cy="5" r="3"/><path d="M2 14a6 6 0 0112 0"/></svg>
+                </div>
+                <div style="flex:1;min-width:0">
+                  <div class="slack-sim-meta">
+                    <span class="slack-sim-name" id="slackSenderName">OSC Coach</span>
+                    <span class="slack-sim-time" id="slackSenderTime">Today</span>
+                  </div>
+                  <div id="recapPreview" class="recap-preview"><span class="recap-placeholder">Start filling in the fields to see your formatted recap appear here...</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -910,7 +937,7 @@
     <div id="view-osc" class="view page-content">
       <div class="page-header">
         <div class="eyebrow">CLOSING REPORT</div>
-        <div class="page-title">OSC Closing Report</div>
+        <div class="page-title">Post-Opening OSC Report</div>
         <div class="page-subtitle">Complete this report at the close of the NSO program to summarize outcomes for Ops &amp; L&amp;D.</div>
       </div>
 
@@ -1044,7 +1071,7 @@
             <strong>3</strong> = Solid, meeting expectations &nbsp;·&nbsp;
             <strong>4</strong> = Exceeding expectations
           </div>
-          <div class="grid-2" style="margin-bottom:24px">
+          <div class="grid-2" style="margin-bottom:20px">
             <div>
               <div class="form-label" style="margin-bottom:8px">Overall Team Rating</div>
               <div style="display:flex;gap:8px;margin-bottom:14px" id="osc-team-rating-btns">
@@ -1057,15 +1084,39 @@
               <textarea class="recap-textarea" id="osc-team-notes" placeholder="What stood out? Standout GEGs? Any areas of concern for the broader team?"></textarea>
             </div>
             <div>
-              <div class="form-label" style="margin-bottom:8px">SM / ASM Rating</div>
+              <div class="form-label" style="margin-bottom:8px">SM Rating</div>
               <div style="display:flex;gap:8px;margin-bottom:14px" id="osc-sm-rating-btns">
                 <button class="osc-rating-btn" onclick="setOSCRating('sm',1)">1</button>
                 <button class="osc-rating-btn" onclick="setOSCRating('sm',2)">2</button>
                 <button class="osc-rating-btn" onclick="setOSCRating('sm',3)">3</button>
                 <button class="osc-rating-btn" onclick="setOSCRating('sm',4)">4</button>
               </div>
-              <div class="form-label" style="margin-bottom:6px">SM / ASM Notes</div>
+              <div class="form-label" style="margin-bottom:6px">SM Notes</div>
               <textarea class="recap-textarea" id="osc-sm-notes" placeholder="Leadership readiness, coaching gaps, development needs, recommended follow-up..."></textarea>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-bottom:24px">
+            <div>
+              <div class="form-label" style="margin-bottom:8px">ASM Rating</div>
+              <div style="display:flex;gap:8px;margin-bottom:14px" id="osc-asm-rating-btns">
+                <button class="osc-rating-btn" onclick="setOSCRating('asm',1)">1</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('asm',2)">2</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('asm',3)">3</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('asm',4)">4</button>
+              </div>
+              <div class="form-label" style="margin-bottom:6px">ASM Notes</div>
+              <textarea class="recap-textarea" id="osc-asm-notes" placeholder="ASM readiness, confidence, development gaps, recommended follow-up..."></textarea>
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:8px">Franchise Owner Rating</div>
+              <div style="display:flex;gap:8px;margin-bottom:14px" id="osc-fo-rating-btns">
+                <button class="osc-rating-btn" onclick="setOSCRating('fo',1)">1</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('fo',2)">2</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('fo',3)">3</button>
+                <button class="osc-rating-btn" onclick="setOSCRating('fo',4)">4</button>
+              </div>
+              <div class="form-label" style="margin-bottom:6px">Franchise Owner Notes</div>
+              <textarea class="recap-textarea" id="osc-fo-notes" placeholder="FO engagement, alignment with brand standards, partnership quality, follow-up needed..."></textarea>
             </div>
           </div>
           <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveOSCReport()">

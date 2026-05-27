@@ -828,15 +828,87 @@
   .osc-rating-btn:hover { border-color: var(--trigger); color: var(--trigger); background: var(--trigger-light); }
   .osc-rating-btn.active { border-color: var(--hb); background: var(--hb); color: #fff; }
 
-  .recap-preview {
-    background: var(--hb);
-    border-radius: var(--radius-lg);
-    padding: 20px 22px;
-    color: var(--white);
+  /* Slack sim wrapper styles */
+  .slack-sim-header {
+    background: #1A1D21;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 9px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .slack-sim-hash {
+    color: #97979A;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .slack-sim-channel {
+    color: #D1D2D3;
     font-size: 13px;
-    line-height: 1.8;
+    font-weight: 600;
+  }
+  .slack-sim-required {
+    margin-left: auto;
+    font-size: 11px;
+    color: #97979A;
+    white-space: nowrap;
+  }
+  .slack-sim-msg {
+    background: #222529;
+    padding: 14px 16px 16px;
+    display: flex;
+    gap: 12px;
+    min-height: 120px;
+  }
+  .slack-sim-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: #4A154B;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .slack-sim-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .slack-sim-name {
+    color: #FFF;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .slack-sim-time {
+    color: #888;
+    font-size: 11px;
+  }
+
+  /* Recap preview — rendered inside Slack sim */
+  .recap-preview {
+    color: #D1D2D3;
+    font-size: 13.5px;
+    line-height: 1.75;
     white-space: pre-wrap;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font);
+    word-break: break-word;
+  }
+  .recap-preview strong {
+    color: #FFF;
+    font-weight: 700;
+  }
+  .recap-placeholder {
+    color: #888;
+    font-style: italic;
+    font-size: 13px;
+  }
+  .slack-recap-divider {
+    display: block;
+    color: #444;
   }
 
   .recap-preview-label {

@@ -862,7 +862,7 @@ function navigate(view) {
     leadership: 'Leadership Lens',
     admin: 'All Openings',
     videos: 'Training Videos',
-    osc: 'OSC Closing Report',
+    osc: 'Post-Opening OSC Report',
     resources: 'Resources'
   };
   document.getElementById('topbarTitle').textContent = titles[view] || view;
@@ -1357,10 +1357,21 @@ function updateRecapPreview() {
   lines.push('');
 
   function addSection(emoji, title, fields, section) {
-    var body = fields.filter(function(f){ return get(f); }).map(function(f){
+    var body = [];
+    fields.forEach(function(f) {
+      var val = get(f);
+      if (!val) return;
       var label = f.split('-').slice(section ? 1 : 0).join(' ');
       label = label.charAt(0).toUpperCase() + label.slice(1).replace(/-/g, ' ');
-      return '• *' + label + ':* ' + get(f);
+      // Split multi-line values (from multiple chip clicks) into individual bullets
+      var fieldLines = val.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+      if (fieldLines.length === 1) {
+        body.push('• *' + label + ':* ' + fieldLines[0]);
+      } else {
+        // Multiple items — each chip gets its own bullet, label becomes header
+        body.push('• *' + label + ':*');
+        fieldLines.forEach(function(l){ body.push('  · ' + l); });
+      }
     });
     var prob = section && get(section + '-problem');
     if (!body.length && !prob) return;
@@ -1390,8 +1401,30 @@ function updateRecapPreview() {
   if (preview) {
     var content = lines.join('\n').trim();
     var empty = lines.slice(4).join('').trim() === '';
-    preview.textContent = empty ? 'Start filling in the fields to see your formatted recap appear here...' : content;
+    if (empty) {
+      preview.dataset.plaintext = '';
+      preview.innerHTML = '<span class="recap-placeholder">Start filling in the fields to see your formatted recap appear here...</span>';
+    } else {
+      preview.dataset.plaintext = content;
+      preview.innerHTML = renderSlackHTML(content);
+    }
+    // Update sender name from opening coach
+    var nameEl = document.getElementById('slackSenderName');
+    var timeEl = document.getElementById('slackSenderTime');
+    if (nameEl && state.opening && state.opening.coach) nameEl.textContent = state.opening.coach;
+    if (timeEl) {
+      var now = new Date();
+      timeEl.textContent = 'Today at ' + now.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+    }
   }
+}
+
+function renderSlackHTML(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+    .replace(/─+/g, '<span class="slack-recap-divider">────────────────────────────────────</span>')
+    .replace(/\n/g, '<br>');
 }
 
 async function saveRecap() {
@@ -1409,8 +1442,8 @@ async function saveRecap() {
 }
 
 async function copyRecap() {
-  var text = document.getElementById('recapPreview').textContent;
-  if (!text || text.startsWith('Start filling')) { showToast('Nothing to copy yet.', 'info'); return; }
+  var text = (document.getElementById('recapPreview').dataset.plaintext || '').trim();
+  if (!text) { showToast('Nothing to copy yet.', 'info'); return; }
   // Write both HTML (bold tags) and plain text so Slack desktop renders bold correctly
   var htmlVersion = '<meta charset="utf-8">' + text
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')  // escape first
@@ -2259,19 +2292,25 @@ function confirmDeleteOpening(openingId, storeName) {
 // ============================================================
 var _oscTeamRating = 0;
 var _oscSMRating = 0;
+var _oscASMRating = 0;
+var _oscFORating = 0;
 
 function setOSCRating(type, val) {
-  if (type === 'team') {
-    _oscTeamRating = val;
-    document.querySelectorAll('#osc-team-rating-btns .osc-rating-btn').forEach(function(b, i) {
-      b.classList.toggle('active', i + 1 === val);
-    });
-  } else {
-    _oscSMRating = val;
-    document.querySelectorAll('#osc-sm-rating-btns .osc-rating-btn').forEach(function(b, i) {
-      b.classList.toggle('active', i + 1 === val);
-    });
-  }
+  var map = {
+    team: { stateVar: '_oscTeamRating', btnId: 'osc-team-rating-btns' },
+    sm:   { stateVar: '_oscSMRating',   btnId: 'osc-sm-rating-btns'   },
+    asm:  { stateVar: '_oscASMRating',  btnId: 'osc-asm-rating-btns'  },
+    fo:   { stateVar: '_oscFORating',   btnId: 'osc-fo-rating-btns'   }
+  };
+  if (type === 'team')  _oscTeamRating = val;
+  if (type === 'sm')    _oscSMRating   = val;
+  if (type === 'asm')   _oscASMRating  = val;
+  if (type === 'fo')    _oscFORating   = val;
+  var entry = map[type];
+  if (!entry) return;
+  document.querySelectorAll('#' + entry.btnId + ' .osc-rating-btn').forEach(function(b, i) {
+    b.classList.toggle('active', i + 1 === val);
+  });
 }
 
 function toggleTSName() {
@@ -2298,9 +2337,13 @@ function loadOSCReportFields() {
   get('osc-ts-notes').value           = r.tech_specialist_notes || '';
   get('osc-team-notes').value         = r.team_notes || '';
   get('osc-sm-notes').value           = r.sm_notes || '';
-  _oscTeamRating = 0; _oscSMRating = 0;
+  get('osc-asm-notes').value          = r.asm_notes || '';
+  get('osc-fo-notes').value           = r.fo_notes  || '';
+  _oscTeamRating = 0; _oscSMRating = 0; _oscASMRating = 0; _oscFORating = 0;
   setOSCRating('team', r.team_rating || 0);
-  setOSCRating('sm',   r.sm_rating  || 0);
+  setOSCRating('sm',   r.sm_rating   || 0);
+  setOSCRating('asm',  r.asm_rating  || 0);
+  setOSCRating('fo',   r.fo_rating   || 0);
 }
 
 async function saveOSCReport() {
@@ -2320,7 +2363,11 @@ async function saveOSCReport() {
     team_rating:           _oscTeamRating || null,
     team_notes:            document.getElementById('osc-team-notes').value                 || null,
     sm_rating:             _oscSMRating   || null,
-    sm_notes:              document.getElementById('osc-sm-notes').value                   || null
+    sm_notes:              document.getElementById('osc-sm-notes').value                   || null,
+    asm_rating:            _oscASMRating  || null,
+    asm_notes:             document.getElementById('osc-asm-notes').value                  || null,
+    fo_rating:             _oscFORating   || null,
+    fo_notes:              document.getElementById('osc-fo-notes').value                   || null
   };
   state.oscReport = r;
   const err = await dbSaveOSCReport(r);
