@@ -339,7 +339,7 @@ const KB = {
 </ul>
 <h3>Store Operations</h3>
 <ul>
-<li><a href="http://app.delightree.com" target="_blank" style="color:var(--trigger)">Opening Checklist →</a> — Full opening procedure checklist. Day 3 block.</li>
+<li><a href="https://app.delightree.com/chapters/view/qn6mmw3r88bbcbnkxl7lmw7p" target="_blank" style="color:var(--trigger)">Opening Checklist →</a> — Full opening procedure checklist. Day 3 block.</li>
 <li><a href="https://app.delightree.com/chapters/view/zb4jjqwwm4e60zqd8lpl362r" target="_blank" style="color:var(--trigger)">Closing Checklist →</a> — Full closing procedure checklist. Day 3 block.</li>
 <li><a href="https://app.delightree.com/chapters/view/9qxrrw548blphl34935lz7lm" target="_blank" style="color:var(--trigger)">Store Cleaning SOP →</a> — Daily cleaning standards and responsibilities.</li>
 <li><a href="https://app.delightree.com/chapters/view/pzxaaen5x6d4u6xj5838bpnd" target="_blank" style="color:var(--trigger)">Restroom Cleaning Checklist →</a> — Restroom cleaning standards.</li>
@@ -483,7 +483,7 @@ const KB = {
 <h3>Block-by-Block Coaching Notes</h3>
 <h4 style="font-size:13px;font-weight:700;color:var(--hb);margin:16px 0 4px">Opening Procedures</h4>
 <ul>
-<li>Walk through the <a href="http://app.delightree.com" target="_blank" style="color:var(--trigger)">Opening Checklist →</a> item by item before trainees attempt it.</li>
+<li>Walk through the <a href="https://app.delightree.com/chapters/view/qn6mmw3r88bbcbnkxl7lmw7p" target="_blank" style="color:var(--trigger)">Opening Checklist →</a> item by item before trainees attempt it.</li>
 <li>Each trainee leads the opening sequence for one room from start to finish. Do not step in unless safety is at risk.</li>
 <li>Watch for the instinct to rush. Speed comes with experience — completeness comes with habit.</li>
 </ul>
@@ -834,7 +834,7 @@ const KB = {
 </ul>
 <h3>Store Operations</h3>
 <ul>
-<li><a href="http://app.delightree.com" target="_blank" style="color:var(--trigger)">Opening Checklist →</a></li>
+<li><a href="https://app.delightree.com/chapters/view/qn6mmw3r88bbcbnkxl7lmw7p" target="_blank" style="color:var(--trigger)">Opening Checklist →</a></li>
 <li><a href="https://app.delightree.com/chapters/view/zb4jjqwwm4e60zqd8lpl362r" target="_blank" style="color:var(--trigger)">Closing Checklist →</a></li>
 <li><a href="https://app.delightree.com/chapters/view/9qxrrw548blphl34935lz7lm" target="_blank" style="color:var(--trigger)">Store Cleaning SOP →</a></li>
 <li><a href="https://app.delightree.com/chapters/view/pzxaaen5x6d4u6xj5838bpnd" target="_blank" style="color:var(--trigger)">Restroom Cleaning Checklist →</a></li>
@@ -1609,14 +1609,14 @@ function updateRecapStatusCard() {
 async function initApp() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    await onSignedIn();
+    await onSignedIn(session);
   } else {
     showLoginScreen();
   }
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN') {
-      await onSignedIn();
+      await onSignedIn(session);
     } else if (event === 'SIGNED_OUT') {
       Object.assign(state, {
         opening: null, openingId: null, userRole: 'coach', userEmail: null,
@@ -1627,16 +1627,61 @@ async function initApp() {
   });
 }
 
-async function onSignedIn() {
+async function onSignedIn(session) {
   document.getElementById('loginOverlay').style.display = 'none';
-  const loaded = await dbLoadState();
+  hideLoadBanner();
+
+  // Pass the session user directly so dbLoadState doesn't need a second auth round-trip
+  const loaded = await dbLoadState(session?.user);
   if (loaded) {
     refreshAfterLoad();
+  } else {
+    // First attempt failed (common on cold load before auth fully resolves).
+    // Retry once after a short delay before showing the refresh banner.
+    setTimeout(async () => {
+      const retry = await dbLoadState();
+      if (retry) {
+        refreshAfterLoad();
+        hideLoadBanner();
+      } else {
+        showLoadBanner();
+      }
+    }, 1500);
   }
+
   document.getElementById('userEmail').textContent = state.userEmail || '';
   // Admin nav is always visible; renderAdminPage() handles access control messaging
   document.getElementById('nav-admin').style.display = 'flex';
   renderOpeningSwitcherList(); // populate switcher in background
+}
+
+function showLoadBanner() {
+  let banner = document.getElementById('loadRetryBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'loadRetryBanner';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;';
+    banner.innerHTML = '⚠️ Data didn\'t load — <button onclick="retryLoad()" style="background:#fff;color:#92400e;border:none;border-radius:4px;padding:4px 12px;font-size:13px;font-weight:700;cursor:pointer;">Reload now</button>';
+    document.body.prepend(banner);
+  }
+  banner.style.display = 'flex';
+}
+
+function hideLoadBanner() {
+  const banner = document.getElementById('loadRetryBanner');
+  if (banner) banner.style.display = 'none';
+}
+
+async function retryLoad() {
+  hideLoadBanner();
+  const loaded = await dbLoadState();
+  if (loaded) {
+    refreshAfterLoad();
+    document.getElementById('userEmail').textContent = state.userEmail || '';
+    renderOpeningSwitcherList();
+  } else {
+    showLoadBanner();
+  }
 }
 
 function showLoginScreen() {

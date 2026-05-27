@@ -2,8 +2,12 @@
 // DB — all Supabase persistence operations
 // ============================================================
 
-async function dbLoadState() {
-  const { data: { user } } = await supabase.auth.getUser();
+async function dbLoadState(passedUser) {
+  let user = passedUser || null;
+  if (!user) {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  }
   if (!user) return false;
 
   const { data: profile } = await supabase
