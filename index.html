@@ -77,8 +77,11 @@
 
 <div class="app">
 
+  <!-- MOBILE SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
   <!-- SIDEBAR -->
-  <nav class="sidebar">
+  <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <img src="Logo white.png" alt="Sandbox VR" style="height:34px;display:block;margin-bottom:4px">
       <div class="portal-label">NSO Portal</div>
@@ -183,6 +186,9 @@
 
     <!-- TOP BAR -->
     <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
       <div class="topbar-breadcrumb">
         NSO Portal
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
