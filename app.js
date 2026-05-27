@@ -2467,7 +2467,7 @@ function renderResourcesPage() {
   var RESOURCES = [
     {
       id: 'guest-journey',
-      label: 'Guest Experience',
+      label: 'Guest Journey',
       icon: '🎭',
       videos: [
         { title: 'CH 1 — Introduction to Guest Journey', url: 'https://app.delightree.com/chapters/view/kz3q68dxq5n5inwaw936b9n6' },
@@ -2477,6 +2477,7 @@ function renderResourcesPage() {
         { title: 'CH 5 — Post Experience', url: 'https://app.delightree.com/chapters/view/7qz9kwplp6d306zomwonop6w' }
       ],
       written: [
+        { title: 'Guest Journey QRG', url: 'https://app.delightree.com/chapters/view/aamkrj6aq256u869nq4rwdzo' },
         { title: 'Sandbox VR Website', url: 'http://sandboxvr.com' }
       ]
     },
@@ -2490,7 +2491,26 @@ function renderResourcesPage() {
         { title: 'Exterminator', url: 'https://app.delightree.com/chapters/view/o9oqp69znp640zqxdrnbam83' },
         { title: 'Gatling Gun', url: 'https://app.delightree.com/chapters/view/2l97zzkazjpzsol45dpnnklo' }
       ],
-      written: []
+      written: [
+        { title: '— Quick Reference Guides —', url: null },
+        { title: 'Age of Dinosaurs QRG', url: 'https://app.delightree.com/chapters/view/9qq6wqbd23pkuxo78k7xwwx6' },
+        { title: 'Deadwood Phobia QRG', url: 'https://app.delightree.com/chapters/view/d8dbborn63zbi6mwloae82ad' },
+        { title: 'Squid Game Virtuals QRG', url: 'https://app.delightree.com/chapters/view/rzb7mz4j4blmtzaokkez6pn7' },
+        { title: 'Stranger Things Catalyst QRG', url: 'https://app.delightree.com/chapters/view/6qqj7mezdjxrfb7x4rlap35b' },
+        { title: 'Rebel Moon QRG', url: 'https://app.delightree.com/chapters/view/4qjppor3o3a6ulaarzqdj762' },
+        { title: '— Ops Flow Guides —', url: null },
+        { title: 'Ops Flow Guide | Deadwood Mansion', url: 'https://app.delightree.com/chapters/view/nm84468wlmqp0z99djk7nk7x' },
+        { title: 'Ops Flow Guide | Curse of Davy Jones', url: 'https://app.delightree.com/chapters/view/b5525wj2zqp8saanwl74naj9' },
+        { title: 'Ops Flow Guide | Unbound Fighting League', url: 'https://app.delightree.com/chapters/view/3lzwwnldmqzp0ae3z2nwj43n' },
+        { title: 'Ops Flow Guide | Deadwood Valley', url: 'https://app.delightree.com/chapters/view/xxmjjqmn5bkxs3o8aoq64jzj' },
+        { title: 'Ops Flow Guide | Deadwood Phobia', url: 'https://app.delightree.com/chapters/view/8qo22eok3zqnfbll6mxwzxwx' },
+        { title: 'Ops Flow Guide | Birthday Selfie', url: 'https://app.delightree.com/chapters/view/nm8446878r9mcj5pn5l427ll' },
+        { title: 'Ops Flow Guide | Amber Sky', url: 'https://app.delightree.com/chapters/view/zb4jjq4rkj3l0dn4l6n3z636' },
+        { title: 'Ops Flow Guide | Age of Dinosaurs', url: 'https://app.delightree.com/chapters/view/qnn7wn3wp72bu8ajnl4no673' },
+        { title: 'Ops Flow Guide | Stranger Things Catalyst', url: 'https://app.delightree.com/chapters/view/b55ej7akq33qurkmw4k343n5' },
+        { title: 'Ops Flow Guide | Rebel Moon', url: 'https://app.delightree.com/chapters/view/eo5eex68x5k9u8pa47n7w6r9' },
+        { title: 'Ops Flow Guide | Dragonfire', url: 'https://app.delightree.com/chapters/view/6qzpe76eqaxjuwp9jaldoaq6' }
+      ]
     },
     {
       id: 'tracking',
@@ -2506,12 +2526,16 @@ function renderResourcesPage() {
         { title: 'CH 7 — Passive Tracking Prop Tracker Assembly', url: 'https://app.delightree.com/chapters/view/xxmpbbxklb9aideb7qwojbw8' }
       ],
       written: [
-        { title: 'Calibration SOP', url: 'https://app.delightree.com/chapters/view/o9ozzbz7nnxx0xkd87bxqll4' }
+        { title: 'Calibration SOP', url: 'https://app.delightree.com/chapters/view/o9ozzbz7nnxx0xkd87bxqll4' },
+        { title: 'Building Trackers SOP', url: 'https://app.delightree.com/chapters/view/zb46rae6n8251pkl3k893re4' },
+        { title: 'Camera Calibration Cheat Sheet', url: 'https://app.delightree.com/chapters/view/6qqwpx259np4hbp3elo232l9' },
+        { title: 'MoCap Camera Cheat Sheet', url: 'https://app.delightree.com/chapters/view/6qqwpx259np4hbp3elo232l9' },
+        { title: 'Tracker Build Charts', url: 'https://app.delightree.com/chapters/view/6qz3368zn355frn964or844x' }
       ]
     },
     {
       id: 'wireless',
-      label: 'Wireless Streaming',
+      label: 'HTC Headset and Wireless Streaming',
       icon: '📶',
       videos: [
         { title: 'CH 1 — Intro to Wireless', url: 'https://app.delightree.com/chapters/view/qn6q38w5ow6a16x89xjbrn42' },
@@ -2519,7 +2543,13 @@ function renderResourcesPage() {
         { title: 'CH 3 — Hardware and Software Infrastructure', url: 'https://app.delightree.com/chapters/view/6qz4ke8e5e5qhxaek6edjm2z' },
         { title: 'CH 4 — Wireless Daily Operations', url: 'https://app.delightree.com/chapters/view/nm8qwpjw48kjczmdwkdoe79p' }
       ],
-      written: []
+      written: [
+        { title: 'HTC Kiosk Mode SOP', url: 'https://app.delightree.com/chapters/view/4qq5awwxkmn31l9eqpjm43qe' },
+        { title: 'HTC Cheat Sheet', url: 'https://app.delightree.com/chapters/view/5qqewolj7jp2izll7ooo4ak8' },
+        { title: 'HTC Vive Focus Vision SOP', url: 'https://app.delightree.com/chapters/view/j44m68zew4b9twz58noze47m' },
+        { title: 'HTC Wireless Streaming SOP', url: 'https://app.delightree.com/chapters/view/qn6mmwmmk3ezh8aw5kaxkw83' },
+        { title: 'HTC Handling QRG', url: 'https://app.delightree.com/chapters/view/b5mqdo42wro6ta7r4xwj5kpj' }
+      ]
     },
     {
       id: 'servers',
@@ -2542,7 +2572,10 @@ function renderResourcesPage() {
         { title: 'CH 3 — Vest Operations', url: 'https://app.delightree.com/chapters/view/qn6q3lboedjoh5oz3xp2zbj8' }
       ],
       written: [
-        { title: 'Quick Reference Guide: Haptic Feedback Vests', url: 'https://app.delightree.com/chapters/view/2l9eep69x5jj0ezo58l8zx6m' }
+        { title: 'Quick Reference Guide: Haptic Feedback Vests', url: 'https://app.delightree.com/chapters/view/2l9eep69x5jj0ezo58l8zx6m' },
+        { title: 'Vest TactSuit Pro SOP', url: 'https://app.delightree.com/chapters/view/o994xpbl4lz4czlnppk2jj6d' },
+        { title: 'Vest Maintenance and Handling SOP', url: 'https://app.delightree.com/chapters/view/mj877xnm89pn0dzajq2qzbnp' },
+        { title: 'TactSuit X40 Vest SOP', url: 'https://app.delightree.com/chapters/view/2l9eep69x5jj0ezo58l8zx6m' }
       ]
     },
     {
@@ -2554,18 +2587,23 @@ function renderResourcesPage() {
         { title: 'CH 2 — Building Props', url: 'https://app.delightree.com/chapters/view/9qxojzxldz3dtezr3jnb7dp5' },
         { title: 'CH 3 — Props Daily Operations and Care', url: 'https://app.delightree.com/chapters/view/xxx3qoqnpm45c6oqmq9j267o' }
       ],
-      written: []
+      written: [
+        { title: 'Prop Operations Cheat Sheet', url: 'https://app.delightree.com/chapters/view/xxx7oeaqde3oue7798456kpe' },
+        { title: 'WiFi Prop Troubleshooting Cheat Sheet', url: 'https://app.delightree.com/chapters/view/xxx7oeaqde3oue7798456kpe' },
+        { title: 'WiFi Props QRG', url: 'https://app.delightree.com/chapters/view/9qxrrw4z6qe7ur83bwpr4wed' }
+      ]
     },
     {
       id: 'silica',
-      label: 'Checkfront & Silica',
+      label: 'Checkfront, Silica & Command Bar',
       icon: '💻',
       videos: [
         { title: 'CH 1 — Intro and Mobile Check-In', url: 'https://app.delightree.com/chapters/view/qnn62o8el7a9h885pblbwmqp' },
         { title: 'CH 2 — Running Sessions', url: 'https://app.delightree.com/chapters/view/j44nba73ea9mtjlnoador9b7' }
       ],
       written: [
-        { title: 'SOP: Checkfront', url: 'https://app.delightree.com/chapters/view/5qqrqm2ko4ansm272keoq6wx' }
+        { title: 'SOP: Checkfront', url: 'https://app.delightree.com/chapters/view/5qqrqm2ko4ansm272keoq6wx' },
+        { title: 'Command Bar SOP', url: 'https://app.delightree.com/chapters/view/eo5z2kwe2eb8ubjeoo55x78z' }
       ]
     },
     {
@@ -2573,10 +2611,11 @@ function renderResourcesPage() {
       label: 'T1 Workflow & Escalation',
       icon: '🎫',
       videos: [
-        { title: 'T1 Communication', url: 'https://app.delightree.com/chapters/view/b5mq93opkldqt5mqd4rn3b34' },
-        { title: 'HTC Handling Guide', url: 'https://app.delightree.com/chapters/view/b5mqdo42wro6ta7r4xwj5kpj' }
+        { title: 'T1 Communication', url: 'https://app.delightree.com/chapters/view/b5mq93opkldqt5mqd4rn3b34' }
       ],
-      written: []
+      written: [
+        { title: 'T1 Support Tickets', url: 'https://app.delightree.com/chapters/view/j4nqrk83kokbh4pz935o78d9' }
+      ]
     },
     {
       id: 'checklists',
@@ -2593,13 +2632,19 @@ function renderResourcesPage() {
   ];
 
   function linkRow(item, type) {
+    // Section header rows (url === null)
+    if (!item.url) {
+      return '<div style="font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--text-muted);text-transform:uppercase;padding:10px 10px 2px;margin-top:4px">'
+        + item.title.replace(/^—\s*/, '').replace(/\s*—$/, '')
+        + '</div>';
+    }
     var isVideo = type === 'video';
     var icon = isVideo
       ? '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--trigger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 13 8 5 13 5 3" fill="var(--trigger)"/></svg>'
       : '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1.8" stroke-linecap="round"><path d="M4 2h8a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M6 6h4M6 9h4M6 12h2"/></svg>';
     return '<a href="' + item.url + '" target="_blank" style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;text-decoration:none;color:var(--text-primary);font-size:12.5px;transition:background 0.12s" onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'transparent\'">'
-      + icon + '<span>' + item.title + '</span>'
-      + '<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" style="margin-left:auto;flex-shrink:0"><path d="M3 8h10M8 3l5 5-5 5"/></svg>'
+      + icon + '<span style="flex:1">' + item.title + '</span>'
+      + '<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M3 8h10M8 3l5 5-5 5"/></svg>'
       + '</a>';
   }
 
@@ -2609,10 +2654,11 @@ function renderResourcesPage() {
     + '<div class="page-subtitle">All Delightree eLearning, videos, SOPs, and quick reference guides — organized by topic.</div>'
     + '</div></div>';
 
-  // Learning Plan prominent link
+  // Learning Plan hero link
   html += '<div class="card mb-24" style="background:var(--trigger-light);border:1.5px solid var(--trigger)">'
     + '<div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px">'
-    + '<div><div style="font-weight:700;color:var(--hb);margin-bottom:2px">NSO GEG Learning Plan</div><div style="font-size:12px;color:var(--text-secondary)">The master agenda for the 3-day training program — always open this first.</div></div>'
+    + '<div><div style="font-weight:700;color:var(--hb);margin-bottom:2px">NSO GEG Learning Plan</div>'
+    + '<div style="font-size:12px;color:var(--text-secondary)">The master agenda for the 3-day training program — always open this first.</div></div>'
     + '<a href="https://app.delightree.com/chapters/view/nmm89lolo598sr5opzam7nz3" target="_blank" class="btn btn-primary" style="white-space:nowrap;flex-shrink:0">Open on Delightree →</a>'
     + '</div></div>';
 
@@ -2624,14 +2670,14 @@ function renderResourcesPage() {
       + '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + cat.icon + '</span>'
       + '<div class="card-title" style="font-size:14px">' + cat.label + '</div></div>'
       + '</div>'
-      + '<div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:2px">';
+      + '<div style="padding:8px 6px 16px;display:flex;flex-direction:column;gap:1px">';
 
     if (cat.videos.length > 0) {
-      html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;margin:8px 0 4px">Videos / eLearning</div>';
+      html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;padding:8px 10px 4px">Videos / eLearning</div>';
       cat.videos.forEach(function(v) { html += linkRow(v, 'video'); });
     }
     if (cat.written.length > 0) {
-      html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;margin:8px 0 4px">SOPs & Written Materials</div>';
+      html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;padding:8px 10px 4px' + (cat.videos.length ? ';margin-top:4px;border-top:1px solid var(--border-light)' : '') + '">SOPs & Written Materials</div>';
       cat.written.forEach(function(w) { html += linkRow(w, 'written'); });
     }
 
