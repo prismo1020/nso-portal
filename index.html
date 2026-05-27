@@ -486,8 +486,12 @@
         <button class="tab" onclick="selectRecapDay(5)">Day 5</button>
       </div>
 
-      <div style="margin-bottom:20px;padding:10px 16px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);font-size:12px;color:var(--text-secondary)">
-        <strong style="color:var(--hb)">All sections are optional</strong> — complete what is relevant for today. Use the quick-add bubbles or type directly.
+      <div style="margin-bottom:20px;padding:10px 16px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);font-size:12px;color:var(--text-secondary);display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <span><strong style="color:var(--hb)">All sections are optional</strong> — complete what is relevant for today. Use the quick-add bubbles or type directly.</span>
+        <button class="btn btn-ghost" onclick="clearRecapDay()" style="font-size:11px;color:var(--danger);white-space:nowrap;flex-shrink:0;padding:5px 10px;border:1px solid var(--danger);border-radius:var(--radius-sm)">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+          Clear Day
+        </button>
       </div>
 
       <div class="grid-2">

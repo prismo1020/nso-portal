@@ -1103,7 +1103,10 @@ function renderCompetencyTable(day) {
 </th>
         ${comps.map(c => `<th class="competency-col">
   <div>${c.name}</div>
-  <button onclick="markCompAllDemonstrated('${c.id}', ${day})" style="margin-top:4px;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap" title="Mark all trainees as demonstrated">✓ All</button>
+  <div style="display:flex;gap:4px;justify-content:center;margin-top:4px">
+    <button onclick="markCompAllDemonstrated('${c.id}', ${day})" style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap" title="Mark all as demonstrated">✓ All</button>
+    <button onclick="clearCompSignoffs('${c.id}', ${day})" style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;border:1px solid var(--danger);background:transparent;color:var(--danger);cursor:pointer;white-space:nowrap" title="Clear all sign-offs for this competency">✕</button>
+  </div>
 </th>`).join('')}
         <th style="text-align:center;width:80px">Progress</th>
       </tr>
@@ -1150,7 +1153,10 @@ function renderCompetencyTable(day) {
         <div class="progress-bar-wrap" style="width:60px;margin:0 auto">
           <div class="progress-bar-fill ${pct === 100 ? 'green' : 'blue'}" style="width:${pct}%"></div>
         </div>
-        <button onclick="markTraineeAllDemonstrated('${trainee.id}', ${day})" style="margin-top:6px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:block;margin-left:auto;margin-right:auto" title="Mark all competencies as demonstrated for this trainee">✓ All</button>
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:6px">
+          <button onclick="markTraineeAllDemonstrated('${trainee.id}', ${day})" style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap" title="Mark all as demonstrated">✓ All</button>
+          <button onclick="clearTraineeSignoffs('${trainee.id}')" style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;border:1px solid var(--danger);background:transparent;color:var(--danger);cursor:pointer;white-space:nowrap" title="Clear all sign-offs for this trainee">✕</button>
+        </div>
       </td>
     </tr>`;
   });
@@ -1212,6 +1218,49 @@ function markTraineeAllDemonstrated(traineeId, day) {
   renderCompetencyTable(day);
   updateDashboardStats();
   showToast('All competencies marked as Demonstrated', 'success');
+}
+
+// ─── CLEAR FUNCTIONS ────────────────────────────────────────────────────────
+
+async function clearRecapDay() {
+  var day = state.currentRecapDay;
+  if (!confirm('Clear all recap fields for Day ' + day + '? This cannot be undone.')) return;
+  state.recaps[day] = {};
+  loadRecapFields(day); // resets all form fields and preview
+  const err = await dbSaveRecap(day);
+  if (err) { showToast('Clear failed: ' + (err.message || 'DB error'), 'error'); return; }
+  showToast('Day ' + day + ' recap cleared.', 'info');
+}
+
+async function clearTraineeSignoffs(traineeId) {
+  var day = state.currentCompDay;
+  var trainee = state.trainees.find(function(t){ return t.id === traineeId; });
+  var name = trainee ? trainee.name : 'this trainee';
+  if (!confirm('Clear all Day ' + day + ' sign-offs for ' + name + '?')) return;
+  var dayComps = COMPETENCIES.filter(function(c){ return c.day === day; });
+  // Clear from state
+  dayComps.forEach(function(c){ delete state.signoffs[traineeId + '_' + c.id]; });
+  delete state.signoffs[traineeId + '_attendance-d' + day];
+  // Clear from DB in parallel
+  var promises = dayComps.map(function(c){ return dbSaveSignoff(traineeId, c.id, 'pending'); });
+  promises.push(dbSaveSignoff(traineeId, 'attendance-d' + day, 'pending'));
+  await Promise.all(promises);
+  renderCompetencyTable(day);
+  updateDashboardStats();
+  showToast(name + '\'s sign-offs cleared.', 'info');
+}
+
+async function clearCompSignoffs(compId, day) {
+  var comp = COMPETENCIES.find(function(c){ return c.id === compId; });
+  var compName = comp ? comp.name : compId;
+  if (!confirm('Clear "' + compName + '" sign-offs for all trainees?')) return;
+  // Clear from state
+  state.trainees.forEach(function(t){ delete state.signoffs[t.id + '_' + compId]; });
+  // Clear from DB in parallel
+  await Promise.all(state.trainees.map(function(t){ return dbSaveSignoff(t.id, compId, 'pending'); }));
+  renderCompetencyTable(day);
+  updateDashboardStats();
+  showToast('"' + compName + '" sign-offs cleared.', 'info');
 }
 
 function updateCompProgress(day) {
