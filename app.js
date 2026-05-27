@@ -115,14 +115,8 @@ function openKBEditor(id) {
 
   document.getElementById('kbEditTitle').value = getContent('kb', id, 'title', article.title);
   document.getElementById('kbEditSubtitle').value = getContent('kb', id, 'subtitle', article.subtitle);
-
-  if (!_kbQuill) {
-    _kbQuill = new Quill('#kbEditQuill', {
-      theme: 'snow',
-      modules: { toolbar: [['bold','italic'],[{'header':2},{'header':3}],[{'list':'ordered'},{'list':'bullet'}],['link','blockquote','clean']] }
-    });
-  }
-  _kbQuill.root.innerHTML = getContent('kb', id, 'content', article.content);
+  // Use raw textarea — preserves all HTML including custom classes/styles that Quill would strip
+  document.getElementById('kbEditContent').value = getContent('kb', id, 'content', article.content);
   document.getElementById('kbEditModal').style.display = 'flex';
 }
 
@@ -135,7 +129,7 @@ async function saveKBEdit() {
   if (!_kbEditId) return;
   var title = document.getElementById('kbEditTitle').value;
   var subtitle = document.getElementById('kbEditSubtitle').value;
-  var content = _kbQuill ? _kbQuill.root.innerHTML : '';
+  var content = document.getElementById('kbEditContent').value;
 
   state.overrides['kb|' + _kbEditId + '|title'] = title;
   state.overrides['kb|' + _kbEditId + '|subtitle'] = subtitle;
@@ -307,8 +301,9 @@ const KB = {
 <li>Trainee access issue in Delightree: continue group learning, flag to L&amp;D, ensure the individual completes solo before end of day.</li>
 </ul>
 <div class="science-callout"><div class="science-callout-label">What You Should Not Do</div><div class="science-callout-text">Do not add your own content blocks that are not in the plan. Do not reorder the three days. Do not tell trainees the Learning Plan is optional. The plan reflects months of instructional design work — deviations compound across the opening program.</div></div>`
-    },
-    {
+    }
+  /* Delightree Resource Links moved to Resources page */
+  /* {
       id: 'start-delightree-links',
       title: 'Delightree Resource Links',
       category: 'Start Here',
@@ -345,6 +340,7 @@ const KB = {
 <li><a href="https://app.delightree.com/chapters/view/pzxaaen5x6d4u6xj5838bpnd" target="_blank" style="color:var(--trigger)">Restroom Cleaning Checklist →</a> — Restroom cleaning standards.</li>
 </ul>`
     }
+  } */
   ],
   'Daily Facilitation': [
     {
@@ -779,8 +775,9 @@ const KB = {
 </ul>
 <div class="science-callout"><div class="science-callout-label">Coach Note</div><div class="science-callout-text">Every trainee must build at least one complete tracker independently before you sign off on this competency — not just rotate through a station. The assembly line builds speed. Individual completion builds accountability. Both are required.</div></div>`
     }
-  ],
-  'Reference': [
+  ]
+  /* Reference category (Source Links) moved to Resources page */
+  /* 'Reference': [
     {
       id: 'ref-guest',
       title: 'Guest Journey, Sales &amp; Policies: Source Links',
@@ -840,7 +837,7 @@ const KB = {
 <li><a href="https://app.delightree.com/chapters/view/pzxaaen5x6d4u6xj5838bpnd" target="_blank" style="color:var(--trigger)">Restroom Cleaning Checklist →</a></li>
 </ul>`
     }
-  ]
+  ] */
 };
 
 // ============================================================
@@ -859,13 +856,14 @@ function navigate(view) {
     schedule: 'Daily Agenda',
     competencies: 'Competency Tracker',
     recap: 'Daily Recap',
-    knowledge: 'Knowledge Base',
+    knowledge: 'Facilitation Guidance',
     franchise: 'Day 0 Checks',
     franchisee: 'Day 4 – Franchise Partner Review',
     leadership: 'Leadership Lens',
     admin: 'All Openings',
     videos: 'Training Videos',
-    osc: 'OSC Closing Report'
+    osc: 'OSC Closing Report',
+    resources: 'Resources'
   };
   document.getElementById('topbarTitle').textContent = titles[view] || view;
   state.currentView = view;
@@ -882,7 +880,8 @@ function navigate(view) {
     leadership: 'nav-leadership',
     admin: 'nav-admin',
     videos: 'nav-videos',
-    osc: 'nav-osc'
+    osc: 'nav-osc',
+    resources: 'nav-resources'
   };
   const navEl = document.getElementById(navIdMap[view]);
   if (navEl) navEl.classList.add('active');
@@ -898,6 +897,12 @@ function navigate(view) {
   if (view === 'admin') renderAdminPage();
   if (view === 'videos') renderVideosPage();
   if (view === 'osc') loadOSCReportFields();
+  if (view === 'resources') renderResourcesPage();
+
+  // Update browser history so Back button works inside the portal
+  if (history.state?.view !== view) {
+    history.pushState({ view }, '', '#' + view);
+  }
 }
 
 // ============================================================
@@ -1381,7 +1386,21 @@ async function saveRecap() {
 function copyRecap() {
   var text = document.getElementById('recapPreview').textContent;
   if (!text || text.startsWith('Start filling')) { showToast('Nothing to copy yet.', 'info'); return; }
-  navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard — paste into Slack!', 'success'); });
+  // Write both HTML (bold tags) and plain text so Slack receives formatted content
+  var htmlVersion = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')  // escape first
+    .replace(/\*(.*?)\*/g, '<b>$1</b>')   // *bold* → <b>bold</b>
+    .replace(/\n/g, '<br>');
+  try {
+    var item = new ClipboardItem({
+      'text/html':  new Blob([htmlVersion], { type: 'text/html' }),
+      'text/plain': new Blob([text],        { type: 'text/plain' })
+    });
+    navigator.clipboard.write([item]).then(function(){ showToast('Copied — paste into Slack!', 'success'); });
+  } catch(e) {
+    // Fallback for browsers that don't support ClipboardItem
+    navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard — paste into Slack!', 'success'); });
+  }
 }
 
 function exportSignoffs() {
@@ -1466,36 +1485,54 @@ function renderTeamRoster() {
     const totalComps = COMPETENCIES.length;
     const signedComps = COMPETENCIES.filter(c => state.signoffs[t.id + '_' + c.id] === 'signed').length;
     const pct = Math.round((signedComps / totalComps) * 100);
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-light)">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--trigger-light);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--trigger)">${t.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}</div>
-        <div>
-          <div style="font-weight:600;font-size:14px">${t.name}</div>
-          <select onchange="editTraineeRole('${t.id}', this.value)" style="font-size:11px;color:var(--text-secondary);border:none;background:transparent;cursor:pointer;padding:0;font-family:var(--font);margin-top:2px">
-            <option value="GEG" ${t.role==='GEG'?'selected':''}>GEG</option>
-            <option value="Lead GEG" ${t.role==='Lead GEG'?'selected':''}>Lead GEG</option>
-            <option value="ASM" ${t.role==='ASM'?'selected':''}>ASM</option>
-            <option value="SM" ${t.role==='SM'?'selected':''}>SM</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:16px">
-        <div style="text-align:right">
-          <div style="font-size:11px;color:var(--text-muted)">Sign-offs</div>
-          <div style="font-size:14px;font-weight:700;color:${pct === 100 ? 'var(--success)' : 'var(--hb)'}">${signedComps}/${totalComps}</div>
-        </div>
-        <div style="width:80px">
-          <div class="progress-bar-wrap">
-            <div class="progress-bar-fill ${pct === 100 ? 'green' : 'blue'}" style="width:${pct}%"></div>
+    const notesSafe = (t.notes || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return `<div style="padding:14px 0;border-bottom:1px solid var(--border-light)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--trigger-light);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--trigger)">${t.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}</div>
+          <div>
+            <div style="font-weight:600;font-size:14px">${t.name}</div>
+            <select onchange="editTraineeRole('${t.id}', this.value)" style="font-size:11px;color:var(--text-secondary);border:none;background:transparent;cursor:pointer;padding:0;font-family:var(--font);margin-top:2px">
+              <option value="GEG" ${t.role==='GEG'?'selected':''}>GEG</option>
+              <option value="Lead GEG" ${t.role==='Lead GEG'?'selected':''}>Lead GEG</option>
+              <option value="ASM" ${t.role==='ASM'?'selected':''}>ASM</option>
+              <option value="SM" ${t.role==='SM'?'selected':''}>SM</option>
+            </select>
           </div>
         </div>
-        <button onclick="removeTrainee('${t.id}')" style="color:var(--text-muted);background:transparent;border:none;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:4px;transition:all 0.1s" onmouseover="this.style.background='var(--danger-light)';this.style.color='var(--danger)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">Remove</button>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--text-muted)">Sign-offs</div>
+            <div style="font-size:14px;font-weight:700;color:${pct === 100 ? 'var(--success)' : 'var(--hb)'}">${signedComps}/${totalComps}</div>
+          </div>
+          <div style="width:80px">
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill ${pct === 100 ? 'green' : 'blue'}" style="width:${pct}%"></div>
+            </div>
+          </div>
+          <button onclick="removeTrainee('${t.id}')" style="color:var(--text-muted);background:transparent;border:none;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:4px;transition:all 0.1s" onmouseover="this.style.background='var(--danger-light)';this.style.color='var(--danger)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">Remove</button>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding-left:48px">
+        <textarea id="notes-${t.id}" placeholder="Coach notes — visible to all coaches on this opening" rows="1"
+          style="width:100%;font-size:12px;color:var(--text-secondary);border:1px solid transparent;border-radius:6px;padding:6px 8px;resize:none;font-family:var(--font);line-height:1.5;background:var(--surface);transition:border-color 0.15s;overflow:hidden"
+          onfocus="this.style.borderColor='var(--border)';this.style.minHeight='56px'"
+          onblur="this.style.borderColor='transparent';this.style.minHeight='';saveTraineeNotes('${t.id}',this.value)"
+        >${notesSafe}</textarea>
       </div>
     </div>`;
   }).join('') + `<div style="padding-top:14px;display:flex;gap:8px">
     <button class="btn btn-secondary" onclick="openAddTraineeModal()">+ Add Another</button>
     <button class="btn btn-ghost" onclick="openAddTraineeModal();setTimeout(()=>switchAddTab('bulk'),50)">Bulk Add</button>
   </div>`;
+}
+
+function saveTraineeNotes(id, value) {
+  const t = state.trainees.find(t => t.id === id);
+  if (!t) return;
+  if (t.notes === value) return;
+  t.notes = value;
+  dbSaveTrainee(t);
 }
 
 function editTraineeRole(id, newRole) {
@@ -2420,6 +2457,192 @@ async function exportAllAdmin() {
 // ============================================================
 // TRAINING VIDEOS
 // ============================================================
+// ============================================================
+// RESOURCES PAGE
+// ============================================================
+function renderResourcesPage() {
+  var el = document.getElementById('resourcesPageContent');
+  if (!el) return;
+
+  var RESOURCES = [
+    {
+      id: 'guest-journey',
+      label: 'Guest Experience',
+      icon: '🎭',
+      videos: [
+        { title: 'CH 1 — Introduction to Guest Journey', url: 'https://app.delightree.com/chapters/view/kz3q68dxq5n5inwaw936b9n6' },
+        { title: 'CH 2 — Lobby', url: 'https://app.delightree.com/chapters/view/rzbo5apd44j8hlqlmnj84j9j' },
+        { title: 'CH 3 — Barracks', url: 'https://app.delightree.com/chapters/view/4qjzk9n9nb9pflqlx3knzplx' },
+        { title: 'CH 4 — Holodeck', url: 'https://app.delightree.com/chapters/view/2l97zx7x6knatlaba3x6kw26' },
+        { title: 'CH 5 — Post Experience', url: 'https://app.delightree.com/chapters/view/7qz9kwplp6d306zomwonop6w' }
+      ],
+      written: [
+        { title: 'Sandbox VR Website', url: 'http://sandboxvr.com' }
+      ]
+    },
+    {
+      id: 'experiences',
+      label: 'Experiences',
+      icon: '🕹️',
+      videos: [
+        { title: 'Age of Dinosaurs', url: 'https://app.delightree.com/chapters/view/7qqxb9naljwdu96kzkwb3l5l' },
+        { title: 'Deadwood Phobia', url: 'https://app.delightree.com/chapters/view/aamqzj6366jou86e8x82xd8r' },
+        { title: 'Exterminator', url: 'https://app.delightree.com/chapters/view/o9oqp69znp640zqxdrnbam83' },
+        { title: 'Gatling Gun', url: 'https://app.delightree.com/chapters/view/2l97zzkazjpzsol45dpnnklo' }
+      ],
+      written: []
+    },
+    {
+      id: 'tracking',
+      label: 'Tracking',
+      icon: '📡',
+      videos: [
+        { title: 'CH 1 — Active Tracking Headmount Intro', url: 'https://app.delightree.com/chapters/view/nm8qwxowdn3lizmdwkb392kb' },
+        { title: 'CH 2 — Active Tracking Headmount Control Panel & Modes', url: 'https://app.delightree.com/chapters/view/qn6q3ex3wb7mfbdwb4bna8x9' },
+        { title: 'CH 3 — Active Tracking Headmount Troubleshooting and Care', url: 'https://app.delightree.com/chapters/view/lznqb2x884jr0wkdw6w329z5' },
+        { title: 'CH 4 — Passive Tracking Intro', url: 'https://app.delightree.com/chapters/view/kz3q66aal9baclewb2359e2q' },
+        { title: 'CH 5 — Passive Tracking Props', url: 'https://app.delightree.com/chapters/view/aamqzz73az8btwmkr7j4zz6w' },
+        { title: 'CH 6 — Passive Limb Tracker Assembly', url: 'https://app.delightree.com/chapters/view/zb43wwlaej32fl256wkn77ab' },
+        { title: 'CH 7 — Passive Tracking Prop Tracker Assembly', url: 'https://app.delightree.com/chapters/view/xxmpbbxklb9aideb7qwojbw8' }
+      ],
+      written: [
+        { title: 'Calibration SOP', url: 'https://app.delightree.com/chapters/view/o9ozzbz7nnxx0xkd87bxqll4' }
+      ]
+    },
+    {
+      id: 'wireless',
+      label: 'Wireless Streaming',
+      icon: '📶',
+      videos: [
+        { title: 'CH 1 — Intro to Wireless', url: 'https://app.delightree.com/chapters/view/qn6q38w5ow6a16x89xjbrn42' },
+        { title: 'CH 2 — HTC Basics Wireless', url: 'https://app.delightree.com/chapters/view/eo5ql8w73487u7lbmde4wbx2' },
+        { title: 'CH 3 — Hardware and Software Infrastructure', url: 'https://app.delightree.com/chapters/view/6qz4ke8e5e5qhxaek6edjm2z' },
+        { title: 'CH 4 — Wireless Daily Operations', url: 'https://app.delightree.com/chapters/view/nm8qwpjw48kjczmdwkdoe79p' }
+      ],
+      written: []
+    },
+    {
+      id: 'servers',
+      label: 'Holodeck Room Servers',
+      icon: '🖥️',
+      videos: [
+        { title: 'CH 1 — Introduction', url: 'https://app.delightree.com/chapters/view/6qz4kkmjj2pbuxaek6j3lqbm' },
+        { title: 'CH 2 — VNC', url: 'https://app.delightree.com/chapters/view/7qz9k29par75ipw9bw7639lp' },
+        { title: 'CH 3 — Daily Operations and Care', url: 'https://app.delightree.com/chapters/view/b5mqdw47pzad1pn8wmmzaqbk' }
+      ],
+      written: []
+    },
+    {
+      id: 'vests',
+      label: 'Haptic Feedback Vests',
+      icon: '🦺',
+      videos: [
+        { title: 'CH 1 — Introduction to Vests', url: 'https://app.delightree.com/chapters/view/rzbo5lzdjko6ul64b95a2j5e' },
+        { title: 'CH 2 — Vest Pairing', url: 'https://app.delightree.com/chapters/view/mj8qelb9d9w3sqxw37b9lnzd' },
+        { title: 'CH 3 — Vest Operations', url: 'https://app.delightree.com/chapters/view/qn6q3lboedjoh5oz3xp2zbj8' }
+      ],
+      written: [
+        { title: 'Quick Reference Guide: Haptic Feedback Vests', url: 'https://app.delightree.com/chapters/view/2l9eep69x5jj0ezo58l8zx6m' }
+      ]
+    },
+    {
+      id: 'props',
+      label: 'Props',
+      icon: '🎮',
+      videos: [
+        { title: 'CH 1 — WiFi Prop Pairing & Troubleshooting', url: 'https://app.delightree.com/chapters/view/o9oqp8a6o43lizwrp8l6amza' },
+        { title: 'CH 2 — Building Props', url: 'https://app.delightree.com/chapters/view/9qxojzxldz3dtezr3jnb7dp5' },
+        { title: 'CH 3 — Props Daily Operations and Care', url: 'https://app.delightree.com/chapters/view/xxx3qoqnpm45c6oqmq9j267o' }
+      ],
+      written: []
+    },
+    {
+      id: 'silica',
+      label: 'Checkfront & Silica',
+      icon: '💻',
+      videos: [
+        { title: 'CH 1 — Intro and Mobile Check-In', url: 'https://app.delightree.com/chapters/view/qnn62o8el7a9h885pblbwmqp' },
+        { title: 'CH 2 — Running Sessions', url: 'https://app.delightree.com/chapters/view/j44nba73ea9mtjlnoador9b7' }
+      ],
+      written: [
+        { title: 'SOP: Checkfront', url: 'https://app.delightree.com/chapters/view/5qqrqm2ko4ansm272keoq6wx' }
+      ]
+    },
+    {
+      id: 't1',
+      label: 'T1 Workflow & Escalation',
+      icon: '🎫',
+      videos: [
+        { title: 'T1 Communication', url: 'https://app.delightree.com/chapters/view/b5mq93opkldqt5mqd4rn3b34' },
+        { title: 'HTC Handling Guide', url: 'https://app.delightree.com/chapters/view/b5mqdo42wro6ta7r4xwj5kpj' }
+      ],
+      written: []
+    },
+    {
+      id: 'checklists',
+      label: 'Checklists & SOPs',
+      icon: '📋',
+      videos: [],
+      written: [
+        { title: 'Opening Checklist', url: 'https://app.delightree.com/chapters/view/qn6mmw3r88bbcbnkxl7lmw7p' },
+        { title: 'Closing Checklist', url: 'https://app.delightree.com/chapters/view/zb4jjqwwm4e60zqd8lpl362r' },
+        { title: 'Store Cleaning SOP', url: 'https://app.delightree.com/chapters/view/9qxrrw548blphl34935lz7lm' },
+        { title: 'Restroom Cleaning Checklist', url: 'https://app.delightree.com/chapters/view/pzxaaen5x6d4u6xj5838bpnd' }
+      ]
+    }
+  ];
+
+  function linkRow(item, type) {
+    var isVideo = type === 'video';
+    var icon = isVideo
+      ? '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--trigger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 13 8 5 13 5 3" fill="var(--trigger)"/></svg>'
+      : '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1.8" stroke-linecap="round"><path d="M4 2h8a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M6 6h4M6 9h4M6 12h2"/></svg>';
+    return '<a href="' + item.url + '" target="_blank" style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;text-decoration:none;color:var(--text-primary);font-size:12.5px;transition:background 0.12s" onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'transparent\'">'
+      + icon + '<span>' + item.title + '</span>'
+      + '<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" style="margin-left:auto;flex-shrink:0"><path d="M3 8h10M8 3l5 5-5 5"/></svg>'
+      + '</a>';
+  }
+
+  var html = '<div class="page-header" style="margin-bottom:24px"><div>'
+    + '<div class="eyebrow">RESOURCES</div>'
+    + '<div class="page-title">NSO Resources</div>'
+    + '<div class="page-subtitle">All Delightree eLearning, videos, SOPs, and quick reference guides — organized by topic.</div>'
+    + '</div></div>';
+
+  // Learning Plan prominent link
+  html += '<div class="card mb-24" style="background:var(--trigger-light);border:1.5px solid var(--trigger)">'
+    + '<div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px">'
+    + '<div><div style="font-weight:700;color:var(--hb);margin-bottom:2px">NSO GEG Learning Plan</div><div style="font-size:12px;color:var(--text-secondary)">The master agenda for the 3-day training program — always open this first.</div></div>'
+    + '<a href="https://app.delightree.com/chapters/view/nmm89lolo598sr5opzam7nz3" target="_blank" class="btn btn-primary" style="white-space:nowrap;flex-shrink:0">Open on Delightree →</a>'
+    + '</div></div>';
+
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">';
+
+  RESOURCES.forEach(function(cat) {
+    html += '<div class="card">'
+      + '<div class="card-header" style="padding-bottom:0">'
+      + '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + cat.icon + '</span>'
+      + '<div class="card-title" style="font-size:14px">' + cat.label + '</div></div>'
+      + '</div>'
+      + '<div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:2px">';
+
+    if (cat.videos.length > 0) {
+      html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;margin:8px 0 4px">Videos / eLearning</div>';
+      cat.videos.forEach(function(v) { html += linkRow(v, 'video'); });
+    }
+    if (cat.written.length > 0) {
+      html += '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;margin:8px 0 4px">SOPs & Written Materials</div>';
+      cat.written.forEach(function(w) { html += linkRow(w, 'written'); });
+    }
+
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+
 function renderVideosPage() {
   var el = document.getElementById('pageContent');
   if (!el) return;
@@ -2968,7 +3191,7 @@ async function switchToOpening(openingId) {
     supabase.from('franchise_checks').select('*').eq('opening_id', openingId)
   ]);
 
-  state.trainees = (trainees || []).map(t => ({ id: t.id, name: t.name, role: t.role }));
+  state.trainees = (trainees || []).map(t => ({ id: t.id, name: t.name, role: t.role, notes: t.notes || '' }));
   state.signoffs = {};
   (signoffs || []).forEach(s => { state.signoffs[s.trainee_id + '_' + s.competency_id] = s.status; });
   state.recaps = {};
@@ -3007,3 +3230,43 @@ renderKBNav();
 const _ac1 = document.getElementById('agendacard-1');
 if (_ac1) _ac1.classList.add('active');
 initApp();
+
+// Browser Back / Forward support
+window.addEventListener('popstate', function(e) {
+  var view = e.state && e.state.view;
+  if (view) {
+    // navigate() without pushing another history entry
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    var el = document.getElementById('view-' + view);
+    if (el) el.classList.add('active');
+    var navEl = document.getElementById({
+      dashboard:'nav-dashboard', team:'nav-roster', schedule:'nav-schedule',
+      competencies:'nav-competencies', recap:'nav-recap', knowledge:'nav-kb',
+      franchise:'nav-franchise', franchisee:'nav-franchisee', osc:'nav-osc',
+      resources:'nav-resources', leadership:'nav-leadership', admin:'nav-admin', videos:'nav-videos'
+    }[view]);
+    if (navEl) navEl.classList.add('active');
+    state.currentView = view;
+    if (view === 'schedule') renderAgenda(state.currentAgendaDay);
+    if (view === 'competencies') renderCompetencyTable(state.currentCompDay);
+    if (view === 'knowledge') renderKBNav();
+    if (view === 'team') renderTeamRoster();
+    if (view === 'recap') loadRecapFields(state.currentRecapDay);
+    if (view === 'franchise') renderFranchiseChecks();
+    if (view === 'franchisee') renderFranchisePartnerReview();
+    if (view === 'leadership') renderLeadershipLens();
+    if (view === 'admin') renderAdminPage();
+    if (view === 'resources') renderResourcesPage();
+    if (view === 'osc') loadOSCReportFields();
+  }
+});
+
+// Handle direct URL with hash on load (e.g. after refresh on a non-dashboard view)
+(function() {
+  var hash = window.location.hash.slice(1);
+  if (hash && hash !== 'dashboard') {
+    // wait for initApp to finish, then navigate
+    setTimeout(function() { if (state.userEmail) navigate(hash); }, 1200);
+  }
+})();

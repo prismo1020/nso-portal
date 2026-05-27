@@ -46,7 +46,7 @@ async function dbLoadState(passedUser) {
     supabase.from('franchise_checks').select('*').eq('opening_id', o.id)
   ]);
 
-  state.trainees = (trainees || []).map(t => ({ id: t.id, name: t.name, role: t.role }));
+  state.trainees = (trainees || []).map(t => ({ id: t.id, name: t.name, role: t.role, notes: t.notes || '' }));
 
   state.signoffs = {};
   (signoffs || []).forEach(s => {
@@ -161,7 +161,8 @@ async function dbSaveTrainee(trainee) {
     id:         trainee.id,
     opening_id: state.openingId,
     name:       trainee.name,
-    role:       trainee.role
+    role:       trainee.role,
+    notes:      trainee.notes || null
   }, { onConflict: 'id' });
   if (error) console.error('dbSaveTrainee:', error);
 }
