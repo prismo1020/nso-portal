@@ -1682,7 +1682,7 @@ function updateDashboardStats() {
   document.getElementById('statTrainees').textContent = state.trainees.length;
   document.getElementById('statDaysLeft').textContent = state.opening ? (5 - state.currentDay + 1) : 5;
 
-  const allSigned = Object.values(state.signoffs).filter(v => v === 'signed').length;
+  const allSigned = Object.entries(state.signoffs).filter(([k, v]) => v === 'signed' && !k.includes('_attendance-')).length;
   // Exclude N/A cells (smOnly comps for non-SM/ASM trainees) from the total
   let allTotal = 0;
   state.trainees.forEach(trainee => {
@@ -2207,8 +2207,12 @@ async function renderAdminPage() {
     var signoffs = o.signoffs || [];
     var recaps = o.recaps || [];
     var franchiseChecks = o.franchise_checks || [];
-    var allSigned = signoffs.filter(function(s){ return s.status === 'signed'; }).length;
-    var allTotal = COMPETENCIES.length * trainees.length;
+    var allSigned = signoffs.filter(function(s){ return s.status === 'signed' && !s.competency_id.startsWith('attendance-'); }).length;
+    var allTotal = 0;
+    trainees.forEach(function(t) {
+      var isLeader = t.role === 'SM' || t.role === 'ASM';
+      COMPETENCIES.forEach(function(c) { if (!c.smOnly || isLeader) allTotal++; });
+    });
     var pct = allTotal > 0 ? Math.round((allSigned / allTotal) * 100) : 0;
     var recapCount = recaps.filter(function(r){ return r.recap_data && Object.values(r.recap_data).some(function(v){ return v; }); }).length;
     var openingId = 'admin-' + o.id.replace(/[^a-z0-9]/gi, '_');
