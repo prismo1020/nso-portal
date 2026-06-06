@@ -2197,7 +2197,7 @@ async function renderAdminPage() {
     var allSigned = signoffs.filter(function(s){ return s.status === 'signed'; }).length;
     var allTotal = COMPETENCIES.length * trainees.length;
     var pct = allTotal > 0 ? Math.round((allSigned / allTotal) * 100) : 0;
-    var recapCount = recaps.filter(function(r){ return r.ld_topics || r.ld_team; }).length;
+    var recapCount = recaps.filter(function(r){ return r.recap_data && Object.values(r.recap_data).some(function(v){ return v; }); }).length;
     var openingId = 'admin-' + o.id.replace(/[^a-z0-9]/gi, '_');
     var opening = { store: o.store_name, coach: o.coach_name || (o.profiles && o.profiles.full_name) || '—', date: o.start_date };
     var pctBadge = pct === 100 ? 'badge-green' : 'badge-gray';
@@ -2278,7 +2278,8 @@ async function renderAdminPage() {
     html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px">Daily Recaps</div>';
     [1,2,3,4,5].forEach(function(d) {
       var r = recaps.find(function(x){ return x.day_num === d; });
-      var hasContent = r && (r.ld_topics || r.ld_team || r.tech);
+      var rd = r && r.recap_data;
+      var hasContent = rd && Object.values(rd).some(function(v){ return v; });
       var badge = hasContent ? 'badge-green' : 'badge-gray';
       var label = hasContent ? 'Complete' : 'Pending';
       html += '<div style="padding:10px 0;border-bottom:1px solid var(--border-light)">';
@@ -2287,14 +2288,10 @@ async function renderAdminPage() {
       html += '<span class="badge ' + badge + '">' + label + '</span>';
       html += '</div>';
       if (hasContent) {
-        if (r.ld_topics) {
-          var ldText = r.ld_topics.substring(0, 120) + (r.ld_topics.length > 120 ? '...' : '');
-          html += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px"><strong>L&amp;D:</strong> ' + ldText + '</div>';
-        }
-        if (r.sm_notes) {
-          var smText = r.sm_notes.substring(0, 100) + (r.sm_notes.length > 100 ? '...' : '');
-          html += '<div style="font-size:12px;color:var(--text-secondary)"><strong>SM:</strong> ' + smText + '</div>';
-        }
+        var ldSnippet = (rd['ld-progress'] || rd['ld-delays'] || '').trim();
+        var teamSnippet = (rd['sm-execution'] || rd['team-progress'] || rd['team-successes'] || '').trim();
+        if (ldSnippet) html += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px"><strong>L&amp;D:</strong> ' + ldSnippet.substring(0, 120) + (ldSnippet.length > 120 ? '…' : '') + '</div>';
+        if (teamSnippet) html += '<div style="font-size:12px;color:var(--text-secondary)"><strong>Team:</strong> ' + teamSnippet.substring(0, 100) + (teamSnippet.length > 100 ? '…' : '') + '</div>';
       }
       html += '</div>';
     });
@@ -2564,7 +2561,7 @@ async function exportAllAdmin() {
     const trainees = o.trainees || [];
     const signoffs = o.signoffs || [];
     const recaps = o.recaps || [];
-    const recapCount = recaps.filter(r => r.ld_topics || r.ld_team).length;
+    const recapCount = recaps.filter(r => r.recap_data && Object.values(r.recap_data).some(v => v)).length;
     if (trainees.length === 0) {
       csv += `"${o.store_name||''}","${o.coach_name||''}","${o.start_date||''}","${o.current_day||''}","(no trainees)","","","${recapCount}"\n`;
     } else {
