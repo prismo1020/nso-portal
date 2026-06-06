@@ -1726,7 +1726,9 @@ function updateDashboardFocus() {
   const pendingComps = COMPETENCIES.filter(c => c.day === state.currentDay);
   const pending = [];
   state.trainees.forEach(t => {
+    const isLeader = t.role === 'SM' || t.role === 'ASM';
     pendingComps.forEach(c => {
+      if (c.smOnly && !isLeader) return; // N/A for GEG trainees — skip
       if (!state.signoffs[t.id + '_' + c.id]) {
         pending.push({ trainee: t.name, comp: c.name });
       }
