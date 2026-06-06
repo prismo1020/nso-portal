@@ -1398,7 +1398,7 @@ function updateRecapPreview() {
   };
   var store = (state.opening && state.opening.store) ? state.opening.store : '[Store]';
   var coach = (state.opening && state.opening.coach) ? state.opening.coach : '[Coach]';
-  var dayTitles = ['Guest Experience','Service & Tech','Role-Play & Ops','Full Roleplay','Friends & Family'];
+  var dayTitles = ['Guest Experience','Service & Tech','Role-Play & Ops','Full Roleplay','Friends & Family','Opening Weekend — Friday','Opening Weekend — Saturday','Opening Weekend — Sunday'];
   var lines = [];
   lines.push('*NSO Daily Recap — Day ' + day + ': ' + (dayTitles[day-1] || '') + '*');
   lines.push('*' + store + '*  |  OSC: ' + coach);
@@ -1465,6 +1465,17 @@ function updateRecapPreview() {
       var now = new Date();
       timeEl.textContent = 'Today at ' + now.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
     }
+  }
+
+  // Ticket count warning: show if tech issues logged but tickets field is empty
+  var hasTechIssue = (get('tech-mscap') + get('tech-unusual')).trim().length > 0;
+  var hasTickets = get('tech-tickets').trim().length > 0;
+  var ticketsWarning = document.getElementById('tickets-warning');
+  var ticketsEl = document.getElementById('recap-tech-tickets');
+  if (ticketsWarning) ticketsWarning.style.display = (hasTechIssue && !hasTickets) ? '' : 'none';
+  if (ticketsEl) {
+    ticketsEl.style.borderColor = (hasTechIssue && !hasTickets) ? 'var(--warning)' : '';
+    ticketsEl.style.background  = (hasTechIssue && !hasTickets) ? 'var(--warning-light)' : '';
   }
 }
 
@@ -2201,7 +2212,7 @@ async function renderAdminPage() {
     var openingId = 'admin-' + o.id.replace(/[^a-z0-9]/gi, '_');
     var opening = { store: o.store_name, coach: o.coach_name || (o.profiles && o.profiles.full_name) || '—', date: o.start_date };
     var pctBadge = pct === 100 ? 'badge-green' : 'badge-gray';
-    var recapBadge = recapCount >= 5 ? 'badge-green' : 'badge-amber';
+    var recapBadge = recapCount >= 8 ? 'badge-green' : 'badge-amber';
 
     // Safe store name for use inside onclick attributes (no quote issues)
     var safeId = o.id;
@@ -2218,7 +2229,7 @@ async function renderAdminPage() {
     html += '<div style="display:flex;gap:16px;align-items:center">';
     html += '<span class="badge badge-blue">' + trainees.length + ' trainees</span>';
     html += '<span class="badge ' + pctBadge + '">' + pct + '% signed off</span>';
-    html += '<span class="badge ' + recapBadge + '">' + recapCount + '/5 recaps</span>';
+    html += '<span class="badge ' + recapBadge + '">' + recapCount + '/8 recaps</span>';
     html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" id="chevron-' + openingId + '" style="transition:transform 0.2s"><path d="M2 5l5 5 5-5"/></svg>';
     html += '</div>';
     html += '</div>'; // end card-header
@@ -2276,7 +2287,8 @@ async function renderAdminPage() {
     // Recaps
     html += '<div>';
     html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px">Daily Recaps</div>';
-    [1,2,3,4,5].forEach(function(d) {
+    var dayLabels = {1:'Day 1',2:'Day 2',3:'Day 3',4:'Day 4',5:'Day 5',6:'Fri Open',7:'Sat Open',8:'Sun Open'};
+    [1,2,3,4,5,6,7,8].forEach(function(d) {
       var r = recaps.find(function(x){ return x.day_num === d; });
       var rd = r && r.recap_data;
       var hasContent = rd && Object.values(rd).some(function(v){ return v; });
@@ -2284,7 +2296,7 @@ async function renderAdminPage() {
       var label = hasContent ? 'Complete' : 'Pending';
       html += '<div style="padding:10px 0;border-bottom:1px solid var(--border-light)">';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:' + (hasContent ? '8px' : '0') + '">';
-      html += '<span style="font-size:13px;font-weight:600">Day ' + d + '</span>';
+      html += '<span style="font-size:13px;font-weight:600">' + (dayLabels[d] || 'Day ' + d) + '</span>';
       html += '<span class="badge ' + badge + '">' + label + '</span>';
       html += '</div>';
       if (hasContent) {
