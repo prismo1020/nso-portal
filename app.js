@@ -1606,9 +1606,11 @@ function renderTeamRoster() {
   const roleColors = { 'GEG': 'badge-gray', 'Lead GEG': 'badge-blue', 'ASM': 'badge-amber', 'SM': 'badge-dark' };
 
   body.innerHTML = state.trainees.map(t => {
-    const totalComps = COMPETENCIES.length;
-    const signedComps = COMPETENCIES.filter(c => state.signoffs[t.id + '_' + c.id] === 'signed').length;
-    const pct = Math.round((signedComps / totalComps) * 100);
+    const isLeader = t.role === 'SM' || t.role === 'ASM';
+    const applicableComps = COMPETENCIES.filter(c => !c.smOnly || isLeader);
+    const totalComps = applicableComps.length;
+    const signedComps = applicableComps.filter(c => state.signoffs[t.id + '_' + c.id] === 'signed').length;
+    const pct = totalComps > 0 ? Math.round((signedComps / totalComps) * 100) : 0;
     const notesSafe = (t.notes || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     return `<div style="padding:14px 0;border-bottom:1px solid var(--border-light)">
       <div style="display:flex;align-items:center;justify-content:space-between">
