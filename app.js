@@ -2486,11 +2486,11 @@ async function exportOpeningCSV(openingId, storeName) {
   });
   rows.push(['', '', '']);
 
-  // Attendance
-  rows.push(['ATTENDANCE', 'Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Fri Open', 'Sat Open', 'Sun Open']);
+  // Attendance (training days only — opening weekend days are not tracked)
+  rows.push(['ATTENDANCE', 'Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5']);
   (trainees || []).forEach(function(t) {
     var atRow = [esc(t.name)];
-    [1,2,3,4,5,6,7,8].forEach(function(d) {
+    [1,2,3,4,5].forEach(function(d) {
       var rec = (signoffs || []).find(function(s){ return s.trainee_id === t.id && s.competency_id === 'attendance-d' + d; });
       atRow.push(rec ? (rec.status === 'signed' ? 'Present' : 'Absent') : 'Not recorded');
     });
