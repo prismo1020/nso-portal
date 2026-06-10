@@ -1756,12 +1756,12 @@ function updateDashboardFocus() {
 function updateRecapStatusCard() {
   const container = document.getElementById('recapStatusContent');
   if (!container) return;
-  const days = [1, 2, 3, 4, 5];
-  const html = days.map(d => {
+  const dayNames = {1:'Day 1',2:'Day 2',3:'Day 3',4:'Day 4',5:'Day 5',6:'Fri Open',7:'Sat Open',8:'Sun Open'};
+  const html = [1,2,3,4,5,6,7,8].map(d => {
     const r = state.recaps[d];
-    const complete = r && (r['ld-topics'] || r['ld-team'] || r['tech']);
+    const complete = r && Object.values(r).some(v => v && String(v).trim().length > 0);
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-light)">
-      <span style="font-size:13px;font-weight:500">Day ${d}</span>
+      <span style="font-size:13px;font-weight:500">${dayNames[d]}</span>
       <span class="badge ${complete ? 'badge-green' : 'badge-gray'}">${complete ? 'Complete' : 'Pending'}</span>
     </div>`;
   }).join('');
