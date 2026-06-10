@@ -2414,16 +2414,21 @@ function loadOSCReportFields() {
 
 async function saveOSCReport() {
   if (!state.openingId) { showToast('No opening loaded. Set up an opening first.', 'error'); return; }
+  var numberOrNull = function(id) {
+    var value = document.getElementById(id).value;
+    return value === '' ? null : parseInt(value, 10);
+  };
+  var tsPresent = document.getElementById('osc-ts-present').value;
   var r = {
-    ff_headcount:          parseInt(document.getElementById('osc-ff-headcount').value)    || null,
-    weekend_bookings:      parseInt(document.getElementById('osc-weekend-bookings').value) || null,
-    t1_ticket_count:       parseInt(document.getElementById('osc-t1-count').value)         || null,
+    ff_headcount:          numberOrNull('osc-ff-headcount'),
+    weekend_bookings:      numberOrNull('osc-weekend-bookings'),
+    t1_ticket_count:       numberOrNull('osc-t1-count'),
     team_resolvable:       document.getElementById('osc-team-resolvable').value            || null,
     biz_impact_notes:      document.getElementById('osc-biz-impact').value                 || null,
     deployed_by:           document.getElementById('osc-deployed-by').value                || null,
     deployment_rating:     document.getElementById('osc-deployment-rating').value          || null,
     deployment_notes:      document.getElementById('osc-deployment-notes').value           || null,
-    tech_specialist:       document.getElementById('osc-ts-present').value === 'Yes',
+    tech_specialist:       tsPresent === '' ? null : tsPresent === 'Yes',
     tech_specialist_name:  document.getElementById('osc-ts-name').value                   || null,
     tech_specialist_notes: document.getElementById('osc-ts-notes').value                  || null,
     team_rating:           _oscTeamRating || null,
@@ -2450,8 +2455,9 @@ async function exportOpeningCSV(openingId, storeName) {
     supabase.from('signoffs').select('*').eq('opening_id', openingId),
     supabase.from('recaps').select('*').eq('opening_id', openingId).order('day_num'),
     supabase.from('franchise_checks').select('*').eq('opening_id', openingId),
-    supabase.from('osc_reports').select('*').eq('opening_id', openingId).maybeSingle()
+    supabase.from('osc_reports').select('*').eq('opening_id', openingId).order('updated_at', { ascending: false }).limit(1)
   ]);
+  const closingReport = (oscReport && oscReport[0]) || null;
 
   var rows = [];
   var esc = function(v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; };
@@ -2548,27 +2554,27 @@ async function exportOpeningCSV(openingId, storeName) {
 
   // OSC Report
   rows.push(['POST-OPENING OSC REPORT', '']);
-  if (oscReport) {
+  if (closingReport) {
     rows.push(['Field', 'Value']);
-    rows.push(['F&F Headcount', esc(oscReport.ff_headcount)]);
-    rows.push(['Weekend Bookings', esc(oscReport.weekend_bookings)]);
-    rows.push(['T1 Ticket Count', esc(oscReport.t1_ticket_count)]);
-    rows.push(['Team-Resolvable Issues', esc(oscReport.team_resolvable)]);
-    rows.push(['Business Impact Notes', esc(oscReport.biz_impact_notes)]);
-    rows.push(['Deployment Lead', esc(oscReport.deployed_by)]);
-    rows.push(['Deployment Rating', esc(oscReport.deployment_rating)]);
-    rows.push(['Deployment Notes', esc(oscReport.deployment_notes)]);
-    rows.push(['Tech Specialist On-Site', oscReport.tech_specialist ? 'Yes' : 'No']);
-    rows.push(['Tech Specialist Name', esc(oscReport.tech_specialist_name)]);
-    rows.push(['Tech Specialist Notes', esc(oscReport.tech_specialist_notes)]);
-    rows.push(['Team Rating', esc(oscReport.team_rating)]);
-    rows.push(['Team Notes', esc(oscReport.team_notes)]);
-    rows.push(['SM Rating', esc(oscReport.sm_rating)]);
-    rows.push(['SM Notes', esc(oscReport.sm_notes)]);
-    rows.push(['ASM Rating', esc(oscReport.asm_rating)]);
-    rows.push(['ASM Notes', esc(oscReport.asm_notes)]);
-    rows.push(['FO Rating', esc(oscReport.fo_rating)]);
-    rows.push(['FO Notes', esc(oscReport.fo_notes)]);
+    rows.push(['F&F Headcount', esc(closingReport.ff_headcount)]);
+    rows.push(['Weekend Bookings', esc(closingReport.weekend_bookings)]);
+    rows.push(['T1 Ticket Count', esc(closingReport.t1_ticket_count)]);
+    rows.push(['Team-Resolvable Issues', esc(closingReport.team_resolvable)]);
+    rows.push(['Business Impact Notes', esc(closingReport.biz_impact_notes)]);
+    rows.push(['Deployment Lead', esc(closingReport.deployed_by)]);
+    rows.push(['Deployment Rating', esc(closingReport.deployment_rating)]);
+    rows.push(['Deployment Notes', esc(closingReport.deployment_notes)]);
+    rows.push(['Tech Specialist On-Site', closingReport.tech_specialist ? 'Yes' : 'No']);
+    rows.push(['Tech Specialist Name', esc(closingReport.tech_specialist_name)]);
+    rows.push(['Tech Specialist Notes', esc(closingReport.tech_specialist_notes)]);
+    rows.push(['Team Rating', esc(closingReport.team_rating)]);
+    rows.push(['Team Notes', esc(closingReport.team_notes)]);
+    rows.push(['SM Rating', esc(closingReport.sm_rating)]);
+    rows.push(['SM Notes', esc(closingReport.sm_notes)]);
+    rows.push(['ASM Rating', esc(closingReport.asm_rating)]);
+    rows.push(['ASM Notes', esc(closingReport.asm_notes)]);
+    rows.push(['FO Rating', esc(closingReport.fo_rating)]);
+    rows.push(['FO Notes', esc(closingReport.fo_notes)]);
   } else {
     rows.push(['OSC report not yet completed', '']);
   }
@@ -3446,17 +3452,19 @@ async function switchToOpening(openingId) {
   state.signoffs = {};
   state.recaps = {};
   state.franchiseChecks = {};
+  state.oscReport = {};
   // Load via dbLoadState which picks most-recently-updated — we need to load by specific ID
   const { data: o } = await supabase.from('openings').select('*').eq('id', openingId).single();
   if (!o) { showToast('Could not load opening', 'info'); return; }
   state.opening = { store: o.store_name, coach: o.coach_name, date: o.start_date };
   state.currentDay = o.current_day || 1;
 
-  const [{ data: trainees }, { data: signoffs }, { data: recaps }, { data: fchecks }] = await Promise.all([
+  const [{ data: trainees }, { data: signoffs }, { data: recaps }, { data: fchecks }, { data: oscReports }] = await Promise.all([
     supabase.from('trainees').select('*').eq('opening_id', openingId).order('created_at'),
     supabase.from('signoffs').select('*').eq('opening_id', openingId),
     supabase.from('recaps').select('*').eq('opening_id', openingId),
-    supabase.from('franchise_checks').select('*').eq('opening_id', openingId)
+    supabase.from('franchise_checks').select('*').eq('opening_id', openingId),
+    supabase.from('osc_reports').select('*').eq('opening_id', openingId).order('updated_at', { ascending: false }).limit(1)
   ]);
 
   state.trainees = (trainees || []).map(t => ({ id: t.id, name: t.name, role: t.role, notes: t.notes || '' }));
@@ -3468,6 +3476,7 @@ async function switchToOpening(openingId) {
   });
   state.franchiseChecks = {};
   (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; });
+  state.oscReport = (oscReports && oscReports[0]) || {};
 
   refreshAfterLoad();
   navigate('dashboard');

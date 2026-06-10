@@ -72,20 +72,19 @@ async function dbLoadOSCReport() {
     .from('osc_reports')
     .select('*')
     .eq('opening_id', state.openingId)
-    .single();
-  // PGRST116 = "no rows found" — not an error
-  if (error && error.code !== 'PGRST116') { console.error('dbLoadOSCReport:', error); return; }
-  state.oscReport = data || {};
+    .order('updated_at', { ascending: false })
+    .limit(1);
+  if (error) { console.error('dbLoadOSCReport:', error); return; }
+  state.oscReport = (data && data[0]) || {};
 }
 
 async function dbSaveOSCReport(report) {
   if (!state.openingId) return { message: 'No opening loaded' };
-  const { error } = await supabase.from('osc_reports').upsert({
+  const payload = {
     opening_id:            state.openingId,
     ff_headcount:          report.ff_headcount,
     weekend_bookings:      report.weekend_bookings,
     t1_ticket_count:       report.t1_ticket_count,
-    tech_type:             report.tech_type,
     team_resolvable:       report.team_resolvable,
     biz_impact_notes:      report.biz_impact_notes,
     deployed_by:           report.deployed_by,
@@ -98,8 +97,24 @@ async function dbSaveOSCReport(report) {
     team_notes:            report.team_notes,
     sm_rating:             report.sm_rating,
     sm_notes:              report.sm_notes,
+    asm_rating:            report.asm_rating,
+    asm_notes:             report.asm_notes,
+    fo_rating:             report.fo_rating,
+    fo_notes:              report.fo_notes,
     updated_at:            new Date().toISOString()
-  }, { onConflict: 'opening_id' });
+  };
+
+  const { data: existing, error: lookupError } = await supabase
+    .from('osc_reports')
+    .select('id')
+    .eq('opening_id', state.openingId)
+    .limit(1);
+
+  if (lookupError) { console.error('dbSaveOSCReport lookup:', lookupError); return lookupError; }
+
+  const { error } = existing && existing.length
+    ? await supabase.from('osc_reports').update(payload).eq('id', existing[0].id)
+    : await supabase.from('osc_reports').insert(payload);
   if (error) console.error('dbSaveOSCReport:', error);
   return error || null;
 }
