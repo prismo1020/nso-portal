@@ -2444,12 +2444,13 @@ async function saveOSCReport() {
 async function exportOpeningCSV(openingId, storeName) {
   showToast('Preparing export…', 'info');
   // Load full opening data
-  const [{ data: opening }, { data: trainees }, { data: signoffs }, { data: recaps }, { data: fchecks }] = await Promise.all([
+  const [{ data: opening }, { data: trainees }, { data: signoffs }, { data: recaps }, { data: fchecks }, { data: oscReport }] = await Promise.all([
     supabase.from('openings').select('*').eq('id', openingId).single(),
     supabase.from('trainees').select('*').eq('opening_id', openingId).order('created_at'),
     supabase.from('signoffs').select('*').eq('opening_id', openingId),
     supabase.from('recaps').select('*').eq('opening_id', openingId).order('day_num'),
-    supabase.from('franchise_checks').select('*').eq('opening_id', openingId)
+    supabase.from('franchise_checks').select('*').eq('opening_id', openingId),
+    supabase.from('osc_reports').select('*').eq('opening_id', openingId).maybeSingle()
   ]);
 
   var rows = [];
@@ -2480,10 +2481,10 @@ async function exportOpeningCSV(openingId, storeName) {
   rows.push(['', '', '']);
 
   // Attendance
-  rows.push(['ATTENDANCE', 'Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5']);
+  rows.push(['ATTENDANCE', 'Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Fri Open', 'Sat Open', 'Sun Open']);
   (trainees || []).forEach(function(t) {
     var atRow = [esc(t.name)];
-    [1,2,3,4,5].forEach(function(d) {
+    [1,2,3,4,5,6,7,8].forEach(function(d) {
       var rec = (signoffs || []).find(function(s){ return s.trainee_id === t.id && s.competency_id === 'attendance-d' + d; });
       atRow.push(rec ? (rec.status === 'signed' ? 'Present' : 'Absent') : 'Not recorded');
     });
@@ -2496,22 +2497,81 @@ async function exportOpeningCSV(openingId, storeName) {
   var compHeaders = ['Trainee', 'Role'].concat(COMPETENCIES.map(function(c){ return esc(c.name); }));
   rows.push(compHeaders);
   (trainees || []).forEach(function(t) {
+    var isLeaderT = t.role === 'SM' || t.role === 'ASM';
     var row = [esc(t.name), esc(t.role)];
     COMPETENCIES.forEach(function(c) {
+      if (c.smOnly && !isLeaderT) { row.push('N/A'); return; }
       var s = (signoffs || []).find(function(x){ return x.trainee_id === t.id && x.competency_id === c.id; });
-      row.push(s ? esc(s.status) : 'pending');
+      row.push(s && s.status === 'signed' ? 'Signed' : 'Not Completed');
     });
     rows.push(row);
   });
   rows.push(['', '']);
 
   // Recaps
+  var recapDayNames = {1:'Day 1',2:'Day 2',3:'Day 3',4:'Day 4',5:'Day 5',6:'Fri Open',7:'Sat Open',8:'Sun Open'};
   rows.push(['DAILY RECAPS', '']);
-  rows.push(['Day', 'L&D Topics', 'Team Notes', 'Tech', 'Ops', 'SM Notes', 'Tomorrow', 'Actions']);
-  [1,2,3,4,5].forEach(function(d) {
+  rows.push(['Day', 'Building', 'Tech / MOCAP', 'Tech Tickets', 'L&D Progress', 'L&D Delays', 'Team Progress', 'Team Successes', 'Team Opportunities', 'SM Execution', 'Problems Noted', 'Actions']);
+  [1,2,3,4,5,6,7,8].forEach(function(d) {
     var r = (recaps || []).find(function(x){ return x.day_num === d; });
-    rows.push([d, esc(r && r.ld_topics), esc(r && r.ld_team), esc(r && r.tech), esc(r && r.ops), esc(r && r.sm_notes), esc(r && r.tomorrow), esc(r && r.actions)]);
+    var rd = (r && r.recap_data) || {};
+    var problems = ['building','tech','ld','team','supplies'].map(function(s){ return rd[s+'-problem']; }).filter(Boolean).join(' | ');
+    var actions  = ['building','tech','ld','team','supplies'].map(function(s){ return rd[s+'-actions']; }).filter(Boolean).join(' | ');
+    rows.push([
+      recapDayNames[d],
+      esc((rd['building-permits'] || '') + (rd['building-construction'] ? ' | ' + rd['building-construction'] : '')),
+      esc(rd['tech-mscap']),
+      esc(rd['tech-tickets']),
+      esc(rd['ld-progress']),
+      esc(rd['ld-delays']),
+      esc(rd['team-progress']),
+      esc(rd['team-successes']),
+      esc(rd['team-opportunities']),
+      esc(rd['sm-execution']),
+      esc(problems),
+      esc(actions)
+    ]);
   });
+  rows.push(['', '']);
+
+  // Day 0 Checks
+  rows.push(['DAY 0 READINESS CHECKS', '']);
+  rows.push(['Group', 'Check', 'Status']);
+  var fcMap = {};
+  (fchecks || []).forEach(function(fc){ fcMap[fc.check_key] = fc.checked; });
+  FRANCHISE_CHECK_GROUPS.forEach(function(grp) {
+    grp.checks.forEach(function(c) {
+      rows.push([esc(grp.group), esc(c.label), fcMap[c.key] ? 'Complete' : 'Incomplete']);
+    });
+  });
+  rows.push(['', '']);
+
+  // OSC Report
+  rows.push(['POST-OPENING OSC REPORT', '']);
+  if (oscReport) {
+    rows.push(['Field', 'Value']);
+    rows.push(['F&F Headcount', esc(oscReport.ff_headcount)]);
+    rows.push(['Weekend Bookings', esc(oscReport.weekend_bookings)]);
+    rows.push(['T1 Ticket Count', esc(oscReport.t1_ticket_count)]);
+    rows.push(['Team-Resolvable Issues', esc(oscReport.team_resolvable)]);
+    rows.push(['Business Impact Notes', esc(oscReport.biz_impact_notes)]);
+    rows.push(['Deployment Lead', esc(oscReport.deployed_by)]);
+    rows.push(['Deployment Rating', esc(oscReport.deployment_rating)]);
+    rows.push(['Deployment Notes', esc(oscReport.deployment_notes)]);
+    rows.push(['Tech Specialist On-Site', oscReport.tech_specialist ? 'Yes' : 'No']);
+    rows.push(['Tech Specialist Name', esc(oscReport.tech_specialist_name)]);
+    rows.push(['Tech Specialist Notes', esc(oscReport.tech_specialist_notes)]);
+    rows.push(['Team Rating', esc(oscReport.team_rating)]);
+    rows.push(['Team Notes', esc(oscReport.team_notes)]);
+    rows.push(['SM Rating', esc(oscReport.sm_rating)]);
+    rows.push(['SM Notes', esc(oscReport.sm_notes)]);
+    rows.push(['ASM Rating', esc(oscReport.asm_rating)]);
+    rows.push(['ASM Notes', esc(oscReport.asm_notes)]);
+    rows.push(['FO Rating', esc(oscReport.fo_rating)]);
+    rows.push(['FO Notes', esc(oscReport.fo_notes)]);
+  } else {
+    rows.push(['OSC report not yet completed', '']);
+  }
 
   var csv = rows.map(function(r){ return r.join(','); }).join('\r\n');
   var blob = new Blob([csv], { type: 'text/csv' });
