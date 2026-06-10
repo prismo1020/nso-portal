@@ -80,7 +80,7 @@ async function dbLoadOSCReport() {
 
 async function dbSaveOSCReport(report) {
   if (!state.openingId) return { message: 'No opening loaded' };
-  const payload = {
+  const { error } = await supabase.from('osc_reports').upsert({
     opening_id:            state.openingId,
     ff_headcount:          report.ff_headcount,
     weekend_bookings:      report.weekend_bookings,
@@ -102,19 +102,7 @@ async function dbSaveOSCReport(report) {
     fo_rating:             report.fo_rating,
     fo_notes:              report.fo_notes,
     updated_at:            new Date().toISOString()
-  };
-
-  const { data: existing, error: lookupError } = await supabase
-    .from('osc_reports')
-    .select('id')
-    .eq('opening_id', state.openingId)
-    .limit(1);
-
-  if (lookupError) { console.error('dbSaveOSCReport lookup:', lookupError); return lookupError; }
-
-  const { error } = existing && existing.length
-    ? await supabase.from('osc_reports').update(payload).eq('id', existing[0].id)
-    : await supabase.from('osc_reports').insert(payload);
+  }, { onConflict: 'opening_id' });
   if (error) console.error('dbSaveOSCReport:', error);
   return error || null;
 }
