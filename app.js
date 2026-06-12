@@ -1337,6 +1337,9 @@ const RECAP_TEXT_FIELDS = [
   'additional'
 ];
 const RECAP_PROBLEM_SECTIONS = ['building','tech','ld','team','supplies'];
+const RECAP_FIELD_LABELS = {
+  'tech-mscap': 'MoCap'
+};
 
 function loadRecapFields(day) {
   const r = state.recaps[day] || {};
@@ -1410,8 +1413,11 @@ function updateRecapPreview() {
     fields.forEach(function(f) {
       var val = get(f);
       if (!val) return;
-      var label = f.split('-').slice(section ? 1 : 0).join(' ');
-      label = label.charAt(0).toUpperCase() + label.slice(1).replace(/-/g, ' ');
+      var label = RECAP_FIELD_LABELS[f];
+      if (!label) {
+        label = f.split('-').slice(section ? 1 : 0).join(' ');
+        label = label.charAt(0).toUpperCase() + label.slice(1).replace(/-/g, ' ');
+      }
       // Split multi-line values (from multiple chip clicks) into individual bullets
       var fieldLines = val.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
       if (fieldLines.length === 1) {
@@ -2517,7 +2523,7 @@ async function exportOpeningCSV(openingId, storeName) {
   // Recaps
   var recapDayNames = {1:'Day 1',2:'Day 2',3:'Day 3',4:'Day 4',5:'Day 5',6:'Fri Open',7:'Sat Open',8:'Sun Open'};
   rows.push(['DAILY RECAPS', '']);
-  rows.push(['Day', 'Building', 'Tech / MOCAP', 'Tech Tickets', 'L&D Progress', 'L&D Delays', 'Team Progress', 'Team Successes', 'Team Opportunities', 'SM Execution', 'Problems Noted', 'Actions']);
+  rows.push(['Day', 'Building', 'Tech / MoCap', 'Tech Tickets', 'L&D Progress', 'L&D Delays', 'Team Progress', 'Team Successes', 'Team Opportunities', 'SM Execution', 'Problems Noted', 'Actions']);
   [1,2,3,4,5,6,7,8].forEach(function(d) {
     var r = (recaps || []).find(function(x){ return x.day_num === d; });
     var rd = (r && r.recap_data) || {};
