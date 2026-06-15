@@ -185,8 +185,31 @@
       <div id="nav-leadership-group">
         <button class="nav-item" id="nav-leadership-training" onclick="navigate('leadership-training')">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14a6 6 0 0112 0"/><path d="M12 2l2 2-4 4-2-2z"/></svg>
-          Leadership Training
+          Overview
         </button>
+        <div id="nav-lt-tabs" style="display:none">
+          <div class="nav-section-label">Training</div>
+          <button class="nav-item" id="nav-lt-roster" onclick="setLeadershipTab('roster')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="2.5"/><path d="M1 13a5 5 0 0110 0"/><path d="M11 2l3 3-3 3"/></svg>
+            Roster
+          </button>
+          <button class="nav-item" id="nav-lt-agenda" onclick="setLeadershipTab('agenda')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 6h6M5 9h4M5 12h3"/></svg>
+            Agenda
+          </button>
+          <button class="nav-item" id="nav-lt-signoffs" onclick="setLeadershipTab('signoffs')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
+            Sign-Offs
+          </button>
+          <button class="nav-item" id="nav-lt-notes" onclick="setLeadershipTab('notes')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v9l-3 3H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/></svg>
+            Daily Notes
+          </button>
+          <button class="nav-item" id="nav-lt-report" onclick="setLeadershipTab('report')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+            Readiness Report
+          </button>
+        </div>
         <div class="nav-section-label">Resources</div>
         <button class="nav-item" id="nav-resources-lt" onclick="navigate('resources')">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3z"/><path d="M5 3V1h6v2"/><path d="M6 8h4M8 6v4"/></svg>
@@ -1272,7 +1295,7 @@
 
     <!-- ADD LEADER MODAL -->
     <div class="modal-overlay" id="addLeaderModal">
-      <div class="modal-box">
+      <div class="modal">
         <div class="modal-header">
           <div style="font-size:18px;font-weight:700;color:var(--hb)">Add Leadership Participant</div>
           <button class="modal-close" onclick="closeModal('addLeaderModal')">

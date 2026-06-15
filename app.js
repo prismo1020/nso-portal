@@ -3829,6 +3829,7 @@ async function renderLeadershipTrainingPage() {
 }
 
 function renderLeadershipSetup(container) {
+  updateLeadershipSidebarTabs(false);
   container.innerHTML = `
     <div class="page-header">
       <div class="eyebrow">LEADERSHIP TRAINING</div>
@@ -3919,29 +3920,33 @@ function renderLeadershipDashboard(container) {
       </div>
     </div>`;
 
-  // Tabs
-  const tab = state._leadershipTab || 'roster';
-  html += `<div style="display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border)">
-    ${['roster','agenda','signoffs','notes','report'].map(t => {
-      const labels = { roster:'Roster', agenda:'Agenda', signoffs:'Sign-Offs', notes:'Daily Notes', report:'Readiness Report' };
-      return `<button onclick="setLeadershipTab('${t}')" style="padding:8px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;border-bottom:2px solid ${t===tab?'var(--trigger)':'transparent'};color:${t===tab?'var(--trigger)':'var(--text-secondary)'};margin-bottom:-2px">${labels[t]}</button>`;
-    }).join('')}
-  </div>
-  <div id="leadershipTabContent"></div>`;
+  html += `<div id="leadershipTabContent"></div>`;
 
   container.innerHTML = html;
-  renderLeadershipTab(tab);
+  updateLeadershipSidebarTabs(true);
+  renderLeadershipTab(state._leadershipTab || 'roster');
 }
 
 function setLeadershipTab(tab) {
   state._leadershipTab = tab;
   renderLeadershipTab(tab);
-  // Update tab button styles
-  document.querySelectorAll('#leadershipTrainingContent button[onclick^="setLeadershipTab"]').forEach(btn => {
-    const btnTab = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
-    btn.style.borderBottomColor = btnTab === tab ? 'var(--trigger)' : 'transparent';
-    btn.style.color = btnTab === tab ? 'var(--trigger)' : 'var(--text-secondary)';
+  ['roster','agenda','signoffs','notes','report'].forEach(t => {
+    const btn = document.getElementById('nav-lt-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
   });
+  closeSidebar();
+}
+
+function updateLeadershipSidebarTabs(show) {
+  const el = document.getElementById('nav-lt-tabs');
+  if (el) el.style.display = show ? '' : 'none';
+  if (show) {
+    const tab = state._leadershipTab || 'roster';
+    ['roster','agenda','signoffs','notes','report'].forEach(t => {
+      const btn = document.getElementById('nav-lt-' + t);
+      if (btn) btn.classList.toggle('active', t === tab);
+    });
+  }
 }
 
 async function setLeadershipDay(day) {
@@ -4122,22 +4127,51 @@ async function toggleLeadershipSignoff(participantId, competencyId, dayNum) {
 function renderLeadershipNotes(container) {
   const day = state.currentLeadershipDay;
   const notes = state.leadershipDailyNotes[day] || {};
+  const sp = state.currentStoreProgram;
+  const storeName = sp ? sp.franchise_store_name : 'Leadership Training';
 
   container.innerHTML = `
     <div class="card">
-      <div class="card-header"><div class="card-title">Day ${day} Trainer Notes</div></div>
+      <div class="card-header">
+        <div><div class="card-title">Day ${day} Trainer Notes</div><div class="card-subtitle">${storeName}</div></div>
+        <button class="btn btn-secondary" onclick="copyLeadershipNotes()" style="font-size:12px;padding:6px 12px">Copy to Slack</button>
+      </div>
       <div class="card-body">
         <div class="form-row"><label class="form-label">Overall Observations</label>
           <textarea class="recap-textarea" id="lt-notes-observations" placeholder="What did you observe today across the group?" oninput="autoSaveLeadershipNotes()">${notes.observations || ''}</textarea>
+          <div class="recap-chips">
+            <button class="recap-chip" onclick="ltChip('lt-notes-observations','Group engaged well throughout the day.')">Group engaged</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-observations','Strong energy and enthusiasm from all participants.')">Strong energy</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-observations','Pacing was challenging — adjusted agenda accordingly.')">Pacing challenge</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-observations','Knowledge gaps surfaced — additional coaching provided.')">Gaps surfaced</button>
+          </div>
         </div>
         <div class="form-row"><label class="form-label">Standout Moments</label>
           <textarea class="recap-textarea" id="lt-notes-standouts" placeholder="Highlights, breakthroughs, or moments of confidence..." oninput="autoSaveLeadershipNotes()">${notes.standouts || ''}</textarea>
+          <div class="recap-chips">
+            <button class="recap-chip" onclick="ltChip('lt-notes-standouts','Excellent role-play performance from ___ today.')">Strong role-play</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-standouts','Leader took initiative without prompting.')">Took initiative</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-standouts','Guest interaction felt natural and confident.')">Natural guest interaction</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-standouts','Confident equipment handling across the group.')">Confident with gear</button>
+          </div>
         </div>
         <div class="form-row"><label class="form-label">Areas Needing More Practice</label>
           <textarea class="recap-textarea" id="lt-notes-gaps" placeholder="Skills or topics that need reinforcement tomorrow..." oninput="autoSaveLeadershipNotes()">${notes.gaps || ''}</textarea>
+          <div class="recap-chips">
+            <button class="recap-chip" onclick="ltChip('lt-notes-gaps','CheckFront navigation needs more reps.')">CheckFront navigation</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-gaps','Guest complaint handling requires additional coaching.')">Complaint handling</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-gaps','Technical calibration steps need reinforcement.')">Tech calibration</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-gaps','Sales repeatability pitch needs more practice.')">Sales repeatability</button>
+          </div>
         </div>
         <div class="form-row"><label class="form-label">Plan for Tomorrow</label>
           <textarea class="recap-textarea" id="lt-notes-tomorrow" placeholder="What will you focus on or adjust tomorrow?" oninput="autoSaveLeadershipNotes()">${notes.tomorrow || ''}</textarea>
+          <div class="recap-chips">
+            <button class="recap-chip" onclick="ltChip('lt-notes-tomorrow','Add more dedicated role-play time.')">More role-play</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-tomorrow','Review CheckFront basics before advancing.')">Review CheckFront</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-tomorrow','Focus on guest touchpoints and journey flow.')">Guest touchpoints</button>
+            <button class="recap-chip" onclick="ltChip('lt-notes-tomorrow','Full run-through with no coaching prompts.')">Full run-through</button>
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
           <button class="btn btn-primary" onclick="saveLeadershipNotes()">Save Notes</button>
@@ -4145,6 +4179,49 @@ function renderLeadershipNotes(container) {
         </div>
       </div>
     </div>`;
+}
+
+function ltChip(fieldId, text) {
+  var el = document.getElementById(fieldId);
+  if (!el) return;
+  if (el.value && !el.value.endsWith('\n') && el.value.trim()) el.value += '\n';
+  el.value += text;
+  autoSaveLeadershipNotes();
+}
+
+async function copyLeadershipNotes() {
+  const day = state.currentLeadershipDay;
+  const sp = state.currentStoreProgram;
+  const storeName = sp ? sp.franchise_store_name : 'Leadership Training';
+  const g = id => (document.getElementById(id)?.value || '').trim();
+
+  const obs = g('lt-notes-observations');
+  const standouts = g('lt-notes-standouts');
+  const gaps = g('lt-notes-gaps');
+  const tomorrow = g('lt-notes-tomorrow');
+
+  const lines = [`*Day ${day} Trainer Notes — ${storeName}*`, ''];
+  if (obs) lines.push(`*Overall Observations:*\n${obs}`, '');
+  if (standouts) lines.push(`*Standout Moments:*\n${standouts}`, '');
+  if (gaps) lines.push(`*Areas Needing More Practice:*\n${gaps}`, '');
+  if (tomorrow) lines.push(`*Plan for Tomorrow:*\n${tomorrow}`, '');
+
+  const text = lines.join('\n').trim();
+  const html = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*(.*?)\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([text], { type: 'text/plain' })
+    })]);
+    showToast('Copied to clipboard — paste into Slack!', 'success');
+  } catch(e) {
+    await navigator.clipboard.writeText(text);
+    showToast('Copied as plain text — bold may not carry over in Slack.', 'success');
+  }
 }
 
 let _ltNotesTimer = null;
