@@ -400,6 +400,11 @@ async function dbCreateLeadershipTraining(payload) {
   return { data: training };
 }
 
+async function dbDeleteLeadershipTraining(trainingId) {
+  const { error } = await supabase.from('leadership_trainings').delete().eq('id', trainingId);
+  return error || null;
+}
+
 async function dbSaveLeadershipCurrentDay(day) {
   if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
   const { error } = await supabase.from('leadership_trainings')

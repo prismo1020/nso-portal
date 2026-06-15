@@ -2506,7 +2506,10 @@ async function renderAdminLeadershipSection() {
       });
       html += '</div>';
     }
+    html += '<div style="display:flex;gap:8px">';
     html += '<button class="btn btn-secondary" style="font-size:12px" onclick="exportLeadershipCSV(\'' + t.id + '\',\'' + (sp.franchise_store_name || 'leadership').replace(/'/g,'') + '\')">Export CSV</button>';
+    html += '<button class="btn btn-secondary" style="font-size:12px;color:var(--danger);border-color:var(--danger)" onclick="confirmDeleteLeadershipTraining(\'' + t.id + '\',\'' + (sp.franchise_store_name || 'Training').replace(/'/g,'') + '\')">Delete</button>';
+    html += '</div>';
     html += '</div></div>';
   });
   container.innerHTML = html;
@@ -2529,6 +2532,15 @@ async function saveRename() {
   closeModal('renameModal');
   showToast('Opening updated', 'success');
   renderAdminPage();
+}
+
+function confirmDeleteLeadershipTraining(trainingId, storeName) {
+  if (!confirm('Permanently delete the leadership training for "' + storeName + '"?\n\nThis will delete all participants, sign-offs, notes, and readiness reports. This cannot be undone.')) return;
+  dbDeleteLeadershipTraining(trainingId).then(function(err) {
+    if (err) { showToast('Delete failed: ' + (err.message || 'DB error'), 'error'); return; }
+    showToast('Leadership training deleted.', 'success');
+    renderAdminLeadershipSection();
+  });
 }
 
 function confirmDeleteOpening(openingId, storeName) {
