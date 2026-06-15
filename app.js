@@ -3987,25 +3987,11 @@ function renderLeadershipRoster(container) {
 }
 
 function openAddLeaderModal() {
-  const modal = document.getElementById('modal');
-  const body = document.getElementById('modal-body');
-  if (!modal || !body) return;
-  body.innerHTML = `
-    <div style="padding:24px">
-      <div style="font-size:16px;font-weight:700;margin-bottom:16px">Add Leadership Participant</div>
-      <div class="form-row"><label class="form-label">Full Name</label><input class="input" id="lt-new-name" placeholder="Full name" autofocus></div>
-      <div class="form-row"><label class="form-label">Role</label>
-        <select class="input" id="lt-new-role" onchange="document.getElementById('lt-custom-role-row').style.display=this.value==='Custom'?'':'none'">
-          ${LEADERSHIP_ROLES.map(r=>`<option value="${r}">${r}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-row" id="lt-custom-role-row" style="display:none"><label class="form-label">Custom Role Title</label><input class="input" id="lt-new-custom-role" placeholder="e.g. Events Manager, Head Coach"></div>
-      <div style="display:flex;gap:8px;margin-top:16px">
-        <button class="btn btn-primary" onclick="saveNewLeader()">Add Leader</button>
-        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      </div>
-    </div>`;
-  modal.classList.add('open');
+  document.getElementById('lt-new-name').value = '';
+  document.getElementById('lt-new-role').value = 'Owner';
+  document.getElementById('lt-new-custom-role').value = '';
+  document.getElementById('lt-custom-role-row').style.display = 'none';
+  document.getElementById('addLeaderModal').classList.add('open');
 }
 
 async function saveNewLeader() {
@@ -4016,7 +4002,7 @@ async function saveNewLeader() {
   const { data, error } = await dbSaveLeadershipParticipant({ name, role, custom_role: customRole });
   if (error) { showToast('Error adding leader: ' + (error.message || 'DB error'), 'error'); return; }
   state.leadershipParticipants.push({ id: data.id, name, role, custom_role: customRole || '', notes: '' });
-  closeModal();
+  closeModal('addLeaderModal');
   showToast(name + ' added!', 'success');
   renderLeadershipTab(state._leadershipTab || 'roster');
 }
