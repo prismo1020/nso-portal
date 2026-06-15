@@ -281,3 +281,176 @@ async function dbLoadAllOpenings() {
 
   return results;
 }
+
+// ============================================================
+// LEADERSHIP TRAINING DB HELPERS
+// ============================================================
+async function dbLoadLeadershipTraining(trainingId) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: { message: 'No user loaded' } };
+
+  let query = supabase
+    .from('leadership_trainings')
+    .select('*')
+    .order('updated_at', { ascending: false })
+    .limit(1);
+  if (trainingId) query = supabase.from('leadership_trainings').select('*').eq('id', trainingId).limit(1);
+
+  const { data: trainings, error } = await query;
+  if (error) return { error };
+  if (!trainings || trainings.length === 0) {
+    state.currentStoreProgram = null;
+    state.leadershipTraining = null;
+    state.leadershipParticipants = [];
+    state.leadershipSignoffs = {};
+    state.leadershipDailyNotes = {};
+    state.leadershipReports = {};
+    return { data: null };
+  }
+
+  const training = trainings[0];
+  state.leadershipTraining = training;
+  const [
+    { data: program, error: programError },
+    { data: participants, error: participantsError },
+    { data: signoffs, error: signoffsError },
+    { data: notes, error: notesError },
+    { data: reports, error: reportsError }
+  ] = await Promise.all([
+    supabase.from('store_programs').select('*').eq('id', training.store_program_id).single(),
+    supabase.from('leadership_participants').select('*').eq('leadership_training_id', training.id).order('created_at'),
+    supabase.from('leadership_signoffs').select('*').eq('leadership_training_id', training.id),
+    supabase.from('leadership_daily_notes').select('*').eq('leadership_training_id', training.id),
+    supabase.from('leadership_readiness_reports').select('*').eq('leadership_training_id', training.id)
+  ]);
+
+  const firstError = programError || participantsError || signoffsError || notesError || reportsError;
+  if (firstError) return { error: firstError };
+
+  state.currentStoreProgram = program || null;
+  state.currentLeadershipDay = training.current_day || 1;
+  state.leadershipParticipants = (participants || []).map(p => ({
+    id: p.id, name: p.name, role: p.role,
+    custom_role: p.custom_role || '', notes: p.notes || ''
+  }));
+  state.leadershipSignoffs = {};
+  (signoffs || []).forEach(s => {
+    state.leadershipSignoffs[s.participant_id + '_' + s.competency_id] = s.status;
+  });
+  state.leadershipDailyNotes = {};
+  (notes || []).forEach(n => { state.leadershipDailyNotes[n.day_num] = n.notes_data || {}; });
+  state.leadershipReports = {};
+  (reports || []).forEach(r => { state.leadershipReports[r.participant_id] = r; });
+  return { data: training };
+}
+
+async function dbCreateLeadershipTraining(payload) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: { message: 'No user loaded' } };
+
+  const { data: program, error: programError } = await supabase.from('store_programs').insert({
+    franchise_store_name: payload.franchise_store_name,
+    certified_training_store_name: payload.certified_training_store_name,
+    franchise_owner_name: payload.franchise_owner_name || null,
+    franchise_company: payload.franchise_company || null,
+    status: 'active',
+    created_by: user.id,
+    updated_at: new Date().toISOString()
+  }).select().single();
+  if (programError) return { error: programError };
+
+  const { data: training, error: trainingError } = await supabase.from('leadership_trainings').insert({
+    store_program_id: program.id,
+    trainer_id: user.id,
+    trainer_name: payload.trainer_name,
+    start_date: payload.start_date || null,
+    current_day: 1,
+    status: 'active',
+    updated_at: new Date().toISOString()
+  }).select().single();
+  if (trainingError) return { error: trainingError };
+
+  state.currentStoreProgram = program;
+  state.leadershipTraining = training;
+  state.currentLeadershipDay = 1;
+  state.leadershipParticipants = [];
+  state.leadershipSignoffs = {};
+  state.leadershipDailyNotes = {};
+  state.leadershipReports = {};
+  return { data: training };
+}
+
+async function dbSaveLeadershipCurrentDay(day) {
+  if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
+  const { error } = await supabase.from('leadership_trainings')
+    .update({ current_day: day, updated_at: new Date().toISOString() })
+    .eq('id', state.leadershipTraining.id);
+  if (!error) { state.leadershipTraining.current_day = day; state.currentLeadershipDay = day; }
+  return error || null;
+}
+
+async function dbSaveLeadershipParticipant(participant) {
+  if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
+  const payload = {
+    leadership_training_id: state.leadershipTraining.id,
+    name: participant.name,
+    role: participant.role,
+    custom_role: participant.custom_role || null,
+    notes: participant.notes || null,
+    updated_at: new Date().toISOString()
+  };
+  if (participant.id) payload.id = participant.id;
+  const { data, error } = await supabase.from('leadership_participants').upsert(payload, { onConflict: 'id' }).select().single();
+  if (error) return { error };
+  return { data };
+}
+
+async function dbDeleteLeadershipParticipant(participantId) {
+  const { error } = await supabase.from('leadership_participants').delete().eq('id', participantId);
+  return error || null;
+}
+
+async function dbSaveLeadershipSignoff(participantId, competencyId, status, dayNum) {
+  if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
+  if (status === 'pending') {
+    const { error } = await supabase.from('leadership_signoffs')
+      .delete().eq('participant_id', participantId).eq('competency_id', competencyId);
+    return error || null;
+  }
+  const { error } = await supabase.from('leadership_signoffs').upsert({
+    leadership_training_id: state.leadershipTraining.id,
+    participant_id: participantId,
+    competency_id: competencyId,
+    status: status,
+    day_num: dayNum,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'participant_id,competency_id' });
+  return error || null;
+}
+
+async function dbSaveLeadershipDailyNotes(dayNum, notesData) {
+  if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
+  const { error } = await supabase.from('leadership_daily_notes').upsert({
+    leadership_training_id: state.leadershipTraining.id,
+    day_num: dayNum,
+    notes_data: notesData,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'leadership_training_id,day_num' });
+  return error || null;
+}
+
+async function dbSaveLeadershipReadinessReport(participantId, report) {
+  if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
+  const { error } = await supabase.from('leadership_readiness_reports').upsert({
+    leadership_training_id: state.leadershipTraining.id,
+    participant_id: participantId,
+    readiness_status: report.readiness_status || null,
+    rating_1_to_4: report.rating_1_to_4 || null,
+    strengths: report.strengths || null,
+    risks: report.risks || null,
+    follow_ups: report.follow_ups || null,
+    final_notes: report.final_notes || null,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'leadership_training_id,participant_id' });
+  return error || null;
+}

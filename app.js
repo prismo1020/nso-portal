@@ -16,7 +16,14 @@ let state = {
   recaps: {},
   franchiseChecks: {},
   overrides: {},
-  oscReport: {}
+  oscReport: {},
+  currentStoreProgram: null,
+  leadershipTraining: null,
+  leadershipParticipants: [],
+  leadershipSignoffs: {},
+  leadershipDailyNotes: {},
+  leadershipReports: {},
+  currentLeadershipDay: 1
 };
 
 // ============================================================
@@ -258,6 +265,80 @@ const COMPETENCIES = [
   { day: 5, id: 'c5-1', name: 'Runs full F&F session without coaching' },
   { day: 5, id: 'c5-2', name: 'Maintains guest experience standard for 5+ hrs' },
   { day: 5, id: 'c5-3', name: 'SM/ASM reviews 14-day bookings & flags risk days', smOnly: true },
+];
+
+// ============================================================
+// LEADERSHIP TRAINING DATA
+// Source: Franchise Manager Learning Plan 05.21.26
+// ============================================================
+const LEADERSHIP_ROLES = ['Owner', 'SM', 'ASM', 'Events Manager', 'Custom'];
+
+const LEADERSHIP_AGENDA = [
+  { day: 1, title: 'Sandbox VR Overview, Guest Experience, and Trackers', focus: 'Leaders learn the same Guest Experience Guide foundation they will later need to coach in their own store.', blocks: [
+    { time: '15 mins', title: 'Intros & Store Tour', objectives: ['Gain familiarity with the store layout.', 'Learn Sandbox VR vocabulary and key operational terms.'] },
+    { time: '30 mins', title: 'Introduction to Sandbox VR', objectives: ['Describe Sandbox VR history, mission, and core values.', 'Review experiences, KPIs, and what drives the business.'] },
+    { time: '60 mins', title: 'GEG Responsibilities & Guest Journey', objectives: ['Walk through Guest Journey scripts and touchpoints.'] },
+    { time: '30 mins', title: 'Guest Policies, Procedures & Recovery', objectives: ['Review critical guest policies.', 'Practice the Acknowledge, Empathize, Resolve recovery model.'] },
+    { time: '20 mins', title: 'Technology Essentials: Tracking', objectives: ['Discuss passive and active tracking fundamentals.'] },
+    { time: '240-300 mins', title: 'Tracker Procedure Checklist & Build', objectives: ['Build trackers as a group and validate visibility.'] }
+  ]},
+  { day: 2, title: 'Service, Sales, and Operations Essentials', focus: 'Leaders build fluency in booking software, sales moments, hardware basics, and daily technology procedures.', blocks: [
+    { time: '60 mins', title: 'Booking & Experience Software: Checkfront and Silica', objectives: ['Practice booking, check-in, and session management workflows.'] },
+    { time: '60 mins', title: 'How to Sell Sandbox VR', objectives: ['Practice selling experiences and back-to-backs.', 'Connect repeatability and conversion to store goals.'] },
+    { time: '30 mins', title: 'Technology Essentials: Holodeck Room Servers', objectives: ['Review EMV server basics and room hardware layout.'] },
+    { time: '30 mins', title: 'Holodeck Room Server Procedures', objectives: ['Complete basic technology procedures.'] },
+    { time: '30 mins', title: 'Technology Essentials: Wireless Streaming', objectives: ['Review wireless hardware and software infrastructure.'] },
+    { time: '60 mins', title: 'Wireless Streaming Procedure Checklist', objectives: ['Complete wireless procedures and demonstrate reset/reconnect confidence.'] },
+    { time: '30 mins', title: 'Technology Essentials: Haptic Vests', objectives: ['Discuss haptic feedback basics and vest handling.'] },
+    { time: '30 mins', title: 'Procedure Checklist: Haptic Vests', objectives: ['Complete vest pairing and troubleshooting activity.'] },
+    { time: '30 mins', title: 'Technology Essentials: Props', objectives: ['Discuss prop technology basics and common troubleshooting.'] },
+    { time: '30 mins', title: 'Procedure Checklist: Props', objectives: ['Complete prop pairing and troubleshooting activity.'] }
+  ]},
+  { day: 3, title: 'Technology, Role-play, and Store Operations', focus: 'Leaders practice store opening/closing, T1 escalation, role-play, shadowing, and technical operating standards.', blocks: [
+    { time: '60 mins', title: 'Opening Procedures', objectives: ['Practice the Opening Checklist.', 'Practice room calibration.'] },
+    { time: '30 mins', title: 'T1 Ticket Workflow', objectives: ['Practice submitting T1 tickets with useful detail.'] },
+    { time: '2 hours+', title: 'Review, Role-play & Shadow', objectives: ['Practice the GEG role with scenarios and shadowing.'] },
+    { time: '2 hours+', title: 'Review, Role-play & Shadow Continued', objectives: ['Repeat weak scenarios and build confidence through live practice.'] },
+    { time: '60 mins', title: 'Cleaning & Maintenance and Closing Procedures', objectives: ['Review store cleaning procedures.', 'Practice completing the Closing Checklist.'] }
+  ]},
+  { day: 4, title: 'Manager Operations', focus: 'Leaders shift from task execution to manager judgment: handoffs, cleaning standards, audio checks, shadowing, and operating decisions.', blocks: [
+    { time: '30 mins', title: 'Manager Shift Change', objectives: ['Practice shift change and handover procedures.'] },
+    { time: '60 mins', title: 'Store Cleaning Procedures', objectives: ['Review cleaning procedures, chemicals, supplies, and standards.'] },
+    { time: '30 mins', title: 'Technology Essentials: Audio Checker', objectives: ['Practice the standard audio checker procedure.'] },
+    { time: '4.5 hours', title: 'Store Manager Shadowing', objectives: ['Shadow a seasoned manager or trainer.', 'Focus on store operations, technology, guest recovery, coaching, and staffing decisions.'] }
+  ]},
+  { day: 5, title: 'Reverse Shadowing and Final Certification', focus: 'Leaders demonstrate readiness while the trainer observes, documents follow-ups, and completes final certification.', blocks: [
+    { time: '30 mins', title: 'Manager Shift Change', objectives: ['Practice shift change procedures with trainer observation.'] },
+    { time: '90 mins', title: 'Work as a Guest Experience Guide', objectives: ['Run sessions as a GEG while the trainer shadows.'] },
+    { time: '4 hours', title: 'Store Manager Reverse Shadowing', objectives: ['Work as Manager on Duty while trainer shadows and documents readiness.'] },
+    { time: '60 mins', title: 'Final Certification', objectives: ['Complete final certification with trainer or manager.', 'Document any exceptions or follow-ups.'] }
+  ]}
+];
+
+const LEADERSHIP_COMPETENCIES = [
+  { day: 1, id: 'lt-orientation-brand',    category: 'Orientation',        name: 'Explains brand, store overview, history, mission, values, and vocabulary' },
+  { day: 1, id: 'lt-policies-recovery',    category: 'Guest Policies',     name: 'Explains guest requirements, waivers, cancel/reschedule basics, and service recovery' },
+  { day: 1, id: 'lt-journey-touchpoints',  category: 'Guest Journey',      name: 'Describes and coaches entrance, check-in, barracks, holodeck, and post-experience touchpoints' },
+  { day: 1, id: 'lt-tracker-build',        category: 'Technical Training', name: 'Builds, repairs, identifies, and validates trackers in Vicon' },
+  { day: 2, id: 'lt-sales-repeatability',  category: 'Sales',              name: 'Coaches repeatability, conversion, phone inquiries, walk-by traffic, tours, and value framing' },
+  { day: 2, id: 'lt-checkfront-basic',     category: 'Booking & Software', name: 'Performs daily manifest, lookup, check-in, payment, availability, booking, reschedule, cancel, and refund basics' },
+  { day: 2, id: 'lt-checkfront-advanced',  category: 'Booking & Software', name: 'Performs gift voucher, split payment, booking state changes, and key sales/refund/discount reports' },
+  { day: 2, id: 'lt-control-before',       category: 'Control Center',     name: 'Runs pre-experience Control Center steps including barracks assignment, waivers, photos, and session setup' },
+  { day: 2, id: 'lt-control-during',       category: 'Control Center',     name: 'Runs in-experience Control Center steps including launch, tutorial, weapons, mics, heroic selfie, and guest controls' },
+  { day: 2, id: 'lt-control-after',        category: 'Control Center',     name: 'Runs post-experience Control Center steps including scores, videos, QR codes, and trailer reset' },
+  { day: 3, id: 'lt-tech-gear',            category: 'Technology Basics',  name: 'Explains guest-worn gear, haptic vests, body trackers, active tracking, and props' },
+  { day: 3, id: 'lt-tech-room',            category: 'Technology Basics',  name: 'Explains MoCap cameras, webcam, SPCs, APs, room rack, EMV servers, KVM, dongles, and Raspberry Pi' },
+  { day: 3, id: 'lt-wireless-procedure',   category: 'Technical Training', name: 'Completes wireless headset procedure including power, IPD, serial/IP, battery swap, menus, ATH setup, and Vicon check' },
+  { day: 3, id: 'lt-vest-procedure',       category: 'Technical Training', name: 'Completes haptic vest procedure including power, battery, VirtualHere pairing, troubleshooting, cleaning, and spare handling' },
+  { day: 3, id: 'lt-prop-procedure',       category: 'Technical Training', name: 'Completes prop procedure including pairing, troubleshooting, cleaning, storage, and replacement' },
+  { day: 3, id: 'lt-room-calibration',     category: 'Technical Training', name: 'Independently calibrates a room and adjusts T-Wand battery/brightness as needed' },
+  { day: 3, id: 'lt-server-procedures',    category: 'Technical Training', name: 'Performs server/SPC/VNC procedures including soft reboots, mic/webcam checks, Vicon validation, and SteamVR checks' },
+  { day: 4, id: 'lt-guest-complaints',     category: 'Shadowing',          name: 'Resolves guest complaints involving delays, technical issues, refunds, rescheduling, cancellation, and VIP requests' },
+  { day: 4, id: 'lt-team-coaching',        category: 'Shadowing',          name: 'Coaches team greetings, rules, upsells, and Tier 1 Slack interactions across all touchpoints' },
+  { day: 4, id: 'lt-operations-decisions', category: 'Shadowing',          name: 'Combines public sessions, assesses staffing and labor, and manages downtime productively' },
+  { day: 5, id: 'lt-reverse-shadow-geg',     category: 'Reverse Shadowing', name: 'Runs sessions end-to-end as a GEG while shadowed' },
+  { day: 5, id: 'lt-reverse-shadow-manager', category: 'Reverse Shadowing', name: 'Works as Manager on Duty while trainer shadows and documents readiness' },
+  { day: 5, id: 'lt-final-certification',    category: 'Final Sign-Off',    name: 'Completes See, Say, Do, Review certification with exceptions or follow-ups documented' }
 ];
 
 // ============================================================
@@ -863,7 +944,9 @@ function navigate(view) {
     admin: 'All Openings',
     videos: 'Training Videos',
     osc: 'Post-Opening OSC Report',
-    resources: 'Resources'
+    resources: 'Resources',
+    programs: 'Program Launcher',
+    'leadership-training': 'Leadership Training'
   };
   document.getElementById('topbarTitle').textContent = titles[view] || view;
   state.currentView = view;
@@ -881,7 +964,9 @@ function navigate(view) {
     admin: 'nav-admin',
     videos: 'nav-videos',
     osc: 'nav-osc',
-    resources: 'nav-resources'
+    resources: 'nav-resources',
+    programs: 'nav-programs',
+    'leadership-training': 'nav-leadership-training'
   };
   const navEl = document.getElementById(navIdMap[view]);
   if (navEl) navEl.classList.add('active');
@@ -898,6 +983,7 @@ function navigate(view) {
   if (view === 'videos') renderVideosPage();
   if (view === 'osc') loadOSCReportFields();
   if (view === 'resources') renderResourcesPage();
+  if (view === 'leadership-training') renderLeadershipTrainingPage();
 
   // Update browser history so Back button works inside the portal
   if (history.state?.view !== view) {
@@ -3553,3 +3639,471 @@ window.addEventListener('popstate', function(e) {
     setTimeout(function() { if (state.userEmail) navigate(hash); }, 1200);
   }
 })();
+
+// ============================================================
+// LEADERSHIP TRAINING UI
+// ============================================================
+async function renderLeadershipTrainingPage() {
+  const container = document.getElementById('leadershipTrainingContent');
+  if (!container) return;
+  container.innerHTML = '<div style="padding:32px;color:var(--text-muted);font-size:13px">Loading leadership training…</div>';
+
+  if (!state.leadershipTraining) {
+    const { data } = await dbLoadLeadershipTraining();
+    if (!data) {
+      renderLeadershipSetup(container);
+      return;
+    }
+  }
+  renderLeadershipDashboard(container);
+}
+
+function renderLeadershipSetup(container) {
+  container.innerHTML = `
+    <div class="page-header">
+      <div class="eyebrow">LEADERSHIP TRAINING</div>
+      <div class="page-title">Start a Leadership Training Program</div>
+      <div class="page-subtitle">Five-day Franchise Manager learning plan with individual leader tracking and a final readiness report.</div>
+    </div>
+    <div class="card" style="max-width:560px">
+      <div class="card-header"><div class="card-title">New Leadership Training</div></div>
+      <div class="card-body">
+        <div class="form-row"><label class="form-label">Franchise Store Name</label><input class="input" id="lt-franchise-store" placeholder="e.g. Sandbox VR – San Tan"></div>
+        <div class="form-row"><label class="form-label">Certified Training Store</label><input class="input" id="lt-training-store" placeholder="e.g. Sandbox VR – Mesa"></div>
+        <div class="form-row"><label class="form-label">Franchise Owner Name</label><input class="input" id="lt-fo-name" placeholder="Optional"></div>
+        <div class="form-row"><label class="form-label">Franchise Company</label><input class="input" id="lt-company" placeholder="Optional"></div>
+        <div class="form-row"><label class="form-label">Your Name (Trainer)</label><input class="input" id="lt-trainer-name" placeholder="Your name"></div>
+        <div class="form-row"><label class="form-label">Start Date</label><input class="input" type="date" id="lt-start-date"></div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="createLeadershipTraining()">Create Leadership Training</button>
+      </div>
+    </div>`;
+}
+
+async function createLeadershipTraining() {
+  const g = id => document.getElementById(id).value.trim();
+  const franchiseStore = g('lt-franchise-store');
+  const trainingStore = g('lt-training-store');
+  const trainerName = g('lt-trainer-name');
+  if (!franchiseStore || !trainingStore || !trainerName) {
+    showToast('Please fill in franchise store, training store, and your name.', 'error'); return;
+  }
+  const btn = document.querySelector('#leadershipTrainingContent button[onclick="createLeadershipTraining()"]');
+  if (btn) btn.disabled = true;
+  const { data, error } = await dbCreateLeadershipTraining({
+    franchise_store_name: franchiseStore,
+    certified_training_store_name: trainingStore,
+    franchise_owner_name: g('lt-fo-name'),
+    franchise_company: g('lt-company'),
+    trainer_name: trainerName,
+    start_date: g('lt-start-date') || null
+  });
+  if (error) { showToast('Error: ' + (error.message || 'Could not create training'), 'error'); if (btn) btn.disabled = false; return; }
+  showToast('Leadership training created!', 'success');
+  renderLeadershipDashboard(document.getElementById('leadershipTrainingContent'));
+}
+
+function renderLeadershipDashboard(container) {
+  const lt = state.leadershipTraining;
+  const sp = state.currentStoreProgram;
+  const participants = state.leadershipParticipants;
+  const totalComps = LEADERSHIP_COMPETENCIES.length;
+  const dayNames = ['', 'Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5'];
+
+  // Overall progress
+  let totalSigned = 0, totalPossible = participants.length * totalComps;
+  participants.forEach(p => {
+    totalSigned += LEADERSHIP_COMPETENCIES.filter(c => state.leadershipSignoffs[p.id + '_' + c.id] === 'signed').length;
+  });
+  const overallPct = totalPossible > 0 ? Math.round((totalSigned / totalPossible) * 100) : 0;
+
+  let html = `
+    <div class="page-header">
+      <div class="eyebrow">LEADERSHIP TRAINING</div>
+      <div class="page-title">${sp ? sp.franchise_store_name : 'Leadership Training'}</div>
+      <div class="page-subtitle">Trainer: ${lt.trainer_name} &nbsp;·&nbsp; ${lt.start_date ? 'Started ' + lt.start_date : 'No start date'} &nbsp;·&nbsp; ${dayNames[lt.current_day] || 'Day 1'} of 5</div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:24px">
+      <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-label">CURRENT DAY</div><div class="stat-value">${lt.current_day}</div><div class="stat-sub">${LEADERSHIP_AGENDA[lt.current_day - 1]?.title || ''}</div></div>
+      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">PARTICIPANTS</div><div class="stat-value">${participants.length}</div><div class="stat-sub">leaders added</div></div>
+      <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">SIGN-OFFS</div><div class="stat-value">${totalSigned}</div><div class="stat-sub">of ${totalPossible} total</div></div>
+      <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-label">OVERALL</div><div class="stat-value">${overallPct}%</div><div class="stat-sub">completion</div></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Day Navigation</div><div class="card-subtitle">Advance the training day</div></div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            ${[1,2,3,4,5].map(d => `<button class="btn ${d === lt.current_day ? 'btn-primary' : 'btn-secondary'}" onclick="setLeadershipDay(${d})">${dayNames[d]}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Today's Focus</div><div class="card-subtitle">${LEADERSHIP_AGENDA[lt.current_day - 1]?.title || ''}</div></div>
+        </div>
+        <div class="card-body" style="font-size:13px;color:var(--text-secondary)">${LEADERSHIP_AGENDA[lt.current_day - 1]?.focus || ''}</div>
+      </div>
+    </div>`;
+
+  // Tabs
+  const tab = state._leadershipTab || 'roster';
+  html += `<div style="display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border)">
+    ${['roster','agenda','signoffs','notes','report'].map(t => {
+      const labels = { roster:'Roster', agenda:'Agenda', signoffs:'Sign-Offs', notes:'Daily Notes', report:'Readiness Report' };
+      return `<button onclick="setLeadershipTab('${t}')" style="padding:8px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;border-bottom:2px solid ${t===tab?'var(--trigger)':'transparent'};color:${t===tab?'var(--trigger)':'var(--text-secondary)'};margin-bottom:-2px">${labels[t]}</button>`;
+    }).join('')}
+  </div>
+  <div id="leadershipTabContent"></div>`;
+
+  container.innerHTML = html;
+  renderLeadershipTab(tab);
+}
+
+function setLeadershipTab(tab) {
+  state._leadershipTab = tab;
+  renderLeadershipTab(tab);
+  // Update tab button styles
+  document.querySelectorAll('#leadershipTrainingContent button[onclick^="setLeadershipTab"]').forEach(btn => {
+    const btnTab = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
+    btn.style.borderBottomColor = btnTab === tab ? 'var(--trigger)' : 'transparent';
+    btn.style.color = btnTab === tab ? 'var(--trigger)' : 'var(--text-secondary)';
+  });
+}
+
+async function setLeadershipDay(day) {
+  const err = await dbSaveLeadershipCurrentDay(day);
+  if (err) { showToast('Could not update day: ' + (err.message || 'DB error'), 'error'); return; }
+  renderLeadershipDashboard(document.getElementById('leadershipTrainingContent'));
+}
+
+function renderLeadershipTab(tab) {
+  const container = document.getElementById('leadershipTabContent');
+  if (!container) return;
+  if (tab === 'roster') renderLeadershipRoster(container);
+  else if (tab === 'agenda') renderLeadershipAgenda(container);
+  else if (tab === 'signoffs') renderLeadershipSignoffs(container);
+  else if (tab === 'notes') renderLeadershipNotes(container);
+  else if (tab === 'report') renderLeadershipReport(container);
+}
+
+function renderLeadershipRoster(container) {
+  const roleColors = { 'Owner': 'badge-dark', 'SM': 'badge-blue', 'ASM': 'badge-amber', 'Events Manager': 'badge-green', 'Custom': 'badge-gray' };
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700;color:var(--hb)">Leadership Participants</div>
+    <button class="btn btn-primary" onclick="openAddLeaderModal()">+ Add Leader</button>
+  </div>`;
+
+  if (state.leadershipParticipants.length === 0) {
+    html += '<div class="card" style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px">No leaders added yet. Click "Add Leader" to get started.</div>';
+  } else {
+    html += '<div class="card">';
+    state.leadershipParticipants.forEach(p => {
+      const signed = LEADERSHIP_COMPETENCIES.filter(c => state.leadershipSignoffs[p.id + '_' + c.id] === 'signed').length;
+      const total = LEADERSHIP_COMPETENCIES.length;
+      const pct = Math.round((signed / total) * 100);
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light)">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--trigger-light);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--trigger)">${p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}</div>
+          <div>
+            <div style="font-weight:600;font-size:14px">${p.name}</div>
+            <span class="badge ${roleColors[p.role] || 'badge-gray'}" style="font-size:11px">${p.role === 'Custom' && p.custom_role ? p.custom_role : p.role}</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--text-muted)">Sign-offs</div>
+            <div style="font-size:14px;font-weight:700;color:${pct===100?'var(--success)':'var(--hb)'}">${signed}/${total}</div>
+          </div>
+          <div style="width:80px"><div class="progress-bar-wrap"><div class="progress-bar-fill ${pct===100?'green':'blue'}" style="width:${pct}%"></div></div></div>
+          <button onclick="removeLeadershipParticipant('${p.id}')" style="color:var(--text-muted);background:transparent;border:none;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:4px" onmouseover="this.style.background='var(--danger-light)';this.style.color='var(--danger)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">Remove</button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function openAddLeaderModal() {
+  const modal = document.getElementById('modal');
+  const body = document.getElementById('modal-body');
+  if (!modal || !body) return;
+  body.innerHTML = `
+    <div style="padding:24px">
+      <div style="font-size:16px;font-weight:700;margin-bottom:16px">Add Leadership Participant</div>
+      <div class="form-row"><label class="form-label">Full Name</label><input class="input" id="lt-new-name" placeholder="Full name" autofocus></div>
+      <div class="form-row"><label class="form-label">Role</label>
+        <select class="input" id="lt-new-role" onchange="document.getElementById('lt-custom-role-row').style.display=this.value==='Custom'?'':'none'">
+          ${LEADERSHIP_ROLES.map(r=>`<option value="${r}">${r}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-row" id="lt-custom-role-row" style="display:none"><label class="form-label">Custom Role Title</label><input class="input" id="lt-new-custom-role" placeholder="e.g. Events Manager, Head Coach"></div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-primary" onclick="saveNewLeader()">Add Leader</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>`;
+  modal.classList.add('open');
+}
+
+async function saveNewLeader() {
+  const name = document.getElementById('lt-new-name')?.value.trim();
+  const role = document.getElementById('lt-new-role')?.value;
+  const customRole = document.getElementById('lt-new-custom-role')?.value.trim();
+  if (!name) { showToast('Please enter a name.', 'error'); return; }
+  const { data, error } = await dbSaveLeadershipParticipant({ name, role, custom_role: customRole });
+  if (error) { showToast('Error adding leader: ' + (error.message || 'DB error'), 'error'); return; }
+  state.leadershipParticipants.push({ id: data.id, name, role, custom_role: customRole || '', notes: '' });
+  closeModal();
+  showToast(name + ' added!', 'success');
+  renderLeadershipTab(state._leadershipTab || 'roster');
+}
+
+async function removeLeadershipParticipant(participantId) {
+  const p = state.leadershipParticipants.find(x => x.id === participantId);
+  if (!p || !confirm('Remove ' + p.name + '? This cannot be undone.')) return;
+  const err = await dbDeleteLeadershipParticipant(participantId);
+  if (err) { showToast('Error removing participant.', 'error'); return; }
+  state.leadershipParticipants = state.leadershipParticipants.filter(x => x.id !== participantId);
+  showToast(p.name + ' removed.', 'success');
+  renderLeadershipTab(state._leadershipTab || 'roster');
+}
+
+function renderLeadershipAgenda(container) {
+  const day = state.currentLeadershipDay;
+  const agenda = LEADERSHIP_AGENDA[day - 1];
+  if (!agenda) { container.innerHTML = '<div style="color:var(--text-muted)">No agenda for this day.</div>'; return; }
+
+  let html = `<div class="card mb-20">
+    <div class="card-header">
+      <div><div class="card-title">Day ${day}: ${agenda.title}</div><div class="card-subtitle">${agenda.focus}</div></div>
+    </div>
+  </div>`;
+
+  agenda.blocks.forEach(block => {
+    html += `<div class="card mb-20" style="border-left:3px solid var(--trigger)">
+      <div style="padding:16px">
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:700;color:var(--hb)">${block.title}</div>
+          <div style="font-size:11px;color:var(--text-muted);white-space:nowrap">${block.time}</div>
+        </div>
+        <ul style="margin:0;padding-left:18px;color:var(--text-secondary);font-size:13px">
+          ${block.objectives.map(o => `<li style="margin-bottom:4px">${o}</li>`).join('')}
+        </ul>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderLeadershipSignoffs(container) {
+  const participants = state.leadershipParticipants;
+  const day = state.currentLeadershipDay;
+  const dayComps = LEADERSHIP_COMPETENCIES.filter(c => c.day === day);
+
+  if (participants.length === 0) {
+    container.innerHTML = '<div class="card" style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px">Add leaders to the roster first.</div>';
+    return;
+  }
+
+  // Group by category
+  const categories = [...new Set(dayComps.map(c => c.category))];
+  let html = `<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Showing Day ${day} competencies — switch days using the Day Navigation above.</div>`;
+
+  if (dayComps.length === 0) {
+    container.innerHTML = html + '<div class="card" style="padding:24px;color:var(--text-muted);font-size:13px">No competencies for this day.</div>';
+    return;
+  }
+
+  categories.forEach(cat => {
+    const comps = dayComps.filter(c => c.category === cat);
+    html += `<div class="card mb-20">
+      <div style="padding:12px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);border-bottom:1px solid var(--border-light)">${cat}</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:var(--surface-alt)">
+              <th style="text-align:left;padding:8px 16px;font-weight:600;color:var(--text-secondary);min-width:260px">Competency</th>
+              ${participants.map(p => `<th style="text-align:center;padding:8px 12px;font-weight:600;color:var(--text-secondary);white-space:nowrap">${p.name.split(' ')[0]}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${comps.map(c => `
+              <tr style="border-bottom:1px solid var(--border-light)">
+                <td style="padding:10px 16px;color:var(--text-primary)">${c.name}</td>
+                ${participants.map(p => {
+                  const signed = state.leadershipSignoffs[p.id + '_' + c.id] === 'signed';
+                  return `<td style="text-align:center;padding:10px 12px">
+                    <button onclick="toggleLeadershipSignoff('${p.id}','${c.id}',${c.day})"
+                      style="width:32px;height:32px;border-radius:50%;border:2px solid ${signed?'var(--success)':'var(--border)'};background:${signed?'var(--success)':'transparent'};cursor:pointer;color:${signed?'#fff':'var(--text-muted)'};font-size:14px;display:inline-flex;align-items:center;justify-content:center">
+                      ${signed ? '✓' : ''}
+                    </button>
+                  </td>`;
+                }).join('')}
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+async function toggleLeadershipSignoff(participantId, competencyId, dayNum) {
+  const key = participantId + '_' + competencyId;
+  const current = state.leadershipSignoffs[key];
+  const newStatus = current === 'signed' ? 'pending' : 'signed';
+  state.leadershipSignoffs[key] = newStatus;
+  const err = await dbSaveLeadershipSignoff(participantId, competencyId, newStatus, dayNum);
+  if (err) { showToast('Save failed: ' + (err.message || 'DB error'), 'error'); state.leadershipSignoffs[key] = current; }
+  renderLeadershipTab('signoffs');
+}
+
+function renderLeadershipNotes(container) {
+  const day = state.currentLeadershipDay;
+  const notes = state.leadershipDailyNotes[day] || {};
+
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-header"><div class="card-title">Day ${day} Trainer Notes</div></div>
+      <div class="card-body">
+        <div class="form-row"><label class="form-label">Overall Observations</label>
+          <textarea class="recap-textarea" id="lt-notes-observations" placeholder="What did you observe today across the group?" oninput="autoSaveLeadershipNotes()">${notes.observations || ''}</textarea>
+        </div>
+        <div class="form-row"><label class="form-label">Standout Moments</label>
+          <textarea class="recap-textarea" id="lt-notes-standouts" placeholder="Highlights, breakthroughs, or moments of confidence..." oninput="autoSaveLeadershipNotes()">${notes.standouts || ''}</textarea>
+        </div>
+        <div class="form-row"><label class="form-label">Areas Needing More Practice</label>
+          <textarea class="recap-textarea" id="lt-notes-gaps" placeholder="Skills or topics that need reinforcement tomorrow..." oninput="autoSaveLeadershipNotes()">${notes.gaps || ''}</textarea>
+        </div>
+        <div class="form-row"><label class="form-label">Plan for Tomorrow</label>
+          <textarea class="recap-textarea" id="lt-notes-tomorrow" placeholder="What will you focus on or adjust tomorrow?" oninput="autoSaveLeadershipNotes()">${notes.tomorrow || ''}</textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+          <button class="btn btn-primary" onclick="saveLeadershipNotes()">Save Notes</button>
+          <span id="lt-notes-save-status" style="font-size:12px;color:var(--text-muted)"></span>
+        </div>
+      </div>
+    </div>`;
+}
+
+let _ltNotesTimer = null;
+function autoSaveLeadershipNotes() {
+  clearTimeout(_ltNotesTimer);
+  _ltNotesTimer = setTimeout(saveLeadershipNotes, 2000);
+}
+
+async function saveLeadershipNotes() {
+  const day = state.currentLeadershipDay;
+  const g = id => (document.getElementById(id)?.value || '');
+  const notesData = {
+    observations: g('lt-notes-observations'),
+    standouts: g('lt-notes-standouts'),
+    gaps: g('lt-notes-gaps'),
+    tomorrow: g('lt-notes-tomorrow')
+  };
+  state.leadershipDailyNotes[day] = notesData;
+  const err = await dbSaveLeadershipDailyNotes(day, notesData);
+  const status = document.getElementById('lt-notes-save-status');
+  if (status) status.textContent = err ? 'Save failed.' : 'Saved.';
+  if (!err) setTimeout(() => { if (status) status.textContent = ''; }, 2000);
+}
+
+function renderLeadershipReport(container) {
+  const participants = state.leadershipParticipants;
+  if (participants.length === 0) {
+    container.innerHTML = '<div class="card" style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px">Add leaders to the roster first, then complete their readiness reports here.</div>';
+    return;
+  }
+
+  const statusLabels = { ready: 'Ready', ready_with_support: 'Ready with Support', needs_additional_training: 'Needs Additional Training' };
+  const statusColors = { ready: 'badge-green', ready_with_support: 'badge-amber', needs_additional_training: 'badge-danger' };
+
+  let html = '';
+  participants.forEach(p => {
+    const report = state.leadershipReports[p.id] || {};
+    const signed = LEADERSHIP_COMPETENCIES.filter(c => state.leadershipSignoffs[p.id + '_' + c.id] === 'signed').length;
+    const total = LEADERSHIP_COMPETENCIES.length;
+    const pct = Math.round((signed / total) * 100);
+    const currentStatus = report.readiness_status || '';
+    const currentRating = report.rating_1_to_4 || 0;
+
+    html += `<div class="card mb-20">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${p.name}</div>
+          <div class="card-subtitle">${p.role === 'Custom' && p.custom_role ? p.custom_role : p.role} &nbsp;·&nbsp; ${signed}/${total} competencies (${pct}%)</div>
+        </div>
+        ${currentStatus ? `<span class="badge ${statusColors[currentStatus] || 'badge-gray'}">${statusLabels[currentStatus]}</span>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="form-row"><label class="form-label">Readiness Status</label>
+          <select class="input" id="lt-report-status-${p.id}">
+            <option value="">— Select —</option>
+            ${Object.entries(statusLabels).map(([v,l]) => `<option value="${v}" ${currentStatus===v?'selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">Overall Rating (1–4)</label>
+          <div style="display:flex;gap:8px">
+            ${[1,2,3,4].map(n => `<button onclick="setLeaderRating('${p.id}',${n})" id="lt-rating-${p.id}-${n}"
+              style="width:40px;height:40px;border-radius:8px;border:2px solid ${currentRating===n?'var(--trigger)':'var(--border)'};background:${currentRating===n?'var(--trigger)':'transparent'};color:${currentRating===n?'#fff':'var(--text-secondary)'};font-weight:700;cursor:pointer">${n}</button>`).join('')}
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">Strengths</label>
+          <textarea class="recap-textarea" id="lt-report-strengths-${p.id}" placeholder="What did this leader do well?">${report.strengths || ''}</textarea>
+        </div>
+        <div class="form-row"><label class="form-label">Risks / Development Areas</label>
+          <textarea class="recap-textarea" id="lt-report-risks-${p.id}" placeholder="What areas need continued development?">${report.risks || ''}</textarea>
+        </div>
+        <div class="form-row"><label class="form-label">Follow-Up Items</label>
+          <textarea class="recap-textarea" id="lt-report-followups-${p.id}" placeholder="Any specific follow-up commitments or check-in plans?">${report.follow_ups || ''}</textarea>
+        </div>
+        <div class="form-row"><label class="form-label">Final Notes</label>
+          <textarea class="recap-textarea" id="lt-report-final-${p.id}" placeholder="Overall impression and final certification notes...">${report.final_notes || ''}</textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveLeaderReadinessReport('${p.id}')">Save Report</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+
+  // Store ratings in state for button management
+  participants.forEach(p => {
+    const report = state.leadershipReports[p.id] || {};
+    state['_ltRating_' + p.id] = report.rating_1_to_4 || 0;
+  });
+}
+
+function setLeaderRating(participantId, rating) {
+  state['_ltRating_' + participantId] = rating;
+  [1,2,3,4].forEach(n => {
+    const btn = document.getElementById(`lt-rating-${participantId}-${n}`);
+    if (btn) {
+      btn.style.borderColor = n === rating ? 'var(--trigger)' : 'var(--border)';
+      btn.style.background = n === rating ? 'var(--trigger)' : 'transparent';
+      btn.style.color = n === rating ? '#fff' : 'var(--text-secondary)';
+    }
+  });
+}
+
+async function saveLeaderReadinessReport(participantId) {
+  const g = id => document.getElementById(id)?.value || '';
+  const report = {
+    readiness_status: g(`lt-report-status-${participantId}`),
+    rating_1_to_4: state['_ltRating_' + participantId] || null,
+    strengths: g(`lt-report-strengths-${participantId}`),
+    risks: g(`lt-report-risks-${participantId}`),
+    follow_ups: g(`lt-report-followups-${participantId}`),
+    final_notes: g(`lt-report-final-${participantId}`)
+  };
+  state.leadershipReports[participantId] = { ...report, participant_id: participantId };
+  const err = await dbSaveLeadershipReadinessReport(participantId, report);
+  if (err) { showToast('Save failed: ' + (err.message || 'DB error'), 'error'); return; }
+  const p = state.leadershipParticipants.find(x => x.id === participantId);
+  showToast((p?.name || 'Report') + ' saved!', 'success');
+  renderLeadershipTab('report');
+}
