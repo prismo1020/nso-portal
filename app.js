@@ -23,7 +23,8 @@ let state = {
   leadershipSignoffs: {},
   leadershipDailyNotes: {},
   leadershipReports: {},
-  currentLeadershipDay: 1
+  currentLeadershipDay: 1,
+  mode: null
 };
 
 // ============================================================
@@ -1877,8 +1878,10 @@ async function initApp() {
     } else if (event === 'SIGNED_OUT') {
       Object.assign(state, {
         opening: null, openingId: null, userRole: 'coach', userEmail: null,
-        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {}
+        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {},
+        mode: null
       });
+      document.getElementById('modeSelectorOverlay').style.display = 'none';
       showLoginScreen();
     }
   });
@@ -1888,30 +1891,62 @@ async function onSignedIn(session) {
   document.getElementById('loginOverlay').style.display = 'none';
   hideLoadBanner();
 
-  // Pass the session user directly so dbLoadState doesn't need a second auth round-trip
+  // Load state in background, then show mode selector
   const loaded = await dbLoadState(session?.user);
-  if (loaded === true) {
-    refreshAfterLoad();
-  } else if (loaded === 'no-user') {
-    // Auth hadn't resolved yet — retry once after a short delay
+  if (loaded === 'no-user') {
     setTimeout(async () => {
       const retry = await dbLoadState();
-      if (retry === true) {
-        refreshAfterLoad();
-        hideLoadBanner();
-        document.getElementById('userEmail').textContent = state.userEmail || '';
-      } else if (retry === 'no-user') {
-        showLoadBanner();
-      }
-      // 'no-opening' on retry is fine — user just hasn't set up an opening yet
+      if (retry === 'no-user') { showLoadBanner(); return; }
+      document.getElementById('userEmail').textContent = state.userEmail || '';
+      document.getElementById('nav-admin').style.display = 'flex';
+      renderOpeningSwitcherList();
+      showModeSelector();
     }, 1500);
+    return;
   }
-  // 'no-opening' on first load is totally normal — user will use Setup to create one
 
   document.getElementById('userEmail').textContent = state.userEmail || '';
-  // Admin nav is always visible; renderAdminPage() handles access control messaging
   document.getElementById('nav-admin').style.display = 'flex';
-  renderOpeningSwitcherList(); // populate switcher in background
+  renderOpeningSwitcherList();
+  showModeSelector();
+}
+
+function showModeSelector() {
+  state.mode = null;
+
+  // Populate location names if available
+  const nsoLocation = state.opening?.store || null;
+  const ltLocation = state.currentStoreProgram?.certified_training_store_name || null;
+
+  const nsoEl = document.getElementById('mode-nso-location');
+  const ltEl  = document.getElementById('mode-lt-location');
+  if (nsoEl) nsoEl.textContent = nsoLocation || 'Grand Opening NSO';
+  if (ltEl)  ltEl.textContent  = ltLocation  || 'Corporate Training Store';
+
+  document.getElementById('modeSelectorOverlay').style.display = 'flex';
+}
+
+function selectMode(mode) {
+  state.mode = mode;
+  document.getElementById('modeSelectorOverlay').style.display = 'none';
+
+  // Show the right sidebar groups
+  const nsoGroup  = document.getElementById('nav-nso-group');
+  const ltGroup   = document.getElementById('nav-leadership-group');
+  const nsoFooter = document.getElementById('sidebar-footer-nso');
+  if (nsoGroup)  nsoGroup.style.display  = mode === 'nso'        ? '' : 'none';
+  if (ltGroup)   ltGroup.style.display   = mode === 'leadership' ? '' : 'none';
+  if (nsoFooter) nsoFooter.style.display = mode === 'nso'        ? '' : 'none';
+
+  // Update topbar branding
+  const topbarSub = document.getElementById('portalSubtitle');
+  if (topbarSub) topbarSub.textContent = mode === 'leadership' ? 'Leadership Training' : 'Opening Support Coach';
+
+  if (mode === 'nso') {
+    refreshAfterLoad();
+  } else {
+    navigate('leadership-training');
+  }
 }
 
 function showLoadBanner() {
