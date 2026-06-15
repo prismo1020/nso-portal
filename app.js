@@ -1881,6 +1881,7 @@ async function initApp() {
         currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {},
         mode: null
       });
+      sessionStorage.removeItem('portalMode');
       document.getElementById('modeSelectorOverlay').style.display = 'none';
       showLoginScreen();
     }
@@ -1891,7 +1892,9 @@ async function onSignedIn(session) {
   document.getElementById('loginOverlay').style.display = 'none';
   hideLoadBanner();
 
-  // Load state in background, then show mode selector
+  // If already signed in this session with a chosen mode, skip the selector
+  if (state.mode) return;
+
   const loaded = await dbLoadState(session?.user);
   if (loaded === 'no-user') {
     setTimeout(async () => {
@@ -1900,7 +1903,8 @@ async function onSignedIn(session) {
       document.getElementById('userEmail').textContent = state.userEmail || '';
       document.getElementById('nav-admin').style.display = 'flex';
       renderOpeningSwitcherList();
-      showModeSelector();
+      const saved = sessionStorage.getItem('portalMode');
+      if (saved) { selectMode(saved); } else { showModeSelector(); }
     }, 1500);
     return;
   }
@@ -1908,26 +1912,25 @@ async function onSignedIn(session) {
   document.getElementById('userEmail').textContent = state.userEmail || '';
   document.getElementById('nav-admin').style.display = 'flex';
   renderOpeningSwitcherList();
-  showModeSelector();
+  const saved = sessionStorage.getItem('portalMode');
+  if (saved) { selectMode(saved); } else { showModeSelector(); }
 }
 
 function showModeSelector() {
   state.mode = null;
-
-  // Populate location names if available
-  const nsoLocation = state.opening?.store || null;
-  const ltLocation = state.currentStoreProgram?.certified_training_store_name || null;
+  sessionStorage.removeItem('portalMode');
 
   const nsoEl = document.getElementById('mode-nso-location');
   const ltEl  = document.getElementById('mode-lt-location');
-  if (nsoEl) nsoEl.textContent = nsoLocation || 'Grand Opening NSO';
-  if (ltEl)  ltEl.textContent  = ltLocation  || 'Corporate Training Store';
+  if (nsoEl) nsoEl.textContent = state.opening?.store || 'Grand Opening NSO';
+  if (ltEl)  ltEl.textContent  = state.currentStoreProgram?.certified_training_store_name || 'Corporate Training Store';
 
   document.getElementById('modeSelectorOverlay').style.display = 'flex';
 }
 
 function selectMode(mode) {
   state.mode = mode;
+  sessionStorage.setItem('portalMode', mode);
   document.getElementById('modeSelectorOverlay').style.display = 'none';
 
   // Show the right sidebar groups
@@ -2450,6 +2453,63 @@ async function renderAdminPage() {
   container.innerHTML = html;
 
   renderUserManagement();
+  renderAdminLeadershipSection();
+}
+
+async function renderAdminLeadershipSection() {
+  var container = document.getElementById('adminLeadershipProgramsList');
+  if (!container) return;
+  container.innerHTML = '<div style="padding:12px 0;color:var(--text-muted);font-size:13px">Loading leadership trainings…</div>';
+
+  const { data, error } = await dbLoadAllLeadershipTrainingsForAdmin();
+  if (error || !data || data.length === 0) {
+    container.innerHTML = '<div style="padding:12px 0;color:var(--text-muted);font-size:13px">' + (error ? 'Error loading trainings.' : 'No leadership trainings yet.') + '</div>';
+    return;
+  }
+
+  var html = '';
+  data.forEach(function(t) {
+    var sp = t.store_program || {};
+    var participants = t.participants || [];
+    var signoffs = t.signoffs || [];
+    var reports = t.readiness_reports || [];
+    var totalPossible = participants.length * LEADERSHIP_COMPETENCIES.length;
+    var totalSigned = signoffs.length;
+    var pct = totalPossible > 0 ? Math.round((totalSigned / totalPossible) * 100) : 0;
+    var readyCount = reports.filter(function(r){ return r.readiness_status === 'ready'; }).length;
+    var dayNames = {1:'Day 1',2:'Day 2',3:'Day 3',4:'Day 4',5:'Day 5'};
+
+    html += '<div class="card mb-20" style="border-left:3px solid var(--trigger)">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer" onclick="toggleAdminOpening(\'lt-' + t.id + '\')">';
+    html += '<div><div style="font-size:14px;font-weight:700;color:var(--hb)">' + (sp.franchise_store_name || 'Unknown Store') + '</div>';
+    html += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px">Trainer: ' + t.trainer_name + ' &nbsp;·&nbsp; Start: ' + (t.start_date || '—') + ' &nbsp;·&nbsp; ' + (dayNames[t.current_day] || 'Day 1') + ' of 5</div></div>';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
+    html += '<span class="badge badge-blue">' + participants.length + ' leaders</span>';
+    html += '<span class="badge ' + (pct >= 100 ? 'badge-green' : 'badge-amber') + '">' + pct + '% signed off</span>';
+    if (readyCount > 0) html += '<span class="badge badge-green">' + readyCount + '/' + participants.length + ' ready</span>';
+    html += '<svg style="flex-shrink:0;color:var(--text-muted)" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></div></div>';
+
+    html += '<div id="lt-' + t.id + '" style="display:none;padding:0 16px 14px">';
+    // Participant list
+    if (participants.length > 0) {
+      html += '<div style="margin-bottom:12px">';
+      participants.forEach(function(p) {
+        var pSigned = signoffs.filter(function(s){ return s.participant_id === p.id; }).length;
+        var pTotal = LEADERSHIP_COMPETENCIES.length;
+        var pPct = Math.round((pSigned / pTotal) * 100);
+        var rep = reports.find(function(r){ return r.participant_id === p.id; });
+        var statusBadge = rep && rep.readiness_status ? (' <span class="badge ' + (rep.readiness_status === 'ready' ? 'badge-green' : rep.readiness_status === 'ready_with_support' ? 'badge-amber' : 'badge-gray') + '" style="font-size:10px">' + (rep.readiness_status === 'ready' ? 'Ready' : rep.readiness_status === 'ready_with_support' ? 'Ready w/ Support' : 'Needs Training') + '</span>') : '';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-light);font-size:13px">';
+        html += '<span style="font-weight:500">' + p.name + ' <span style="color:var(--text-muted);font-size:11px">' + (p.role === 'Custom' && p.custom_role ? p.custom_role : p.role) + '</span>' + statusBadge + '</span>';
+        html += '<span style="color:var(--text-muted)">' + pSigned + '/' + pTotal + ' (' + pPct + '%)</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '<button class="btn btn-secondary" style="font-size:12px" onclick="exportLeadershipCSV(\'' + t.id + '\',\'' + (sp.franchise_store_name || 'leadership').replace(/'/g,'') + '\')">Export CSV</button>';
+    html += '</div></div>';
+  });
+  container.innerHTML = html;
 }
 
 function openRenameModal(openingId, storeName, coachName) {
@@ -2571,6 +2631,69 @@ async function saveOSCReport() {
   const err = await dbSaveOSCReport(r);
   if (err) { showToast('Save failed: ' + (err.message || 'DB error'), 'error'); return; }
   showToast('Closing report saved!', 'success');
+}
+
+async function exportLeadershipCSV(trainingId, storeName) {
+  showToast('Preparing leadership export…', 'info');
+  const { data: rows, error } = await dbLoadAllLeadershipTrainingsForAdmin();
+  if (error) { showToast('Export failed.', 'error'); return; }
+  const t = (rows || []).find(function(r){ return r.id === trainingId; });
+  if (!t) { showToast('Training not found.', 'error'); return; }
+
+  var esc = function(v){ return '"' + String(v || '').replace(/"/g, '""') + '"'; };
+  var sp = t.store_program || {};
+  var participants = t.participants || [];
+  var signoffs = t.signoffs || [];
+  var reports = t.readiness_reports || [];
+  var csvRows = [];
+
+  csvRows.push(['LEADERSHIP TRAINING', '', '']);
+  csvRows.push(['Franchise Store', esc(sp.franchise_store_name), '']);
+  csvRows.push(['Training Store', esc(sp.certified_training_store_name), '']);
+  csvRows.push(['Franchise Owner', esc(sp.franchise_owner_name), '']);
+  csvRows.push(['Trainer', esc(t.trainer_name), '']);
+  csvRows.push(['Start Date', esc(t.start_date), '']);
+  csvRows.push(['Current Day', t.current_day, '']);
+  csvRows.push(['', '', '']);
+
+  csvRows.push(['PARTICIPANT ROSTER', '', '']);
+  csvRows.push(['Name', 'Role', 'Signed Off', 'Progress %']);
+  participants.forEach(function(p) {
+    var signed = signoffs.filter(function(s){ return s.participant_id === p.id; }).length;
+    var total = LEADERSHIP_COMPETENCIES.length;
+    csvRows.push([esc(p.name), esc(p.role === 'Custom' && p.custom_role ? p.custom_role : p.role), signed + '/' + total, Math.round((signed/total)*100) + '%']);
+  });
+  csvRows.push(['', '']);
+
+  csvRows.push(['SIGN-OFF MATRIX', '']);
+  csvRows.push(['Participant', 'Role'].concat(LEADERSHIP_COMPETENCIES.map(function(c){ return esc(c.name); })));
+  participants.forEach(function(p) {
+    var row = [esc(p.name), esc(p.role === 'Custom' && p.custom_role ? p.custom_role : p.role)];
+    LEADERSHIP_COMPETENCIES.forEach(function(c) {
+      var s = signoffs.find(function(x){ return x.participant_id === p.id && x.competency_id === c.id; });
+      row.push(s ? 'Signed' : 'Not Completed');
+    });
+    csvRows.push(row);
+  });
+  csvRows.push(['', '']);
+
+  csvRows.push(['READINESS REPORTS', '']);
+  csvRows.push(['Participant', 'Readiness Status', 'Rating (1-4)', 'Strengths', 'Risks', 'Follow-Ups', 'Final Notes']);
+  var statusLabels = { ready: 'Ready', ready_with_support: 'Ready with Support', needs_additional_training: 'Needs Additional Training' };
+  participants.forEach(function(p) {
+    var r = reports.find(function(x){ return x.participant_id === p.id; }) || {};
+    csvRows.push([esc(p.name), esc(statusLabels[r.readiness_status] || ''), r.rating_1_to_4 || '', esc(r.strengths), esc(r.risks), esc(r.follow_ups), esc(r.final_notes)]);
+  });
+
+  var csv = csvRows.map(function(r){ return r.join(','); }).join('\r\n');
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = (storeName || 'leadership').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '-leadership-export.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Leadership export downloaded!', 'success');
 }
 
 async function exportOpeningCSV(openingId, storeName) {

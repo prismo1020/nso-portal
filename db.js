@@ -285,6 +285,26 @@ async function dbLoadAllOpenings() {
 // ============================================================
 // LEADERSHIP TRAINING DB HELPERS
 // ============================================================
+async function dbLoadAllLeadershipTrainingsForAdmin() {
+  const { data: trainings, error } = await supabase
+    .from('leadership_trainings')
+    .select('*')
+    .order('updated_at', { ascending: false });
+  if (error) return { error };
+  if (!trainings || trainings.length === 0) return { data: [] };
+
+  const rows = await Promise.all(trainings.map(async (t) => {
+    const [{ data: program }, { data: participants }, { data: signoffs }, { data: reports }] = await Promise.all([
+      supabase.from('store_programs').select('*').eq('id', t.store_program_id).single(),
+      supabase.from('leadership_participants').select('*').eq('leadership_training_id', t.id),
+      supabase.from('leadership_signoffs').select('*').eq('leadership_training_id', t.id),
+      supabase.from('leadership_readiness_reports').select('*').eq('leadership_training_id', t.id)
+    ]);
+    return { ...t, store_program: program || {}, participants: participants || [], signoffs: signoffs || [], readiness_reports: reports || [] };
+  }));
+  return { data: rows };
+}
+
 async function dbLoadLeadershipTraining(trainingId) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: { message: 'No user loaded' } };
