@@ -1923,7 +1923,7 @@ function showModeSelector() {
   const nsoEl = document.getElementById('mode-nso-location');
   const ltEl  = document.getElementById('mode-lt-location');
   if (nsoEl) nsoEl.textContent = state.opening?.store || 'Grand Opening NSO';
-  if (ltEl)  ltEl.textContent  = state.currentStoreProgram?.certified_training_store_name || 'Corporate Training Store';
+  if (ltEl)  ltEl.textContent  = state.currentStoreProgram?.franchise_store_name || 'Leadership Training';
 
   document.getElementById('modeSelectorOverlay').style.display = 'flex';
 }
