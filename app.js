@@ -4381,16 +4381,16 @@ async function renderScorecards() {
 
   openings.forEach(o => {
     const sc = scMap[o.id];
-    const dateStr = o.start_date ? new Date(o.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'â€”';
+    const dateStr = o.start_date ? new Date(o.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
     html += `<div class="card mb-20" style="cursor:pointer;transition:box-shadow 0.15s" onmouseenter="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.12)'" onmouseleave="this.style.boxShadow=''" onclick="openScorecardEditor('${o.id}')">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--text)">${o.store_name}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Coach: ${o.coach_name || 'â€”'} &nbsp;Â·&nbsp; ${dateStr}</div>
+          <div style=”font-size:12px;color:var(--text-muted);margin-top:2px”>Coach: ${o.coach_name || '-'} &nbsp;&middot;&nbsp; ${dateStr}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           ${sc ? '<span class="badge badge-green">Scorecard</span>' : '<span class="badge badge-gray">No scorecard yet</span>'}
-          <span style="color:var(--text-muted);font-size:20px;line-height:1">â€º</span>
+          <span style="color:var(--text-muted);font-size:20px;line-height:1">&rsaquo;</span>
         </div>
       </div>
     </div>`;
@@ -4435,19 +4435,19 @@ function renderScorecardEditorHTML(container) {
   const ltOptions = ltList.map(lt => {
     const sp = lt.store_programs;
     const label = sp
-      ? `${sp.franchise_store_name} â€” ${lt.trainer_name}${lt.start_date ? ', ' + lt.start_date : ''}`
+      ? `${sp.franchise_store_name} — ${lt.trainer_name}${lt.start_date ? ', ' + lt.start_date : ''}`
       : lt.trainer_name;
     return `<option value="${lt.id}" ${sc.leadership_training_id === lt.id ? 'selected' : ''}>${label}</option>`;
   }).join('');
 
   const statusColors = { green: 'badge-green', amber: 'badge-amber', red: 'badge-danger', gray: 'badge-gray' };
-  const statusWord = s => ({ green: 'Green', amber: 'Amber', red: 'Red', gray: 'â€”' })[s] || 'â€”';
+  const statusWord = s => ({ green: 'Green', amber: 'Amber', red: 'Red', gray: '—' })[s] || '—';
 
   const scoreRow = (label, score) => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
       <span style="font-size:13px;font-weight:600;color:var(--text)">${label}</span>
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:12px;color:var(--text-secondary)">${score.label || 'â€”'}</span>
+        <span style="font-size:12px;color:var(--text-secondary)">${score.label || '—'}</span>
         <span class="badge ${statusColors[score.status] || 'badge-gray'}" style="min-width:52px;text-align:center">${statusWord(score.status)}</span>
       </div>
     </div>`;
@@ -4463,23 +4463,23 @@ function renderScorecardEditorHTML(container) {
     const pct2 = participants.length > 0 ? Math.round((totalSigned / (participants.length * totalComps)) * 100) : 0;
     ltSummaryHtml = `<div style="margin-top:12px;padding:12px 14px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);font-size:12px;color:var(--text-secondary)">
       <div style="font-weight:700;color:var(--text);margin-bottom:3px">${sp2 ? sp2.franchise_store_name : 'Linked Training'}</div>
-      <div>Trainer: ${lt2.trainer_name} &nbsp;Â·&nbsp; ${participants.length} participants &nbsp;Â·&nbsp; ${pct2}% signed off &nbsp;Â·&nbsp; ${reports.length} readiness report${reports.length !== 1 ? 's' : ''}</div>
+      <div>Trainer: ${lt2.trainer_name} &nbsp;&middot;&nbsp; ${participants.length} participants &nbsp;&middot;&nbsp; ${pct2}% signed off &nbsp;&middot;&nbsp; ${reports.length} readiness report${reports.length !== 1 ? 's' : ''}</div>
     </div>`;
   }
 
   container.innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button class="btn btn-secondary" onclick="renderScorecards()">â† All Scorecards</button>
+      <button class="btn btn-secondary" onclick="renderScorecards()">← All Scorecards</button>
     </div>
 
     <div class="page-header">
       <div class="eyebrow">SCORECARD</div>
       <div class="page-title">${opening.store_name}</div>
-      <div class="page-subtitle">Coach: ${opening.coach_name || 'â€”'} &nbsp;Â·&nbsp; ${opening.start_date || 'â€”'}</div>
+      <div class="page-subtitle">Coach: ${opening.coach_name || '—'} &nbsp;·&nbsp; ${opening.start_date || '—'}</div>
     </div>
 
     <div class="card mb-20">
-      <div class="card-header"><div class="card-title">At-a-Glance Scores</div><div class="card-subtitle">Green: â‰¥90% &nbsp;Â·&nbsp; Amber: 70â€“89% &nbsp;Â·&nbsp; Red: &lt;70%</div></div>
+      <div class="card-header"><div class="card-title">At-a-Glance Scores</div><div class="card-subtitle">Green: ≥90% &nbsp;·&nbsp; Amber: 70–89% &nbsp;·&nbsp; Red: &lt;70%</div></div>
       <div class="card-body" style="padding-top:0;padding-bottom:4px">
         ${scoreRow('NSO Sign-off Completion', scores.signoff)}
         ${scoreRow('eLearning Completion', scores.elearning)}
@@ -4495,7 +4495,7 @@ function renderScorecardEditorHTML(container) {
         <div class="form-row">
           <label class="form-label">Link a leadership training program to this opening</label>
           <select class="input" id="sc-lt-link" onchange="onScorecardLTChange()">
-            <option value="">â€” None â€”</option>
+            <option value="">— None —</option>
             ${ltOptions}
           </select>
         </div>
@@ -4576,13 +4576,13 @@ function calcScorecardScores() {
   let staffStatus, staffLabel;
   if (hasSM && hasASM && leadCount >= 1) {
     staffStatus = 'green';
-    staffLabel = 'SM âœ“  ASM âœ“  ' + leadCount + ' Lead' + (leadCount > 1 ? 's' : '') + ' âœ“';
+    staffLabel = 'SM ✓  ASM ✓  ' + leadCount + ' Lead' + (leadCount > 1 ? 's' : '') + ' ✓';
   } else if ((hasSM || hasASM) && leadCount >= 1) {
     staffStatus = 'amber';
-    staffLabel = 'SM ' + (hasSM ? 'âœ“' : 'âœ—') + '  ASM ' + (hasASM ? 'âœ“' : 'âœ—') + '  ' + leadCount + ' Lead' + (leadCount !== 1 ? 's' : '');
+    staffLabel = 'SM ' + (hasSM ? '✓' : '✗') + '  ASM ' + (hasASM ? '✓' : '✗') + '  ' + leadCount + ' Lead' + (leadCount !== 1 ? 's' : '');
   } else {
     staffStatus = 'red';
-    staffLabel = 'SM ' + (hasSM ? 'âœ“' : 'âœ—') + '  ASM ' + (hasASM ? 'âœ“' : 'âœ—') + '  ' + leadCount + ' Lead' + (leadCount !== 1 ? 's' : '');
+    staffLabel = 'SM ' + (hasSM ? '✓' : '✗') + '  ASM ' + (hasASM ? '✓' : '✗') + '  ' + leadCount + ' Lead' + (leadCount !== 1 ? 's' : '');
   }
   scores.staffing = { label: staffLabel, status: staffStatus };
 
@@ -4613,7 +4613,7 @@ function calcScorecardScores() {
       if (readyCount) parts.push(readyCount + ' Ready');
       if (supportCount) parts.push(supportCount + ' With Support');
       if (needsCount) parts.push(needsCount + ' Needs Training');
-      scores.leadership = { label: parts.join(' Â· '), status: needsCount > 0 ? 'red' : supportCount > 0 ? 'amber' : 'green' };
+      scores.leadership = { label: parts.join(' · '), status: needsCount > 0 ? 'red' : supportCount > 0 ? 'amber' : 'green' };
     }
   } else {
     scores.leadership = { label: 'No leadership training linked', status: 'gray' };
@@ -4755,7 +4755,7 @@ async function copyScorecardAIPrompt() {
 
   prompt += '\n\n---\n\n';
   prompt += 'Please write a concise store opening scorecard summary with exactly the following sections:\n\n';
-  prompt += '1. OVERALL (2-3 sentences): A narrative summary of how this opening went. Synthesize the data â€” do not just list the scores back.\n';
+  prompt += '1. OVERALL (2-3 sentences): A narrative summary of how this opening went. Synthesize the data — do not just list the scores back.\n';
   prompt += '2. TOP STRENGTHS (3 bullet points): Specific things that went well, grounded in the data above.\n';
   prompt += '3. WATCH ITEMS (3 bullet points): Risks, gaps, or areas needing follow-up support from the regional team.\n';
   prompt += '4. RECOMMENDED ACTION (1 sentence): The single most important follow-up for the support team in the next 30 days.\n\n';
@@ -4763,7 +4763,7 @@ async function copyScorecardAIPrompt() {
 
   try {
     await navigator.clipboard.writeText(prompt);
-    showToast('AI prompt copied â€” paste into ChatGPT!', 'success');
+    showToast('AI prompt copied — paste into ChatGPT!', 'success');
   } catch(e) {
     showToast('Could not copy to clipboard.', 'error');
   }
