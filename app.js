@@ -4610,16 +4610,16 @@ function renderScorecardEditorHTML(container) {
 
     <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center">
       <button class="btn btn-primary" onclick="saveScorecardData()">Save Scorecard</button>
-      <button class="btn btn-secondary" onclick="copyScorecardAIPrompt()">Copy AI Prompt</button>
+      <button class="btn btn-secondary" onclick="copyScorecardAIPrompt()">Copy Summary Prompt</button>
       <span id="sc-save-status" style="font-size:12px;color:var(--text-muted)"></span>
     </div>
 
     <div class="card mb-20">
       <div class="card-header">
-        <div><div class="card-title">AI Summary</div><div class="card-subtitle">Generate with the Copy AI Prompt button, paste into ChatGPT, then save the result here</div></div>
+        <div><div class="card-title">Summary</div><div class="card-subtitle">Generate with the Copy Summary Prompt button, then paste the result here</div></div>
       </div>
       <div class="card-body">
-        <textarea class="recap-textarea" id="sc-ai-summary" style="min-height:120px" placeholder="Paste the AI-generated summary here to save it to this scorecard...">${sc.ai_summary || ''}</textarea>
+        <textarea class="recap-textarea" id="sc-ai-summary" style="min-height:120px" placeholder="Paste the generated summary here to save it to this scorecard...">${sc.ai_summary || ''}</textarea>
       </div>
     </div>`;
 }
@@ -4839,7 +4839,7 @@ async function copyScorecardAIPrompt() {
 
   try {
     await navigator.clipboard.writeText(prompt);
-    showToast('AI prompt copied — paste into ChatGPT!', 'success');
+    showToast('Summary prompt copied to clipboard!', 'success');
   } catch(e) {
     showToast('Could not copy to clipboard.', 'error');
   }
