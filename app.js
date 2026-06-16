@@ -1915,6 +1915,7 @@ async function onSignedIn(session) {
 
   document.getElementById('userEmail').textContent = state.userEmail || '';
   document.getElementById('nav-admin').style.display = 'flex';
+  document.getElementById('nav-scorecards').style.display = 'flex';
   renderOpeningSwitcherList();
   const saved = sessionStorage.getItem('portalMode');
   if (saved) { selectMode(saved); } else { showModeSelector(); }
