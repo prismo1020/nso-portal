@@ -943,6 +943,7 @@ function navigate(view) {
     franchisee: 'Day 4 – Franchise Partner Review',
     leadership: 'Leadership Lens',
     admin: 'All Openings',
+    scorecards: 'Store Scorecards',
     videos: 'Training Videos',
     osc: 'Post-Opening OSC Report',
     resources: 'Resources',
@@ -967,6 +968,7 @@ function navigate(view) {
     osc: 'nav-osc',
     resources: 'nav-resources',
     programs: 'nav-programs',
+    scorecards: 'nav-scorecards',
     'leadership-training': 'nav-leadership-training'
   };
   const navEl = document.getElementById(navIdMap[view]);
@@ -981,6 +983,7 @@ function navigate(view) {
   if (view === 'franchisee') renderFranchisePartnerReview();
   if (view === 'leadership') renderLeadershipLens();
   if (view === 'admin') renderAdminPage();
+  if (view === 'scorecards') renderScorecards();
   if (view === 'videos') renderVideosPage();
   if (view === 'osc') loadOSCReportFields();
   if (view === 'resources') renderResourcesPage();
@@ -1902,6 +1905,7 @@ async function onSignedIn(session) {
       if (retry === 'no-user') { showLoadBanner(); return; }
       document.getElementById('userEmail').textContent = state.userEmail || '';
       document.getElementById('nav-admin').style.display = 'flex';
+      document.getElementById('nav-scorecards').style.display = 'flex';
       renderOpeningSwitcherList();
       const saved = sessionStorage.getItem('portalMode');
       if (saved) { selectMode(saved); } else { showModeSelector(); }
@@ -4339,4 +4343,427 @@ async function saveLeaderReadinessReport(participantId) {
   const p = state.leadershipParticipants.find(x => x.id === participantId);
   showToast((p?.name || 'Report') + ' saved!', 'success');
   renderLeadershipTab('report');
+}
+
+// ============================================================
+// SCORECARDS
+// ============================================================
+
+let _sc = {}; // scorecard editor state
+
+async function renderScorecards() {
+  const container = document.getElementById('view-scorecards');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">Loading scorecards...</div>';
+
+  const [openingsResult, scorecardsResult] = await Promise.all([
+    dbLoadAllOpeningsForScorecards(),
+    dbLoadAllScorecards()
+  ]);
+
+  const openings = openingsResult.data || [];
+  const scMap = {};
+  (scorecardsResult.data || []).forEach(s => { scMap[s.opening_id] = s; });
+
+  let html = `
+    <div class="page-header">
+      <div class="eyebrow">ADMIN</div>
+      <div class="page-title">Store Opening Scorecards</div>
+      <div class="page-subtitle">Post-opening performance review for each store. Admin only.</div>
+    </div>`;
+
+  if (openings.length === 0) {
+    html += '<div class="card" style="padding:32px;text-align:center;color:var(--text-muted)">No openings found.</div>';
+    container.innerHTML = html;
+    return;
+  }
+
+  openings.forEach(o => {
+    const sc = scMap[o.id];
+    const dateStr = o.start_date ? new Date(o.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'â€”';
+    html += `<div class="card mb-20" style="cursor:pointer;transition:box-shadow 0.15s" onmouseenter="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.12)'" onmouseleave="this.style.boxShadow=''" onclick="openScorecardEditor('${o.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">${o.store_name}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Coach: ${o.coach_name || 'â€”'} &nbsp;Â·&nbsp; ${dateStr}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${sc ? '<span class="badge badge-green">Scorecard</span>' : '<span class="badge badge-gray">No scorecard yet</span>'}
+          <span style="color:var(--text-muted);font-size:20px;line-height:1">â€º</span>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+async function openScorecardEditor(openingId) {
+  const container = document.getElementById('view-scorecards');
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">Loading...</div>';
+
+  const [openingData, scorecardResult, ltListResult] = await Promise.all([
+    dbLoadOpeningForScorecard(openingId),
+    dbLoadScorecard(openingId),
+    dbLoadAllLeadershipTrainingsForLink()
+  ]);
+
+  _sc = {
+    openingId,
+    opening: openingData.opening,
+    trainees: openingData.trainees,
+    signoffs: openingData.signoffs,
+    oscReport: openingData.oscReport,
+    recaps: openingData.recaps,
+    sc: scorecardResult.data || {},
+    ltList: ltListResult.data || [],
+    ltData: null
+  };
+
+  if (_sc.sc.leadership_training_id) {
+    _sc.ltData = await dbLoadLeadershipDataForScorecard(_sc.sc.leadership_training_id);
+  }
+
+  renderScorecardEditorHTML(container);
+}
+
+function renderScorecardEditorHTML(container) {
+  const { opening, sc, ltList, ltData } = _sc;
+  const scores = calcScorecardScores();
+
+  const ltOptions = ltList.map(lt => {
+    const sp = lt.store_programs;
+    const label = sp
+      ? `${sp.franchise_store_name} â€” ${lt.trainer_name}${lt.start_date ? ', ' + lt.start_date : ''}`
+      : lt.trainer_name;
+    return `<option value="${lt.id}" ${sc.leadership_training_id === lt.id ? 'selected' : ''}>${label}</option>`;
+  }).join('');
+
+  const statusColors = { green: 'badge-green', amber: 'badge-amber', red: 'badge-danger', gray: 'badge-gray' };
+  const statusWord = s => ({ green: 'Green', amber: 'Amber', red: 'Red', gray: 'â€”' })[s] || 'â€”';
+
+  const scoreRow = (label, score) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px;font-weight:600;color:var(--text)">${label}</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--text-secondary)">${score.label || 'â€”'}</span>
+        <span class="badge ${statusColors[score.status] || 'badge-gray'}" style="min-width:52px;text-align:center">${statusWord(score.status)}</span>
+      </div>
+    </div>`;
+
+  let ltSummaryHtml = '';
+  if (ltData && ltData.lt) {
+    const { lt: lt2, sp: sp2, participants, signoffs: lso, reports } = ltData;
+    const totalComps = LEADERSHIP_COMPETENCIES.length;
+    let totalSigned = 0;
+    participants.forEach(p => {
+      totalSigned += LEADERSHIP_COMPETENCIES.filter(c => lso.some(s => s.participant_id === p.id && s.competency_id === c.id)).length;
+    });
+    const pct2 = participants.length > 0 ? Math.round((totalSigned / (participants.length * totalComps)) * 100) : 0;
+    ltSummaryHtml = `<div style="margin-top:12px;padding:12px 14px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);font-size:12px;color:var(--text-secondary)">
+      <div style="font-weight:700;color:var(--text);margin-bottom:3px">${sp2 ? sp2.franchise_store_name : 'Linked Training'}</div>
+      <div>Trainer: ${lt2.trainer_name} &nbsp;Â·&nbsp; ${participants.length} participants &nbsp;Â·&nbsp; ${pct2}% signed off &nbsp;Â·&nbsp; ${reports.length} readiness report${reports.length !== 1 ? 's' : ''}</div>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button class="btn btn-secondary" onclick="renderScorecards()">â† All Scorecards</button>
+    </div>
+
+    <div class="page-header">
+      <div class="eyebrow">SCORECARD</div>
+      <div class="page-title">${opening.store_name}</div>
+      <div class="page-subtitle">Coach: ${opening.coach_name || 'â€”'} &nbsp;Â·&nbsp; ${opening.start_date || 'â€”'}</div>
+    </div>
+
+    <div class="card mb-20">
+      <div class="card-header"><div class="card-title">At-a-Glance Scores</div><div class="card-subtitle">Green: â‰¥90% &nbsp;Â·&nbsp; Amber: 70â€“89% &nbsp;Â·&nbsp; Red: &lt;70%</div></div>
+      <div class="card-body" style="padding-top:0;padding-bottom:4px">
+        ${scoreRow('NSO Sign-off Completion', scores.signoff)}
+        ${scoreRow('eLearning Completion', scores.elearning)}
+        ${scoreRow('Staffing (Trained)', scores.staffing)}
+        ${scoreRow('T1 Process-Confusion Tickets', scores.t1)}
+        ${scoreRow('Leadership Readiness', scores.leadership)}
+      </div>
+    </div>
+
+    <div class="card mb-20">
+      <div class="card-header"><div class="card-title">Linked Leadership Training</div></div>
+      <div class="card-body">
+        <div class="form-row">
+          <label class="form-label">Link a leadership training program to this opening</label>
+          <select class="input" id="sc-lt-link" onchange="onScorecardLTChange()">
+            <option value="">â€” None â€”</option>
+            ${ltOptions}
+          </select>
+        </div>
+        ${ltSummaryHtml}
+      </div>
+    </div>
+
+    <div class="card mb-20">
+      <div class="card-header"><div class="card-title">Manual Data Entry</div></div>
+      <div class="card-body">
+        <div class="form-row">
+          <label class="form-label">eLearning Completion (%)</label>
+          <input type="number" class="input" id="sc-elearning" min="0" max="100" style="max-width:160px" placeholder="e.g. 87" value="${sc.elearning_pct != null ? sc.elearning_pct : ''}">
+        </div>
+        <div class="grid-2" style="gap:16px">
+          <div class="form-row">
+            <label class="form-label">Total T1 Tickets (first 30 days)</label>
+            <input type="number" class="input" id="sc-t1-total" min="0" placeholder="e.g. 20" value="${sc.t1_total != null ? sc.t1_total : ''}">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Process-Confusion T1 Tickets</label>
+            <input type="number" class="input" id="sc-t1-process" min="0" placeholder="e.g. 2" value="${sc.t1_process_confusion != null ? sc.t1_process_confusion : ''}">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-20">
+      <div class="card-header">
+        <div><div class="card-title">Brain Dump</div><div class="card-subtitle">Slack notes, permit delays, deployment context, anything not captured elsewhere</div></div>
+      </div>
+      <div class="card-body">
+        <textarea class="recap-textarea" id="sc-brain-dump" style="min-height:140px" placeholder="Paste Slack highlights, permit delays, deployment issues, stakeholder feedback, morale observations...">${sc.brain_dump || ''}</textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-primary" onclick="saveScorecardData()">Save Scorecard</button>
+      <button class="btn btn-secondary" onclick="copyScorecardAIPrompt()">Copy AI Prompt</button>
+      <span id="sc-save-status" style="font-size:12px;color:var(--text-muted)"></span>
+    </div>
+
+    <div class="card mb-20">
+      <div class="card-header">
+        <div><div class="card-title">AI Summary</div><div class="card-subtitle">Generate with the Copy AI Prompt button, paste into ChatGPT, then save the result here</div></div>
+      </div>
+      <div class="card-body">
+        <textarea class="recap-textarea" id="sc-ai-summary" style="min-height:120px" placeholder="Paste the AI-generated summary here to save it to this scorecard...">${sc.ai_summary || ''}</textarea>
+      </div>
+    </div>`;
+}
+
+function calcScorecardScores() {
+  const { trainees, signoffs, sc, ltData } = _sc;
+  const scores = {};
+
+  // 1. NSO sign-off completion
+  let totalSigned = 0, totalPossible = 0;
+  (trainees || []).forEach(t => {
+    const isLeader = t.role === 'SM' || t.role === 'ASM';
+    const applicable = COMPETENCIES.filter(c => !c.smOnly || isLeader);
+    totalPossible += applicable.length;
+    totalSigned += applicable.filter(c =>
+      (signoffs || []).some(s => s.trainee_id === t.id && s.competency_id === c.id && s.status === 'signed')
+    ).length;
+  });
+  const signoffPct = totalPossible > 0 ? Math.round((totalSigned / totalPossible) * 100) : null;
+  scores.signoff = { label: signoffPct != null ? signoffPct + '%' : 'N/A', status: pctToStatus(signoffPct) };
+
+  // 2. eLearning
+  const ePct = sc.elearning_pct != null ? parseInt(sc.elearning_pct) : null;
+  scores.elearning = { label: ePct != null ? ePct + '%' : 'Not entered', status: pctToStatus(ePct) };
+
+  // 3. Staffing
+  const hasSM = (trainees || []).some(t => t.role === 'SM');
+  const hasASM = (trainees || []).some(t => t.role === 'ASM');
+  const leadCount = (trainees || []).filter(t => t.role === 'Lead GEG').length;
+  let staffStatus, staffLabel;
+  if (hasSM && hasASM && leadCount >= 1) {
+    staffStatus = 'green';
+    staffLabel = 'SM âœ“  ASM âœ“  ' + leadCount + ' Lead' + (leadCount > 1 ? 's' : '') + ' âœ“';
+  } else if ((hasSM || hasASM) && leadCount >= 1) {
+    staffStatus = 'amber';
+    staffLabel = 'SM ' + (hasSM ? 'âœ“' : 'âœ—') + '  ASM ' + (hasASM ? 'âœ“' : 'âœ—') + '  ' + leadCount + ' Lead' + (leadCount !== 1 ? 's' : '');
+  } else {
+    staffStatus = 'red';
+    staffLabel = 'SM ' + (hasSM ? 'âœ“' : 'âœ—') + '  ASM ' + (hasASM ? 'âœ“' : 'âœ—') + '  ' + leadCount + ' Lead' + (leadCount !== 1 ? 's' : '');
+  }
+  scores.staffing = { label: staffLabel, status: staffStatus };
+
+  // 4. T1 process-confusion tickets
+  const t1Total = sc.t1_total != null ? parseInt(sc.t1_total) : null;
+  const t1Process = sc.t1_process_confusion != null ? parseInt(sc.t1_process_confusion) : null;
+  let t1Status = 'gray', t1Label = 'Not entered';
+  if (t1Total === 0 && t1Process != null) {
+    t1Label = 'No T1 tickets';
+    t1Status = 'green';
+  } else if (t1Total != null && t1Process != null && t1Total > 0) {
+    const pct = Math.round((t1Process / t1Total) * 100);
+    t1Label = t1Process + '/' + t1Total + ' tickets = ' + pct + '%';
+    t1Status = pct <= 10 ? 'green' : pct <= 20 ? 'amber' : 'red';
+  }
+  scores.t1 = { label: t1Label, status: t1Status };
+
+  // 5. Leadership readiness
+  if (ltData && ltData.reports) {
+    const { reports } = ltData;
+    if (reports.length === 0) {
+      scores.leadership = { label: 'No readiness reports yet', status: 'gray' };
+    } else {
+      const readyCount = reports.filter(r => r.readiness_status === 'ready').length;
+      const supportCount = reports.filter(r => r.readiness_status === 'ready_with_support').length;
+      const needsCount = reports.filter(r => r.readiness_status === 'needs_additional_training').length;
+      const parts = [];
+      if (readyCount) parts.push(readyCount + ' Ready');
+      if (supportCount) parts.push(supportCount + ' With Support');
+      if (needsCount) parts.push(needsCount + ' Needs Training');
+      scores.leadership = { label: parts.join(' Â· '), status: needsCount > 0 ? 'red' : supportCount > 0 ? 'amber' : 'green' };
+    }
+  } else {
+    scores.leadership = { label: 'No leadership training linked', status: 'gray' };
+  }
+
+  return scores;
+}
+
+function pctToStatus(pct) {
+  if (pct == null) return 'gray';
+  if (pct >= 90) return 'green';
+  if (pct >= 70) return 'amber';
+  return 'red';
+}
+
+async function onScorecardLTChange() {
+  const ltId = document.getElementById('sc-lt-link')?.value || null;
+  _sc.sc.leadership_training_id = ltId || null;
+  _sc.ltData = ltId ? await dbLoadLeadershipDataForScorecard(ltId) : null;
+  renderScorecardEditorHTML(document.getElementById('view-scorecards'));
+}
+
+async function saveScorecardData() {
+  const { openingId } = _sc;
+  const elearning = document.getElementById('sc-elearning')?.value;
+  const t1Total = document.getElementById('sc-t1-total')?.value;
+  const t1Process = document.getElementById('sc-t1-process')?.value;
+  const brainDump = document.getElementById('sc-brain-dump')?.value || '';
+  const aiSummary = document.getElementById('sc-ai-summary')?.value || '';
+  const ltId = document.getElementById('sc-lt-link')?.value || null;
+
+  const data = {
+    opening_id: openingId,
+    leadership_training_id: ltId || null,
+    elearning_pct: elearning !== '' ? parseInt(elearning) : null,
+    t1_total: t1Total !== '' ? parseInt(t1Total) : null,
+    t1_process_confusion: t1Process !== '' ? parseInt(t1Process) : null,
+    brain_dump: brainDump,
+    ai_summary: aiSummary
+  };
+
+  const err = await dbSaveScorecard(data);
+  const statusEl = document.getElementById('sc-save-status');
+  if (err) {
+    if (statusEl) statusEl.textContent = 'Save failed.';
+    showToast('Save failed: ' + (err.message || 'DB error'), 'error');
+    return;
+  }
+
+  _sc.sc = Object.assign({}, _sc.sc, data);
+  if (statusEl) { statusEl.textContent = 'Saved!'; setTimeout(function() { if (statusEl) statusEl.textContent = ''; }, 2500); }
+  showToast('Scorecard saved!', 'success');
+  renderScorecardEditorHTML(document.getElementById('view-scorecards'));
+}
+
+async function copyScorecardAIPrompt() {
+  const { opening, oscReport, recaps, sc, ltData } = _sc;
+  const elearning = document.getElementById('sc-elearning')?.value;
+  const t1Total = document.getElementById('sc-t1-total')?.value;
+  const t1Process = document.getElementById('sc-t1-process')?.value;
+  const brainDump = document.getElementById('sc-brain-dump')?.value || '';
+
+  const liveSc = Object.assign({}, sc, {
+    elearning_pct: elearning !== '' ? parseInt(elearning) : sc.elearning_pct,
+    t1_total: t1Total !== '' ? parseInt(t1Total) : sc.t1_total,
+    t1_process_confusion: t1Process !== '' ? parseInt(t1Process) : sc.t1_process_confusion,
+    brain_dump: brainDump
+  });
+
+  const prevSc = _sc.sc;
+  _sc.sc = liveSc;
+  const scores = calcScorecardScores();
+  _sc.sc = prevSc;
+
+  const sw = function(s) { return { green: 'GREEN', amber: 'AMBER', red: 'RED', gray: 'N/A' }[s] || 'N/A'; };
+
+  var prompt = 'You are a Sandbox VR regional support analyst creating a post-opening scorecard summary.\n\n';
+  prompt += 'STORE: ' + opening.store_name + '\n';
+  prompt += 'OPENING DATE: ' + (opening.start_date || 'Unknown') + '\n';
+  prompt += 'COACH: ' + (opening.coach_name || 'Unknown') + '\n\n';
+  prompt += 'SCORECARD SCORES:\n';
+  prompt += '- NSO Sign-off Completion: ' + scores.signoff.label + ' [' + sw(scores.signoff.status) + ']\n';
+  prompt += '- eLearning Completion: ' + scores.elearning.label + ' [' + sw(scores.elearning.status) + ']\n';
+  prompt += '- Staffing Trained: ' + scores.staffing.label + ' [' + sw(scores.staffing.status) + ']\n';
+  prompt += '- T1 Process-Confusion Tickets (30 days): ' + scores.t1.label + ' [' + sw(scores.t1.status) + ']\n';
+  prompt += '- Leadership Readiness: ' + scores.leadership.label + ' [' + sw(scores.leadership.status) + ']';
+
+  if (oscReport) {
+    prompt += '\n\nOSC REPORT:\n';
+    prompt += '- Deployment Rating: ' + (oscReport.deployment_rating || 'N/A') + '/5\n';
+    prompt += '- Team Rating: ' + (oscReport.team_rating || 'N/A') + '/5\n';
+    prompt += '- SM Rating: ' + (oscReport.sm_rating || 'N/A') + '/5\n';
+    prompt += '- ASM Rating: ' + (oscReport.asm_rating || 'N/A') + '/5';
+    if (oscReport.deployment_notes) prompt += '\n- Deployment Notes: ' + oscReport.deployment_notes;
+    if (oscReport.team_notes) prompt += '\n- Team Notes: ' + oscReport.team_notes;
+    if (oscReport.sm_notes) prompt += '\n- SM Notes: ' + oscReport.sm_notes;
+    if (oscReport.asm_notes) prompt += '\n- ASM Notes: ' + oscReport.asm_notes;
+    if (oscReport.biz_impact_notes) prompt += '\n- Business Impact: ' + oscReport.biz_impact_notes;
+  }
+
+  var recapLines = [];
+  var recapFields = [
+    ['ld-progress', 'Learning Plan'], ['team-successes', 'Wins'], ['team-opportunities', 'Opportunities'],
+    ['tech-mscap', 'Tech Issues'], ['tech-tickets', 'T1 Tickets'], ['building-permits', 'Permits']
+  ];
+  (_sc.recaps || []).forEach(function(r) {
+    var data = r.recap_data || {};
+    var lines = recapFields.map(function(f) { return data[f[0]] ? '  [' + f[1] + '] ' + data[f[0]] : null; }).filter(Boolean);
+    if (lines.length) recapLines.push('Day ' + r.day_num + ':\n' + lines.join('\n'));
+  });
+  if (recapLines.length) prompt += '\n\nDAILY RECAP HIGHLIGHTS:\n' + recapLines.join('\n');
+
+  if (ltData && ltData.lt) {
+    var lt2 = ltData.lt, sp2 = ltData.sp, participants = ltData.participants, reports = ltData.reports, notes = ltData.notes;
+    prompt += '\n\nLEADERSHIP TRAINING' + (sp2 ? ' (' + sp2.franchise_store_name + ')' : '') + ':\nTrainer: ' + lt2.trainer_name;
+    if (participants.length > 0) {
+      prompt += '\nParticipants:';
+      participants.forEach(function(p) {
+        var rpt = reports.find(function(r) { return r.participant_id === p.id; });
+        var role = (p.role === 'Custom' && p.custom_role) ? p.custom_role : p.role;
+        var status = rpt && rpt.readiness_status ? rpt.readiness_status.replace(/_/g, ' ') : 'no report';
+        var rating = rpt && rpt.rating_1_to_4 ? ' (' + rpt.rating_1_to_4 + '/4)' : '';
+        prompt += '\n  - ' + p.name + ' (' + role + '): ' + status + rating;
+        if (rpt && rpt.strengths) prompt += '\n    Strengths: ' + rpt.strengths;
+        if (rpt && rpt.risks) prompt += '\n    Risks: ' + rpt.risks;
+        if (rpt && rpt.follow_ups) prompt += '\n    Follow-ups: ' + rpt.follow_ups;
+      });
+    }
+    var noteLines = [];
+    (notes || []).forEach(function(n) {
+      var d = n.notes_data || {};
+      if (d.observations) noteLines.push('  Day ' + n.day_num + ' Observations: ' + d.observations);
+      if (d.gaps) noteLines.push('  Day ' + n.day_num + ' Gaps: ' + d.gaps);
+    });
+    if (noteLines.length) prompt += '\nTrainer Notes:\n' + noteLines.join('\n');
+  }
+
+  if (liveSc.brain_dump) prompt += '\n\nADDITIONAL CONTEXT / BRAIN DUMP:\n' + liveSc.brain_dump;
+
+  prompt += '\n\n---\n\n';
+  prompt += 'Please write a concise store opening scorecard summary with exactly the following sections:\n\n';
+  prompt += '1. OVERALL (2-3 sentences): A narrative summary of how this opening went. Synthesize the data â€” do not just list the scores back.\n';
+  prompt += '2. TOP STRENGTHS (3 bullet points): Specific things that went well, grounded in the data above.\n';
+  prompt += '3. WATCH ITEMS (3 bullet points): Risks, gaps, or areas needing follow-up support from the regional team.\n';
+  prompt += '4. RECOMMENDED ACTION (1 sentence): The single most important follow-up for the support team in the next 30 days.\n\n';
+  prompt += 'Keep the total response under 250 words. Use professional but direct language.';
+
+  try {
+    await navigator.clipboard.writeText(prompt);
+    showToast('AI prompt copied â€” paste into ChatGPT!', 'success');
+  } catch(e) {
+    showToast('Could not copy to clipboard.', 'error');
+  }
 }

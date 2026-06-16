@@ -479,3 +479,84 @@ async function dbSaveLeadershipReadinessReport(participantId, report) {
   }, { onConflict: 'leadership_training_id,participant_id' });
   return error || null;
 }
+
+// ============================================================
+// SCORECARDS
+// ============================================================
+
+async function dbLoadScorecard(openingId) {
+  const { data, error } = await supabase
+    .from('scorecards')
+    .select('*')
+    .eq('opening_id', openingId)
+    .maybeSingle();
+  return { data, error };
+}
+
+async function dbSaveScorecard(scorecardData) {
+  const { error } = await supabase
+    .from('scorecards')
+    .upsert({ ...scorecardData, updated_at: new Date().toISOString() }, { onConflict: 'opening_id' });
+  return error || null;
+}
+
+async function dbLoadAllOpeningsForScorecards() {
+  const { data, error } = await supabase
+    .from('openings')
+    .select('id, store_name, coach_name, start_date, status, current_day')
+    .order('created_at', { ascending: false });
+  return { data: data || [], error };
+}
+
+async function dbLoadAllScorecards() {
+  const { data, error } = await supabase.from('scorecards').select('*');
+  return { data: data || [], error };
+}
+
+async function dbLoadOpeningForScorecard(openingId) {
+  const [opening, trainees, signoffs, oscReport, recaps] = await Promise.all([
+    supabase.from('openings').select('*').eq('id', openingId).single(),
+    supabase.from('trainees').select('*').eq('opening_id', openingId),
+    supabase.from('signoffs').select('*').eq('opening_id', openingId),
+    supabase.from('osc_reports').select('*').eq('opening_id', openingId).maybeSingle(),
+    supabase.from('recaps').select('*').eq('opening_id', openingId).order('day_num')
+  ]);
+  return {
+    opening: opening.data,
+    trainees: trainees.data || [],
+    signoffs: signoffs.data || [],
+    oscReport: oscReport.data || null,
+    recaps: recaps.data || [],
+    error: opening.error || trainees.error || signoffs.error
+  };
+}
+
+async function dbLoadAllLeadershipTrainingsForLink() {
+  const { data, error } = await supabase
+    .from('leadership_trainings')
+    .select('id, trainer_name, start_date, store_programs ( franchise_store_name, certified_training_store_name )')
+    .order('created_at', { ascending: false });
+  return { data: data || [], error };
+}
+
+async function dbLoadLeadershipDataForScorecard(trainingId) {
+  const { data: lt } = await supabase
+    .from('leadership_trainings')
+    .select('*, store_programs(*)')
+    .eq('id', trainingId)
+    .single();
+  const [participants, lSignoffs, reports, notes] = await Promise.all([
+    supabase.from('leadership_participants').select('*').eq('leadership_training_id', trainingId),
+    supabase.from('leadership_signoffs').select('*').eq('leadership_training_id', trainingId),
+    supabase.from('leadership_readiness_reports').select('*').eq('leadership_training_id', trainingId),
+    supabase.from('leadership_daily_notes').select('*').eq('leadership_training_id', trainingId).order('day_num')
+  ]);
+  return {
+    lt,
+    sp: lt?.store_programs || null,
+    participants: participants.data || [],
+    signoffs: lSignoffs.data || [],
+    reports: reports.data || [],
+    notes: notes.data || []
+  };
+}
