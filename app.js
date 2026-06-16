@@ -15,6 +15,7 @@ let state = {
   signoffs: {},
   recaps: {},
   franchiseChecks: {},
+  franchiseCheckNames: {},
   overrides: {},
   oscReport: {},
   currentStoreProgram: null,
@@ -1881,7 +1882,7 @@ async function initApp() {
     } else if (event === 'SIGNED_OUT') {
       Object.assign(state, {
         opening: null, openingId: null, userRole: 'coach', userEmail: null,
-        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {},
+        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {}, franchiseCheckNames: {},
         mode: null
       });
       sessionStorage.removeItem('portalMode');
@@ -2121,6 +2122,7 @@ function saveSetup() {
     state.signoffs = {};
     state.recaps = {};
     state.franchiseChecks = {};
+    state.franchiseCheckNames = {};
   }
 
   state.opening = { store, coach, date };
@@ -3651,11 +3653,19 @@ function renderFranchisePartnerReview() {
       <div class="card-body" style="display:flex;flex-direction:column;gap:0">`;
     section.items.forEach(item => {
       const checked = !!state.franchiseChecks[item.key];
-      html += `<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-light);cursor:pointer">
-        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${item.key}', this.checked); renderFranchisePartnerReview()"
-          style="margin-top:2px;width:16px;height:16px;accent-color:${isSignOff ? 'var(--success)' : 'var(--trigger)'};flex-shrink:0">
-        <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${item.label}</span>
-      </label>`;
+      const signerName = state.franchiseCheckNames[item.key] || '';
+      const signerPlaceholder = item.key === 'fsignoff-franchisee-confirms' ? 'Name of Franchise Manager or Owner' : 'Name of OSC';
+      html += `<div style="padding:12px 0;border-bottom:1px solid var(--border-light)">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+          <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${item.key}', this.checked); renderFranchisePartnerReview()"
+            style="margin-top:2px;width:16px;height:16px;accent-color:${isSignOff ? 'var(--success)' : 'var(--trigger)'};flex-shrink:0">
+          <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${item.label}</span>
+        </label>
+        ${isSignOff ? `<div style="margin-left:28px;margin-top:8px;max-width:280px">
+          <input type="text" class="input" id="fsign-name-${item.key}" placeholder="${signerPlaceholder}" value="${signerName.replace(/"/g, '&quot;')}"
+            onchange="saveFranchiseCheckName('${item.key}', this.value)" style="font-size:12px;padding:7px 10px">
+        </div>` : ''}
+      </div>`;
     });
     html += `</div></div>`;
   });
@@ -3665,7 +3675,15 @@ function renderFranchisePartnerReview() {
 
 function toggleFranchiseCheck(key, checked) {
   state.franchiseChecks[key] = checked;
-  dbSaveFranchiseCheck(key, checked);
+  const nameInput = document.getElementById('fsign-name-' + key);
+  const name = nameInput ? nameInput.value.trim() : state.franchiseCheckNames[key];
+  dbSaveFranchiseCheck(key, checked, name);
+}
+
+function saveFranchiseCheckName(key, name) {
+  const trimmed = name.trim();
+  state.franchiseCheckNames[key] = trimmed;
+  dbSaveFranchiseCheck(key, !!state.franchiseChecks[key], trimmed);
 }
 
 function markFranchiseeAllComplete(keys) {
@@ -3742,7 +3760,8 @@ async function switchToOpening(openingId) {
     state.recaps[r.day_num] = r.recap_data || {};
   });
   state.franchiseChecks = {};
-  (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; });
+  state.franchiseCheckNames = {};
+  (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; state.franchiseCheckNames[f.check_key] = f.signed_name || ''; });
   state.oscReport = (oscReports && oscReports[0]) || {};
 
   refreshAfterLoad();
@@ -4307,6 +4326,46 @@ function renderLeadershipReport(container) {
       </div>
     </div>`;
   });
+
+  const lt = state.leadershipTraining || {};
+  const trainerConfirmed = !!lt.trainer_confirmed;
+  const partnerConfirmed = !!lt.partner_confirmed;
+  const lsComplete = trainerConfirmed && partnerConfirmed;
+
+  html += `<div class="card mb-20" style="border:2px solid ${lsComplete ? 'var(--success)' : 'var(--trigger)'}">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Formal Sign-Off</div>
+        <div class="card-subtitle">Both parties confirm these readiness reports are accurate and complete.</div>
+      </div>
+      ${lsComplete ? '<span class="badge badge-green">Signed Off</span>' : ''}
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:0">
+      <div style="padding:12px 0;border-bottom:1px solid var(--border-light)">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+          <input type="checkbox" ${trainerConfirmed ? 'checked' : ''} onchange="toggleLeadershipFormalSignoff('trainer_confirmed', this.checked)"
+            style="margin-top:2px;width:16px;height:16px;accent-color:var(--success);flex-shrink:0">
+          <span style="font-size:14px;color:${trainerConfirmed?'var(--text-muted)':'var(--hb)'};${trainerConfirmed?'text-decoration:line-through':''}">Trainer confirms: These readiness reports accurately reflect the leaders' performance and outcomes</span>
+        </label>
+        <div style="margin-left:28px;margin-top:8px;max-width:280px">
+          <input type="text" class="input" id="lt-sign-name-trainer_confirmed" placeholder="Name of Trainer" value="${(lt.trainer_confirmed_name || '').replace(/"/g, '&quot;')}"
+            onchange="saveLeadershipFormalSignoffName('trainer_confirmed', this.value)" style="font-size:12px;padding:7px 10px">
+        </div>
+      </div>
+      <div style="padding:12px 0;border-bottom:1px solid var(--border-light)">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+          <input type="checkbox" ${partnerConfirmed ? 'checked' : ''} onchange="toggleLeadershipFormalSignoff('partner_confirmed', this.checked)"
+            style="margin-top:2px;width:16px;height:16px;accent-color:var(--success);flex-shrink:0">
+          <span style="font-size:14px;color:${partnerConfirmed?'var(--text-muted)':'var(--hb)'};${partnerConfirmed?'text-decoration:line-through':''}">Franchise Manager/Owner confirms: I have reviewed these readiness reports and acknowledge the plan going forward</span>
+        </label>
+        <div style="margin-left:28px;margin-top:8px;max-width:280px">
+          <input type="text" class="input" id="lt-sign-name-partner_confirmed" placeholder="Name of Franchise Manager or Owner" value="${(lt.partner_confirmed_name || '').replace(/"/g, '&quot;')}"
+            onchange="saveLeadershipFormalSignoffName('partner_confirmed', this.value)" style="font-size:12px;padding:7px 10px">
+        </div>
+      </div>
+    </div>
+  </div>`;
+
   container.innerHTML = html;
 
   // Store ratings in state for button management
@@ -4314,6 +4373,27 @@ function renderLeadershipReport(container) {
     const report = state.leadershipReports[p.id] || {};
     state['_ltRating_' + p.id] = report.rating_1_to_4 || 0;
   });
+}
+
+async function toggleLeadershipFormalSignoff(field, checked) {
+  const lt = state.leadershipTraining;
+  if (!lt) return;
+  const nameInput = document.getElementById('lt-sign-name-' + field);
+  const name = nameInput ? nameInput.value.trim() : (lt[field + '_name'] || '');
+  lt[field] = checked;
+  lt[field + '_name'] = checked ? name : '';
+  const err = await dbSaveLeadershipFormalSignoff(field, checked, name);
+  if (err) showToast('Save failed: ' + (err.message || 'DB error'), 'error');
+  renderLeadershipTab('report');
+}
+
+async function saveLeadershipFormalSignoffName(field, name) {
+  const lt = state.leadershipTraining;
+  if (!lt) return;
+  const trimmed = name.trim();
+  lt[field + '_name'] = trimmed;
+  const err = await dbSaveLeadershipFormalSignoff(field, !!lt[field], trimmed);
+  if (err) showToast('Save failed: ' + (err.message || 'DB error'), 'error');
 }
 
 function setLeaderRating(participantId, rating) {

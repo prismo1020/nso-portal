@@ -59,7 +59,8 @@ async function dbLoadState(passedUser) {
   });
 
   state.franchiseChecks = {};
-  (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; });
+  state.franchiseCheckNames = {};
+  (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; state.franchiseCheckNames[f.check_key] = f.signed_name || ''; });
 
   await dbLoadOverrides();
   await dbLoadOSCReport();
@@ -210,14 +211,16 @@ async function dbSaveRecap(day) {
   return error || null;
 }
 
-async function dbSaveFranchiseCheck(key, checked) {
+async function dbSaveFranchiseCheck(key, checked, signedName) {
   if (!state.openingId) return;
-  const { error } = await supabase.from('franchise_checks').upsert({
+  const payload = {
     opening_id:  state.openingId,
     check_key:   key,
     checked:     checked,
     updated_at:  new Date().toISOString()
-  }, { onConflict: 'opening_id,check_key' });
+  };
+  if (signedName !== undefined) payload.signed_name = signedName || '';
+  const { error } = await supabase.from('franchise_checks').upsert(payload, { onConflict: 'opening_id,check_key' });
   if (error) console.error('dbSaveFranchiseCheck:', error);
 }
 
@@ -411,6 +414,17 @@ async function dbSaveLeadershipCurrentDay(day) {
     .update({ current_day: day, updated_at: new Date().toISOString() })
     .eq('id', state.leadershipTraining.id);
   if (!error) { state.leadershipTraining.current_day = day; state.currentLeadershipDay = day; }
+  return error || null;
+}
+
+async function dbSaveLeadershipFormalSignoff(field, checked, name) {
+  if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
+  const nameField = field + '_name';
+  const payload = { [field]: checked, [nameField]: name || '', updated_at: new Date().toISOString() };
+  const { error } = await supabase.from('leadership_trainings')
+    .update(payload)
+    .eq('id', state.leadershipTraining.id);
+  if (!error) Object.assign(state.leadershipTraining, payload);
   return error || null;
 }
 
