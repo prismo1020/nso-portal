@@ -4441,15 +4441,11 @@ function renderScorecardEditorHTML(container) {
   }).join('');
 
   const statusColors = { green: 'badge-green', amber: 'badge-amber', red: 'badge-danger', gray: 'badge-gray' };
-  const statusWord = s => ({ green: 'Green', amber: 'Amber', red: 'Red', gray: '—' })[s] || '—';
 
   const scoreRow = (label, score) => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
       <span style="font-size:13px;font-weight:600;color:var(--text)">${label}</span>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:12px;color:var(--text-secondary)">${score.label || '—'}</span>
-        <span class="badge ${statusColors[score.status] || 'badge-gray'}" style="min-width:52px;text-align:center">${statusWord(score.status)}</span>
-      </div>
+      <span class="badge ${statusColors[score.status] || 'badge-gray'}" style="min-width:52px;text-align:center">${score.label || '—'}</span>
     </div>`;
 
   let ltSummaryHtml = '';
