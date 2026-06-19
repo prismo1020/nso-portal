@@ -60,7 +60,13 @@ async function dbLoadState(passedUser) {
 
   state.franchiseChecks = {};
   state.franchiseCheckNames = {};
-  (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; state.franchiseCheckNames[f.check_key] = f.signed_name || ''; });
+  state.franchiseCheckTimestamps = {};
+  (fchecks || []).forEach(f => {
+    state.franchiseChecks[f.check_key] = f.checked;
+    state.franchiseCheckNames[f.check_key] = f.signed_name || '';
+    state.franchiseCheckTimestamps[f.check_key] = f.checked_at || null;
+  });
+  state.partnerReviewNotes = o.partner_review_notes || '';
 
   await dbLoadOverrides();
   await dbLoadOSCReport();
@@ -213,15 +219,29 @@ async function dbSaveRecap(day) {
 
 async function dbSaveFranchiseCheck(key, checked, signedName) {
   if (!state.openingId) return;
+  const now = new Date().toISOString();
   const payload = {
     opening_id:  state.openingId,
     check_key:   key,
     checked:     checked,
-    updated_at:  new Date().toISOString()
+    updated_at:  now
   };
   if (signedName !== undefined) payload.signed_name = signedName || '';
+  // Only set checked_at on the transition to checked; never clear it
+  if (checked && !state.franchiseCheckTimestamps[key]) {
+    payload.checked_at = now;
+    state.franchiseCheckTimestamps[key] = now;
+  }
   const { error } = await supabase.from('franchise_checks').upsert(payload, { onConflict: 'opening_id,check_key' });
   if (error) console.error('dbSaveFranchiseCheck:', error);
+}
+
+async function dbSavePartnerReviewNotes(notes) {
+  if (!state.openingId) return;
+  const { error } = await supabase.from('openings')
+    .update({ partner_review_notes: notes, updated_at: new Date().toISOString() })
+    .eq('id', state.openingId);
+  if (error) console.error('dbSavePartnerReviewNotes:', error);
 }
 
 async function dbLoadOpeningsForCoach() {
@@ -420,7 +440,11 @@ async function dbSaveLeadershipCurrentDay(day) {
 async function dbSaveLeadershipFormalSignoff(field, checked, name) {
   if (!state.leadershipTraining) return { message: 'No leadership training loaded' };
   const nameField = field + '_name';
-  const payload = { [field]: checked, [nameField]: name || '', updated_at: new Date().toISOString() };
+  const atField = field + '_at';
+  const now = new Date().toISOString();
+  const payload = { [field]: checked, [nameField]: name || '', updated_at: now };
+  // Record timestamp only on initial confirmation; preserve it if unchecked/re-checked
+  if (checked && !state.leadershipTraining[atField]) payload[atField] = now;
   const { error } = await supabase.from('leadership_trainings')
     .update(payload)
     .eq('id', state.leadershipTraining.id);

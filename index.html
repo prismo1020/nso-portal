@@ -274,10 +274,17 @@
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
           Sign-offs
         </button>
-        <button class="btn btn-ghost" onclick="signOut()" title="Sign out" style="padding:8px 10px">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6"/></svg>
+        <button class="btn btn-danger" onclick="signOut()" title="Sign out of portal" style="gap:6px;font-size:12px;padding:7px 12px">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6"/></svg>
+          Sign Out
         </button>
       </div>
+    </div>
+
+    <!-- DEVICE WARNING BANNER -->
+    <div id="device-warning-banner" style="display:none;background:#7c2d12;color:#fef2f2;font-size:12px;font-weight:600;text-align:center;padding:6px 16px;letter-spacing:0.01em;border-bottom:1px solid #991b1b">
+      Using a franchise store iPad? Sign out when finished &mdash; this portal is for training support personnel only.
+      <button onclick="document.getElementById('device-warning-banner').style.display='none'" style="background:transparent;border:none;color:#fca5a5;cursor:pointer;margin-left:12px;font-size:13px" title="Dismiss">&#x2715;</button>
     </div>
 
     <!-- DASHBOARD VIEW -->

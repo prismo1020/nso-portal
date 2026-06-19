@@ -16,6 +16,8 @@ let state = {
   recaps: {},
   franchiseChecks: {},
   franchiseCheckNames: {},
+  franchiseCheckTimestamps: {},
+  partnerReviewNotes: '',
   overrides: {},
   oscReport: {},
   currentStoreProgram: null,
@@ -1871,6 +1873,8 @@ function updateRecapStatusCard() {
 async function initApp() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
+    startInactivityTimer();
+    showDeviceWarningBanner();
     await onSignedIn(session);
   } else {
     showLoginScreen();
@@ -1878,11 +1882,15 @@ async function initApp() {
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN') {
+      startInactivityTimer();
+      showDeviceWarningBanner();
       await onSignedIn(session);
     } else if (event === 'SIGNED_OUT') {
+      stopInactivityTimer();
+      hideDeviceWarningBanner();
       Object.assign(state, {
         opening: null, openingId: null, userRole: 'coach', userEmail: null,
-        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {}, franchiseCheckNames: {},
+        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {}, franchiseCheckNames: {}, franchiseCheckTimestamps: {}, partnerReviewNotes: '',
         mode: null
       });
       sessionStorage.removeItem('portalMode');
@@ -2058,7 +2066,53 @@ async function signUp() {
 }
 
 async function signOut() {
+  clearInactivityTimer();
   await supabase.auth.signOut();
+}
+
+// ============================================================
+// SESSION TIMEOUT (30 min inactivity — for shared/franchise iPads)
+// ============================================================
+let _inactivityTimer = null;
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+
+function resetInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer = setTimeout(async () => {
+    if (state.userEmail) {
+      showToast('Signed out due to inactivity. Please sign in again.', 'error');
+      await supabase.auth.signOut();
+    }
+  }, INACTIVITY_TIMEOUT_MS);
+}
+
+function clearInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer = null;
+}
+
+function startInactivityTimer() {
+  ['click', 'keydown', 'touchstart', 'mousemove', 'scroll'].forEach(e =>
+    document.addEventListener(e, resetInactivityTimer, { passive: true })
+  );
+  resetInactivityTimer();
+}
+
+function stopInactivityTimer() {
+  clearInactivityTimer();
+  ['click', 'keydown', 'touchstart', 'mousemove', 'scroll'].forEach(e =>
+    document.removeEventListener(e, resetInactivityTimer)
+  );
+}
+
+function showDeviceWarningBanner() {
+  const banner = document.getElementById('device-warning-banner');
+  if (banner) banner.style.display = '';
+}
+
+function hideDeviceWarningBanner() {
+  const banner = document.getElementById('device-warning-banner');
+  if (banner) banner.style.display = 'none';
 }
 
 function refreshAfterLoad() {
@@ -2123,6 +2177,8 @@ function saveSetup() {
     state.recaps = {};
     state.franchiseChecks = {};
     state.franchiseCheckNames = {};
+    state.franchiseCheckTimestamps = {};
+    state.partnerReviewNotes = '';
   }
 
   state.opening = { store, coach, date };
@@ -2809,16 +2865,33 @@ async function exportOpeningCSV(openingId, storeName) {
   });
   rows.push(['', '']);
 
-  // Day 0 Checks
+  // Day 0 Checks (with timestamps)
   rows.push(['DAY 0 READINESS CHECKS', '']);
-  rows.push(['Group', 'Check', 'Status']);
+  rows.push(['Group', 'Check', 'Status', 'Completed At']);
   var fcMap = {};
-  (fchecks || []).forEach(function(fc){ fcMap[fc.check_key] = fc.checked; });
+  var fcTsMap = {};
+  (fchecks || []).forEach(function(fc){ fcMap[fc.check_key] = fc.checked; fcTsMap[fc.check_key] = fc.checked_at || ''; });
   FRANCHISE_CHECK_GROUPS.forEach(function(grp) {
     grp.checks.forEach(function(c) {
-      rows.push([esc(grp.group), esc(c.label), fcMap[c.key] ? 'Complete' : 'Incomplete']);
+      rows.push([esc(grp.group), esc(c.label), fcMap[c.key] ? 'Complete' : 'Incomplete', esc(fcTsMap[c.key])]);
     });
   });
+  rows.push(['', '']);
+
+  // NSO Partner Review Formal Sign-Offs
+  rows.push(['NSO PARTNER REVIEW - FORMAL SIGN-OFF', '']);
+  rows.push(['Item', 'Status', 'Signed By', 'Signed At']);
+  var fsignoffChecks = {};
+  (fchecks || []).forEach(function(fc){ fsignoffChecks[fc.check_key] = fc; });
+  FSIGNOFF_SECTIONS.forEach(function(section) {
+    section.items.forEach(function(item) {
+      var fc = fsignoffChecks[item.key] || {};
+      rows.push([esc(item.label), fc.checked ? 'Signed' : 'Not Signed', esc(fc.signed_name || ''), esc(fc.checked_at || '')]);
+    });
+  });
+  if (opening && opening.partner_review_notes) {
+    rows.push(['Partner Notes', esc(opening.partner_review_notes), '', '']);
+  }
   rows.push(['', '']);
 
   // OSC Report
@@ -3542,6 +3615,67 @@ function renderFranchiseChecks() {
   container.innerHTML = html;
 }
 
+// Module-scope so exportOpeningCSV can access section/item keys
+const FSIGNOFF_SECTIONS = [
+  {
+    key_prefix: 'fsignoff-training',
+    title: 'Training Summary',
+    subtitle: 'Confirm what took place during the opening training program.',
+    items: [
+      { key: 'fsignoff-training-days', label: 'All 5 training days were completed as scheduled' },
+      { key: 'fsignoff-training-elearning', label: 'All trainees completed required Delightree eLearning modules' },
+      { key: 'fsignoff-training-signoffs', label: 'Competency sign-offs were reviewed and discussed with the franchise partner' },
+      { key: 'fsignoff-training-attendance', label: 'Attendance was consistent — any absences were discussed' },
+    ]
+  },
+  {
+    key_prefix: 'fsignoff-readiness',
+    title: 'Team Readiness',
+    subtitle: 'Select all areas where the team demonstrated readiness.',
+    items: [
+      { key: 'fsignoff-ready-guest', label: 'Team can deliver the full Guest Journey confidently and consistently' },
+      { key: 'fsignoff-ready-tech', label: 'Team can operate all technology independently (trackers, vests, props, wireless)' },
+      { key: 'fsignoff-ready-sales', label: 'Team understands and can execute Repeatability and upsell moments' },
+      { key: 'fsignoff-ready-ops', label: 'Team can complete open and close procedures without guidance' },
+      { key: 'fsignoff-ready-sm', label: 'Store Manager is ready to independently lead the store' },
+    ]
+  },
+  {
+    key_prefix: 'fsignoff-opportunities',
+    title: 'Development Opportunities',
+    subtitle: 'Identify areas that need continued attention during opening weekend.',
+    items: [
+      { key: 'fsignoff-dev-guest', label: 'Guest experience and service delivery' },
+      { key: 'fsignoff-dev-tech', label: 'Technology operations and troubleshooting' },
+      { key: 'fsignoff-dev-sales', label: 'Sales, Repeatability, and walk-in conversion' },
+      { key: 'fsignoff-dev-ops', label: 'Operational procedures and execution speed' },
+      { key: 'fsignoff-dev-sm', label: 'Store Manager\'s leadership and team direction' },
+      { key: 'fsignoff-dev-none', label: 'No critical gaps identified — team is ready to operate' },
+    ]
+  },
+  {
+    key_prefix: 'fsignoff-plan',
+    title: 'Opening Weekend Action Plan',
+    subtitle: 'What happens next — agreed upon by OSC and franchise partner.',
+    items: [
+      { key: 'fsignoff-plan-coach-present', label: 'Coach will be present for Friends & Family Day' },
+      { key: 'fsignoff-plan-sm-leads', label: 'SM will lead F&F Day independently with coach in an observing role' },
+      { key: 'fsignoff-plan-debrief', label: 'End-of-day debrief scheduled for each opening weekend day' },
+      { key: 'fsignoff-plan-areas', label: 'Specific coaching focus areas have been communicated to the SM' },
+      { key: 'fsignoff-plan-followup', label: 'Follow-up plan is in place for any critical development areas' },
+    ]
+  },
+  {
+    key_prefix: 'fsignoff-confirm',
+    title: 'Formal Sign-Off',
+    subtitle: 'Both parties confirm this review is accurate and complete.',
+    items: [
+      { key: 'fsignoff-osc-confirms', label: 'OSC confirms: This summary accurately reflects the training program and outcomes' },
+      { key: 'fsignoff-franchisee-confirms', label: 'Franchise Partner confirms: I have reviewed this summary and acknowledge the plan for opening weekend' },
+    ]
+  },
+];
+
 function renderFranchisePartnerReview() {
   const container = document.getElementById('franchiseeContent');
   if (!container) return;
@@ -3555,66 +3689,6 @@ function renderFranchisePartnerReview() {
   }
 
   let html = '';
-
-  const FSIGNOFF_SECTIONS = [
-    {
-      key_prefix: 'fsignoff-training',
-      title: 'Training Summary',
-      subtitle: 'Confirm what took place during the opening training program.',
-      items: [
-        { key: 'fsignoff-training-days', label: 'All 5 training days were completed as scheduled' },
-        { key: 'fsignoff-training-elearning', label: 'All trainees completed required Delightree eLearning modules' },
-        { key: 'fsignoff-training-signoffs', label: 'Competency sign-offs were reviewed and discussed with the franchise partner' },
-        { key: 'fsignoff-training-attendance', label: 'Attendance was consistent — any absences were discussed' },
-      ]
-    },
-    {
-      key_prefix: 'fsignoff-readiness',
-      title: 'Team Readiness',
-      subtitle: 'Select all areas where the team demonstrated readiness.',
-      items: [
-        { key: 'fsignoff-ready-guest', label: 'Team can deliver the full Guest Journey confidently and consistently' },
-        { key: 'fsignoff-ready-tech', label: 'Team can operate all technology independently (trackers, vests, props, wireless)' },
-        { key: 'fsignoff-ready-sales', label: 'Team understands and can execute Repeatability and upsell moments' },
-        { key: 'fsignoff-ready-ops', label: 'Team can complete open and close procedures without guidance' },
-        { key: 'fsignoff-ready-sm', label: 'Store Manager is ready to independently lead the store' },
-      ]
-    },
-    {
-      key_prefix: 'fsignoff-opportunities',
-      title: 'Development Opportunities',
-      subtitle: 'Identify areas that need continued attention during opening weekend.',
-      items: [
-        { key: 'fsignoff-dev-guest', label: 'Guest experience and service delivery' },
-        { key: 'fsignoff-dev-tech', label: 'Technology operations and troubleshooting' },
-        { key: 'fsignoff-dev-sales', label: 'Sales, Repeatability, and walk-in conversion' },
-        { key: 'fsignoff-dev-ops', label: 'Operational procedures and execution speed' },
-        { key: 'fsignoff-dev-sm', label: 'Store Manager\'s leadership and team direction' },
-        { key: 'fsignoff-dev-none', label: 'No critical gaps identified — team is ready to operate' },
-      ]
-    },
-    {
-      key_prefix: 'fsignoff-plan',
-      title: 'Opening Weekend Action Plan',
-      subtitle: 'What happens next — agreed upon by OSC and franchise partner.',
-      items: [
-        { key: 'fsignoff-plan-coach-present', label: 'Coach will be present for Friends & Family Day' },
-        { key: 'fsignoff-plan-sm-leads', label: 'SM will lead F&F Day independently with coach in an observing role' },
-        { key: 'fsignoff-plan-debrief', label: 'End-of-day debrief scheduled for each opening weekend day' },
-        { key: 'fsignoff-plan-areas', label: 'Specific coaching focus areas have been communicated to the SM' },
-        { key: 'fsignoff-plan-followup', label: 'Follow-up plan is in place for any critical development areas' },
-      ]
-    },
-    {
-      key_prefix: 'fsignoff-confirm',
-      title: 'Formal Sign-Off',
-      subtitle: 'Both parties confirm this review is accurate and complete.',
-      items: [
-        { key: 'fsignoff-osc-confirms', label: 'OSC confirms: This summary accurately reflects the training program and outcomes' },
-        { key: 'fsignoff-franchisee-confirms', label: 'Franchise Partner confirms: I have reviewed this summary and acknowledge the plan for opening weekend' },
-      ]
-    },
-  ];
 
   const fsTotal = FSIGNOFF_SECTIONS.reduce((s, sec) => s + sec.items.length, 0);
   const fsDone = FSIGNOFF_SECTIONS.reduce((s, sec) => s + sec.items.filter(i => state.franchiseChecks[i.key]).length, 0);
@@ -3655,22 +3729,45 @@ function renderFranchisePartnerReview() {
       const checked = !!state.franchiseChecks[item.key];
       const signerName = state.franchiseCheckNames[item.key] || '';
       const signerPlaceholder = item.key === 'fsignoff-franchisee-confirms' ? 'Name of Franchise Manager or Owner' : 'Name of OSC';
+      const ts = state.franchiseCheckTimestamps[item.key];
+      const tsLabel = ts ? 'Signed ' + new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
       html += `<div style="padding:12px 0;border-bottom:1px solid var(--border-light)">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
           <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${item.key}', this.checked); renderFranchisePartnerReview()"
             style="margin-top:2px;width:16px;height:16px;accent-color:${isSignOff ? 'var(--success)' : 'var(--trigger)'};flex-shrink:0">
           <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${item.label}</span>
         </label>
-        ${isSignOff ? `<div style="margin-left:28px;margin-top:8px;max-width:280px">
+        ${isSignOff ? `<div style="margin-left:28px;margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
           <input type="text" class="input" id="fsign-name-${item.key}" placeholder="${signerPlaceholder}" value="${signerName.replace(/"/g, '&quot;')}"
-            onchange="saveFranchiseCheckName('${item.key}', this.value)" style="font-size:12px;padding:7px 10px">
+            onchange="saveFranchiseCheckName('${item.key}', this.value)" style="font-size:12px;padding:7px 10px;max-width:260px">
+          ${tsLabel ? `<span style="font-size:11px;color:var(--text-muted)">${tsLabel}</span>` : ''}
         </div>` : ''}
       </div>`;
     });
     html += `</div></div>`;
   });
 
+  // Partner notes
+  html += `<div class="card mb-20">
+    <div class="card-header"><div class="card-title">Franchise Partner Notes</div><div class="card-subtitle">Franchisee comments, questions, concerns, or acknowledgments from this review</div></div>
+    <div class="card-body">
+      <textarea class="recap-textarea" id="partner-review-notes" style="min-height:100px" placeholder="Record any franchisee comments, questions, or concerns from this review session...">${(state.partnerReviewNotes || '').replace(/</g,'&lt;')}</textarea>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+        <button class="btn btn-primary" onclick="savePartnerReviewNotes()" style="font-size:13px">Save Notes</button>
+        <span id="partner-notes-status" style="font-size:12px;color:var(--text-muted)"></span>
+      </div>
+    </div>
+  </div>`;
+
   container.innerHTML = html;
+}
+
+async function savePartnerReviewNotes() {
+  const notes = document.getElementById('partner-review-notes')?.value || '';
+  state.partnerReviewNotes = notes;
+  await dbSavePartnerReviewNotes(notes);
+  const st = document.getElementById('partner-notes-status');
+  if (st) { st.textContent = 'Saved.'; setTimeout(() => { st.textContent = ''; }, 2000); }
 }
 
 function toggleFranchiseCheck(key, checked) {
@@ -3761,7 +3858,13 @@ async function switchToOpening(openingId) {
   });
   state.franchiseChecks = {};
   state.franchiseCheckNames = {};
-  (fchecks || []).forEach(f => { state.franchiseChecks[f.check_key] = f.checked; state.franchiseCheckNames[f.check_key] = f.signed_name || ''; });
+  state.franchiseCheckTimestamps = {};
+  (fchecks || []).forEach(f => {
+    state.franchiseChecks[f.check_key] = f.checked;
+    state.franchiseCheckNames[f.check_key] = f.signed_name || '';
+    state.franchiseCheckTimestamps[f.check_key] = f.checked_at || null;
+  });
+  state.partnerReviewNotes = o.partner_review_notes || '';
   state.oscReport = (oscReports && oscReports[0]) || {};
 
   refreshAfterLoad();
@@ -3991,10 +4094,11 @@ function renderLeadershipTab(tab) {
 
 function renderLeadershipRoster(container) {
   const roleColors = { 'Owner': 'badge-dark', 'SM': 'badge-blue', 'ASM': 'badge-amber', 'Events Manager': 'badge-green', 'Custom': 'badge-gray' };
-  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
     <div style="font-size:15px;font-weight:700;color:var(--hb)">Leadership Participants</div>
     <button class="btn btn-primary" onclick="openAddLeaderModal()">+ Add Leader</button>
-  </div>`;
+  </div>
+  <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.5">Add all leadership training participants who are present. Corporate leadership training typically includes the franchise owner and/or store manager; additional roles may be included when applicable.</div>`;
 
   if (state.leadershipParticipants.length === 0) {
     html += '<div class="card" style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px">No leaders added yet. Click "Add Leader" to get started.</div>';
@@ -4347,9 +4451,10 @@ function renderLeadershipReport(container) {
             style="margin-top:2px;width:16px;height:16px;accent-color:var(--success);flex-shrink:0">
           <span style="font-size:14px;color:${trainerConfirmed?'var(--text-muted)':'var(--hb)'};${trainerConfirmed?'text-decoration:line-through':''}">Trainer confirms: These readiness reports accurately reflect the leaders' performance and outcomes</span>
         </label>
-        <div style="margin-left:28px;margin-top:8px;max-width:280px">
+        <div style="margin-left:28px;margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
           <input type="text" class="input" id="lt-sign-name-trainer_confirmed" placeholder="Name of Trainer" value="${(lt.trainer_confirmed_name || '').replace(/"/g, '&quot;')}"
-            onchange="saveLeadershipFormalSignoffName('trainer_confirmed', this.value)" style="font-size:12px;padding:7px 10px">
+            onchange="saveLeadershipFormalSignoffName('trainer_confirmed', this.value)" style="font-size:12px;padding:7px 10px;max-width:260px">
+          ${lt.trainer_confirmed_at ? `<span style="font-size:11px;color:var(--text-muted)">Signed ${new Date(lt.trainer_confirmed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>` : ''}
         </div>
       </div>
       <div style="padding:12px 0;border-bottom:1px solid var(--border-light)">
@@ -4358,9 +4463,10 @@ function renderLeadershipReport(container) {
             style="margin-top:2px;width:16px;height:16px;accent-color:var(--success);flex-shrink:0">
           <span style="font-size:14px;color:${partnerConfirmed?'var(--text-muted)':'var(--hb)'};${partnerConfirmed?'text-decoration:line-through':''}">Franchise Manager/Owner confirms: I have reviewed these readiness reports and acknowledge the plan going forward</span>
         </label>
-        <div style="margin-left:28px;margin-top:8px;max-width:280px">
+        <div style="margin-left:28px;margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
           <input type="text" class="input" id="lt-sign-name-partner_confirmed" placeholder="Name of Franchise Manager or Owner" value="${(lt.partner_confirmed_name || '').replace(/"/g, '&quot;')}"
-            onchange="saveLeadershipFormalSignoffName('partner_confirmed', this.value)" style="font-size:12px;padding:7px 10px">
+            onchange="saveLeadershipFormalSignoffName('partner_confirmed', this.value)" style="font-size:12px;padding:7px 10px;max-width:260px">
+          ${lt.partner_confirmed_at ? `<span style="font-size:11px;color:var(--text-muted)">Signed ${new Date(lt.partner_confirmed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>` : ''}
         </div>
       </div>
     </div>
