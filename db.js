@@ -65,6 +65,7 @@ async function dbLoadState(passedUser) {
     state.franchiseChecks[f.check_key] = f.checked;
     state.franchiseCheckNames[f.check_key] = f.signed_name || '';
     state.franchiseCheckTimestamps[f.check_key] = f.checked_at || null;
+    state.franchiseCheckDates[f.check_key] = f.signed_date || '';
   });
   state.partnerReviewNotes = o.partner_review_notes || '';
 
@@ -234,6 +235,17 @@ async function dbSaveFranchiseCheck(key, checked, signedName) {
   }
   const { error } = await supabase.from('franchise_checks').upsert(payload, { onConflict: 'opening_id,check_key' });
   if (error) console.error('dbSaveFranchiseCheck:', error);
+}
+
+async function dbSaveFranchiseCheckDate(key, date) {
+  if (!state.openingId) return;
+  const { error } = await supabase.from('franchise_checks').upsert({
+    opening_id: state.openingId,
+    check_key: key,
+    signed_date: date,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'opening_id,check_key' });
+  if (error) console.error('dbSaveFranchiseCheckDate:', error);
 }
 
 async function dbSavePartnerReviewNotes(notes) {

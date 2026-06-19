@@ -17,6 +17,7 @@ let state = {
   franchiseChecks: {},
   franchiseCheckNames: {},
   franchiseCheckTimestamps: {},
+  franchiseCheckDates: {},
   partnerReviewNotes: '',
   overrides: {},
   oscReport: {},
@@ -1890,7 +1891,7 @@ async function initApp() {
       hideDeviceWarningBanner();
       Object.assign(state, {
         opening: null, openingId: null, userRole: 'coach', userEmail: null,
-        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {}, franchiseCheckNames: {}, franchiseCheckTimestamps: {}, partnerReviewNotes: '',
+        currentDay: 1, trainees: [], signoffs: {}, recaps: {}, franchiseChecks: {}, franchiseCheckNames: {}, franchiseCheckTimestamps: {}, franchiseCheckDates: {}, partnerReviewNotes: '',
         mode: null
       });
       sessionStorage.removeItem('portalMode');
@@ -2178,6 +2179,7 @@ function saveSetup() {
     state.franchiseChecks = {};
     state.franchiseCheckNames = {};
     state.franchiseCheckTimestamps = {};
+    state.franchiseCheckDates = {};
     state.partnerReviewNotes = '';
   }
 
@@ -2880,13 +2882,13 @@ async function exportOpeningCSV(openingId, storeName) {
 
   // NSO Partner Review Formal Sign-Offs
   rows.push(['NSO PARTNER REVIEW - FORMAL SIGN-OFF', '']);
-  rows.push(['Item', 'Status', 'Signed By', 'Signed At']);
+  rows.push(['Item', 'Status', 'Signed By', 'Date Signed', 'Timestamp']);
   var fsignoffChecks = {};
   (fchecks || []).forEach(function(fc){ fsignoffChecks[fc.check_key] = fc; });
   FSIGNOFF_SECTIONS.forEach(function(section) {
     section.items.forEach(function(item) {
       var fc = fsignoffChecks[item.key] || {};
-      rows.push([esc(item.label), fc.checked ? 'Signed' : 'Not Signed', esc(fc.signed_name || ''), esc(fc.checked_at || '')]);
+      rows.push([esc(item.label), fc.checked ? 'Signed' : 'Not Signed', esc(fc.signed_name || ''), esc(fc.signed_date || ''), esc(fc.checked_at || '')]);
     });
   });
   if (opening && opening.partner_review_notes) {
@@ -3728,19 +3730,20 @@ function renderFranchisePartnerReview() {
     section.items.forEach(item => {
       const checked = !!state.franchiseChecks[item.key];
       const signerName = state.franchiseCheckNames[item.key] || '';
+      const signerDate = state.franchiseCheckDates[item.key] || '';
       const signerPlaceholder = item.key === 'fsignoff-franchisee-confirms' ? 'Name of Franchise Manager or Owner' : 'Name of OSC';
-      const ts = state.franchiseCheckTimestamps[item.key];
-      const tsLabel = ts ? 'Signed ' + new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+      const datePlaceholder = item.key === 'fsignoff-franchisee-confirms' ? 'Date signed by Franchisee' : 'Date signed by OSC';
       html += `<div style="padding:12px 0;border-bottom:1px solid var(--border-light)">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
           <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFranchiseCheck('${item.key}', this.checked); renderFranchisePartnerReview()"
             style="margin-top:2px;width:16px;height:16px;accent-color:${isSignOff ? 'var(--success)' : 'var(--trigger)'};flex-shrink:0">
           <span style="font-size:14px;color:${checked?'var(--text-muted)':'var(--hb)'};${checked?'text-decoration:line-through':''}">${item.label}</span>
         </label>
-        ${isSignOff ? `<div style="margin-left:28px;margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+        ${isSignOff ? `<div style="margin-left:28px;margin-top:8px;display:flex;flex-wrap:wrap;gap:8px">
           <input type="text" class="input" id="fsign-name-${item.key}" placeholder="${signerPlaceholder}" value="${signerName.replace(/"/g, '&quot;')}"
-            onchange="saveFranchiseCheckName('${item.key}', this.value)" style="font-size:12px;padding:7px 10px;max-width:260px">
-          ${tsLabel ? `<span style="font-size:11px;color:var(--text-muted)">${tsLabel}</span>` : ''}
+            onchange="saveFranchiseCheckName('${item.key}', this.value)" style="font-size:12px;padding:7px 10px;max-width:240px">
+          <input type="text" class="input" id="fsign-date-${item.key}" placeholder="${datePlaceholder}" value="${signerDate.replace(/"/g, '&quot;')}"
+            onchange="saveFranchiseCheckDate('${item.key}', this.value)" style="font-size:12px;padding:7px 10px;max-width:200px">
         </div>` : ''}
       </div>`;
     });
@@ -3781,6 +3784,12 @@ function saveFranchiseCheckName(key, name) {
   const trimmed = name.trim();
   state.franchiseCheckNames[key] = trimmed;
   dbSaveFranchiseCheck(key, !!state.franchiseChecks[key], trimmed);
+}
+
+function saveFranchiseCheckDate(key, date) {
+  const trimmed = date.trim();
+  state.franchiseCheckDates[key] = trimmed;
+  dbSaveFranchiseCheckDate(key, trimmed);
 }
 
 function markFranchiseeAllComplete(keys) {
@@ -3863,6 +3872,7 @@ async function switchToOpening(openingId) {
     state.franchiseChecks[f.check_key] = f.checked;
     state.franchiseCheckNames[f.check_key] = f.signed_name || '';
     state.franchiseCheckTimestamps[f.check_key] = f.checked_at || null;
+    state.franchiseCheckDates[f.check_key] = f.signed_date || '';
   });
   state.partnerReviewNotes = o.partner_review_notes || '';
   state.oscReport = (oscReports && oscReports[0]) || {};
