@@ -19,11 +19,12 @@ async function dbLoadState(passedUser) {
   state.userRole = profile?.role || 'coach';
   state.userEmail = user.email;
 
-  // Load the most recently updated active opening for this coach
+  // Load the most recently updated ACTIVE (non-completed) opening for this coach
   const { data: openings } = await supabase
     .from('openings')
     .select('*')
     .eq('coach_id', user.id)
+    .neq('status', 'completed')
     .order('updated_at', { ascending: false })
     .limit(1);
 
@@ -254,6 +255,18 @@ async function dbSavePartnerReviewNotes(notes) {
     .update({ partner_review_notes: notes, updated_at: new Date().toISOString() })
     .eq('id', state.openingId);
   if (error) console.error('dbSavePartnerReviewNotes:', error);
+}
+
+async function dbCompleteOpening({ actualOpeningDate, actualTrainingDates, completionNotes }) {
+  if (!state.openingId) return { message: 'No opening loaded' };
+  const { error } = await supabase.from('openings').update({
+    status: 'completed',
+    actual_opening_date: actualOpeningDate || null,
+    actual_training_dates: actualTrainingDates || '',
+    completion_notes: completionNotes || '',
+    updated_at: new Date().toISOString()
+  }).eq('id', state.openingId);
+  return error || null;
 }
 
 async function dbLoadOpeningsForCoach() {

@@ -245,6 +245,10 @@
             Switch
           </button>
         </div>
+        <button class="btn btn-secondary" id="completeOpeningBtn" style="width:100%;justify-content:center;background:rgba(34,169,88,0.12);border-color:rgba(34,169,88,0.3);color:rgba(34,169,88,0.85);font-size:11px;margin-top:6px" onclick="openCompleteOpeningModal()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Complete Opening
+        </button>
       </div>
       <!-- Switch Program button (always visible) -->
       <button class="btn btn-secondary" style="width:100%;justify-content:center;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);font-size:11px;margin-top:6px" onclick="showModeSelector()">
@@ -1403,6 +1407,44 @@
 </div>
 
 <!-- OPENING SWITCHER MODAL -->
+<div class="modal-overlay" id="completeOpeningModal">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <div>
+        <div style="font-size:18px;font-weight:700;color:var(--hb)">Complete This Opening</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Record final dates and notes before marking this opening as complete.</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('completeOpeningModal')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;padding-top:4px">
+      <div class="form-row">
+        <label class="form-label">Actual Opening Date <span style="color:var(--danger)">*</span></label>
+        <input type="date" class="input" id="complete-opening-date">
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">The date the store officially opened to the public (Friends &amp; Family Day).</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Training Dates <span style="color:var(--danger)">*</span></label>
+        <input type="text" class="input" id="complete-training-dates" placeholder="e.g. Jun 16 – Jun 20, 2025">
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">The actual dates training took place (free text — enter whatever format is clearest).</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Variance Notes</label>
+        <textarea class="input" id="complete-notes" rows="4" placeholder="Note any changes from the original plan — opening date shifts, training day changes, cancellations, make-up days, etc." style="min-height:90px;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;color:var(--text-muted)"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span style="font-size:12px;color:var(--text-secondary)">This opening will remain visible in your opening switcher and can still be edited at any time.</span>
+      </div>
+      <div style="display:flex;gap:10px;padding-top:4px">
+        <button class="btn btn-secondary" onclick="closeModal('completeOpeningModal')" style="flex:1;justify-content:center">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCompleteOpening()" style="flex:2;justify-content:center;background:var(--success);border-color:var(--success)">&#10003; Mark as Complete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="openingSwitcherModal">
   <div class="modal" style="width:480px">
     <div class="modal-header">

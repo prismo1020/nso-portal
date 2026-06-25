@@ -2127,6 +2127,8 @@ function refreshAfterLoad() {
     document.getElementById('sidebarDates').textContent = `${fmt(start)} – ${fmt(end)}`;
   }
   document.getElementById('dashSetupPrompt').style.display = 'none';
+  const completeBtn = document.getElementById('completeOpeningBtn');
+  if (completeBtn) completeBtn.style.display = '';
   selectDay(state.currentDay);
   updateDayPips();
   updateDashboardStats();
@@ -3773,6 +3775,59 @@ async function savePartnerReviewNotes() {
   if (st) { st.textContent = 'Saved.'; setTimeout(() => { st.textContent = ''; }, 2000); }
 }
 
+// ============================================================
+// COMPLETE OPENING
+// ============================================================
+function openCompleteOpeningModal() {
+  if (!state.openingId) return;
+  document.getElementById('complete-opening-date').value = '';
+  document.getElementById('complete-training-dates').value = '';
+  document.getElementById('complete-notes').value = '';
+  document.getElementById('completeOpeningModal').classList.add('open');
+}
+
+async function submitCompleteOpening() {
+  const openingDate = document.getElementById('complete-opening-date').value;
+  const trainingDates = document.getElementById('complete-training-dates').value.trim();
+  const notes = document.getElementById('complete-notes').value.trim();
+
+  if (!openingDate) { showToast('Please enter the actual opening date.', 'error'); return; }
+  if (!trainingDates) { showToast('Please enter the training dates.', 'error'); return; }
+
+  const btn = document.querySelector('#completeOpeningModal .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+
+  const err = await dbCompleteOpening({ actualOpeningDate: openingDate, actualTrainingDates: trainingDates, completionNotes: notes });
+
+  if (err) {
+    showToast('Save failed: ' + (err.message || 'DB error'), 'error');
+    if (btn) { btn.disabled = false; btn.innerHTML = '&#10003; Mark as Complete'; }
+    return;
+  }
+
+  closeModal('completeOpeningModal');
+  showToast('Opening marked as complete!', 'success');
+
+  // Clear active opening from state — treat as "no opening"
+  const completedStoreName = state.opening?.store || 'this opening';
+  Object.assign(state, {
+    opening: null, openingId: null,
+    currentDay: 1, trainees: [], signoffs: {}, recaps: {},
+    franchiseChecks: {}, franchiseCheckNames: {}, franchiseCheckTimestamps: {}, franchiseCheckDates: {}, partnerReviewNotes: ''
+  });
+
+  // Refresh UI to show "no active opening" state
+  document.getElementById('sidebarStoreName').textContent = 'No opening set';
+  document.getElementById('sidebarDates').textContent = '—';
+  document.getElementById('dashSetupPrompt').style.display = '';
+  document.getElementById('dashTitle').textContent = 'Welcome to the NSO Portal.';
+  document.getElementById('completeOpeningBtn').style.display = 'none';
+  updateDashboardStats();
+  updateTopbarDayLabel();
+  navigate('dashboard');
+  renderOpeningSwitcherList();
+}
+
 function toggleFranchiseCheck(key, checked) {
   state.franchiseChecks[key] = checked;
   const nameInput = document.getElementById('fsign-name-' + key);
@@ -3824,12 +3879,14 @@ async function renderOpeningSwitcherList() {
   }
   list.innerHTML = openings.map(o => {
     const isCurrent = o.id === state.openingId;
+    const isCompleted = o.status === 'completed';
     const dateStr = o.start_date ? new Date(o.start_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'No date';
     const coachLine = isAdmin ? `<div style="font-size:11px;color:var(--trigger);font-weight:600;margin-top:1px">Coach: ${o.coach_name || '—'}</div>` : '';
-    return `<button onclick="switchToOpening('${o.id}')" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:10px 12px;border-radius:var(--radius-md);border:1px solid ${isCurrent?'var(--trigger)':'var(--border-light)'};background:${isCurrent?'var(--trigger-light)':'var(--white)'};margin-bottom:8px;cursor:pointer;transition:all 0.15s" ${isCurrent?'disabled':''}>
-      <div style="font-size:13px;font-weight:600;color:var(--hb)">${o.store_name}</div>
+    const statusBadge = isCompleted ? `<span style="font-size:10px;background:var(--success-light,#e6f9ef);color:var(--success);border:1px solid var(--success);border-radius:4px;padding:1px 6px;margin-left:6px">Completed</span>` : isCurrent ? `<span style="font-size:10px;background:var(--trigger-light);color:var(--trigger);border:1px solid var(--trigger);border-radius:4px;padding:1px 6px;margin-left:6px">Active</span>` : '';
+    return `<button onclick="switchToOpening('${o.id}')" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:10px 12px;border-radius:var(--radius-md);border:1px solid ${isCurrent?'var(--trigger)':'var(--border-light)'};background:${isCurrent?'var(--trigger-light)':'var(--white)'};margin-bottom:8px;cursor:pointer;transition:all 0.15s;opacity:${isCompleted?'0.75':'1'}">
+      <div style="display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--hb)">${o.store_name}${statusBadge}</div>
       ${coachLine}
-      <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">${dateStr} · Day ${o.current_day || 1} of 5${isCurrent?' · <strong>Current</strong>':''}</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">${dateStr} · Day ${o.current_day || 1} of 5</div>
     </button>`;
   }).join('');
 }
