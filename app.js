@@ -2149,8 +2149,11 @@ function openSetupModal(forceNew = false) {
   document.getElementById('setup-modal-mode').textContent = isNew ? 'Start New Opening' : 'Edit Current Opening';
   document.getElementById('setup-store').value = isNew ? '' : (state.opening?.store || '');
   document.getElementById('setup-coach').value = isNew ? '' : (state.opening?.coach || '');
+  document.getElementById('setup-training-dates').value = isNew ? '' : (state.opening?.trainingDates || '');
+  document.getElementById('setup-expected-opening').value = isNew ? '' : (state.opening?.expectedOpeningDate || '');
   document.getElementById('setup-date').value = isNew ? today : (state.opening?.date || today);
   document.getElementById('setup-day').value = isNew ? 1 : (state.currentDay || 1);
+  document.getElementById('setup-opening-notes').value = isNew ? '' : (state.opening?.openingNotes || '');
   document.getElementById('setup-new-flag').value = isNew ? 'new' : 'edit';
   if (!isNew && state.openingId) {
     document.getElementById('setup-new-hint').style.display = 'block';
@@ -2166,11 +2169,16 @@ function closeModal(id) {
 function saveSetup() {
   const store = document.getElementById('setup-store').value.trim();
   const coach = document.getElementById('setup-coach').value.trim();
+  const trainingDates = document.getElementById('setup-training-dates').value.trim();
+  const expectedOpeningDate = document.getElementById('setup-expected-opening').value;
   const date = document.getElementById('setup-date').value;
   const day = parseInt(document.getElementById('setup-day').value);
+  const openingNotes = document.getElementById('setup-opening-notes').value.trim();
   const isNew = document.getElementById('setup-new-flag').value === 'new';
 
   if (!store || !coach) { showToast('Please fill in store name and coach name', 'info'); return; }
+  if (!trainingDates) { showToast('Please enter the training dates', 'info'); return; }
+  if (!expectedOpeningDate) { showToast('Please enter the expected opening date', 'info'); return; }
 
   if (isNew) {
     // Clear all state to start fresh opening
@@ -2185,7 +2193,7 @@ function saveSetup() {
     state.partnerReviewNotes = '';
   }
 
-  state.opening = { store, coach, date };
+  state.opening = { store, coach, date, trainingDates, expectedOpeningDate, openingNotes };
   state.currentDay = day;
 
   document.getElementById('sidebarStoreName').textContent = store;
@@ -2795,9 +2803,12 @@ async function exportOpeningCSV(openingId, storeName) {
   rows.push(['OPENING INFORMATION', '', '']);
   rows.push(['Store Name', esc(opening.store_name), '']);
   rows.push(['Coach', esc(opening.coach_name), '']);
-  rows.push(['Start Date', esc(opening.start_date), '']);
+  rows.push(['Training Dates', esc(opening.training_dates), '']);
+  rows.push(['Expected Opening Date', esc(opening.expected_opening_date), '']);
+  rows.push(['Training Start Date (Day 1)', esc(opening.start_date), '']);
   rows.push(['Current Day', esc(opening.current_day), '']);
   rows.push(['Status', esc(opening.status), '']);
+  rows.push(['Variance Notes', esc(opening.opening_notes), '']);
   rows.push(['', '', '']);
 
   // Roster
@@ -3904,7 +3915,7 @@ async function switchToOpening(openingId) {
   // Load via dbLoadState which picks most-recently-updated — we need to load by specific ID
   const { data: o } = await supabase.from('openings').select('*').eq('id', openingId).single();
   if (!o) { showToast('Could not load opening', 'info'); return; }
-  state.opening = { store: o.store_name, coach: o.coach_name, date: o.start_date };
+  state.opening = { store: o.store_name, coach: o.coach_name, date: o.start_date, trainingDates: o.training_dates || '', expectedOpeningDate: o.expected_opening_date || '', openingNotes: o.opening_notes || '' };
   state.currentDay = o.current_day || 1;
 
   const [{ data: trainees }, { data: signoffs }, { data: recaps }, { data: fchecks }, { data: oscReports }] = await Promise.all([

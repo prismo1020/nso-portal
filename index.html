@@ -1389,7 +1389,17 @@
       <input class="input" id="setup-coach" placeholder="Your name">
     </div>
     <div class="form-row">
-      <label class="form-label">Opening Start Date (Day 1 — Friday)</label>
+      <label class="form-label">Training Dates <span style="color:var(--danger)">*</span></label>
+      <input class="input" id="setup-training-dates" placeholder="e.g. Jun 16 – Jun 20, 2025">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">The full date range for the 5-day training program.</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Expected Opening Date <span style="color:var(--danger)">*</span></label>
+      <input class="input" id="setup-expected-opening" type="date">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">The planned grand opening / Friends &amp; Family Day.</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Training Start Date (Day 1)</label>
       <input class="input" id="setup-date" type="date">
     </div>
     <div class="form-row">
@@ -1401,6 +1411,10 @@
         <option value="4">Day 4 — Monday</option>
         <option value="5">Day 5 — Tuesday (Friends &amp; Family)</option>
       </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Variance Notes <span style="font-size:11px;color:var(--text-muted);font-weight:400">(optional)</span></label>
+      <textarea class="input" id="setup-opening-notes" rows="3" placeholder="Note anything unusual about this opening — schedule changes, shortened training, non-standard dates, etc." style="min-height:70px;resize:vertical"></textarea>
     </div>
     <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="saveSetup()">Save Opening</button>
   </div>

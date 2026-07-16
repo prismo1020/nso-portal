@@ -32,7 +32,7 @@ async function dbLoadState(passedUser) {
 
   const o = openings[0];
   state.openingId = o.id;
-  state.opening = { store: o.store_name, coach: o.coach_name, date: o.start_date };
+  state.opening = { store: o.store_name, coach: o.coach_name, date: o.start_date, trainingDates: o.training_dates || '', expectedOpeningDate: o.expected_opening_date || '', openingNotes: o.opening_notes || '' };
   state.currentDay = o.current_day || 1;
 
   const [
@@ -143,12 +143,15 @@ async function dbSaveOpening() {
   if (!user || !state.opening) return;
 
   const payload = {
-    coach_id:   user.id,
-    store_name: state.opening.store,
-    coach_name: state.opening.coach,
-    start_date: state.opening.date || null,
-    current_day: state.currentDay,
-    updated_at: new Date().toISOString()
+    coach_id:               user.id,
+    store_name:             state.opening.store,
+    coach_name:             state.opening.coach,
+    start_date:             state.opening.date || null,
+    current_day:            state.currentDay,
+    training_dates:         state.opening.trainingDates || null,
+    expected_opening_date:  state.opening.expectedOpeningDate || null,
+    opening_notes:          state.opening.openingNotes || null,
+    updated_at:             new Date().toISOString()
   };
 
   if (state.openingId) {
