@@ -297,56 +297,271 @@ const guides = {
     category: "START HERE",
     title: "How to use the five-day plan",
     lead: "The agenda is a sequence, not a menu. Each day prepares learners for the performance expected on the next.",
+    useWhen: "Before Day 1, at the start of each training day, and whenever schedule pressure creates a temptation to skip or reorder an objective.",
+    outcome: "The coach protects the performance standard while adapting time, grouping, and repetition to current evidence.",
     principle: "Protect the sequence. Do not move learners into complex technical practice before they understand the complete guest journey.",
     sections: [
-      ["What the plan does", "The five-day plan connects learning objectives, practice, evidence, and readiness decisions. It gives every coach the same standard while preserving room to respond to local conditions."],
-      ["How to make adjustments", "Adjust time and repetition based on evidence. Do not remove an objective because the schedule is tight. Record what changed and why in the daily recap."],
-      ["What counts as complete", "Exposure is not completion. A learner is ready when they can demonstrate the behavior under realistic conditions without coach prompting."],
+      {
+        title: "Read the plan as a performance pathway",
+        body: "Each block prepares learners for a later, more independent performance. The objective defines the behavior, the activity creates practice, and the evidence determines what happens next.",
+        bullets: ["Begin with the day's intent and required evidence.", "Open each block before facilitating and review its success criteria.", "Connect the block to the competency it prepares learners to demonstrate."],
+      },
+      {
+        title: "Adjust the method, not the standard",
+        body: "Local conditions may change the timing or grouping, but they should not erase the required performance.",
+        bullets: ["Add repetition when evidence is weak.", "Change group size or practice order when access is limited.", "Record any delayed objective, the reason, owner, and recovery plan."],
+      },
+      {
+        title: "Know what complete means",
+        body: "Exposure, attendance, and confidence are not completion. Completion requires observable performance under the conditions defined for the competency.",
+        bullets: ["Ask the learner to perform rather than explain when the objective is behavioral.", "Remove prompts before final evidence is captured.", "Leave the competency open when evidence is incomplete or inconsistent."],
+      },
     ],
+    language: { label: "COACH LANGUAGE", text: "We can change how we practice this today, but we cannot remove the performance the team needs for launch." },
+    quickCheck: ["Can I name the performance this block prepares?", "Do I know what evidence I need before moving on?", "Have I documented any change to the planned sequence?"],
+  },
+  signals: {
+    category: "START HERE",
+    title: "Reading readiness signals",
+    lead: "Good coaching begins by separating what learners say they know from what they can demonstrate under realistic conditions.",
+    useWhen: "During Day 0 setup, retrieval practice, early demonstrations, and any moment when confidence and performance appear misaligned.",
+    outcome: "The coach identifies the likely cause of a gap and chooses the right level of support instead of prescribing generic retraining.",
+    principle: "Treat confidence as context and behavior as evidence. Neither should be interpreted without the other.",
+    sections: [
+      {
+        title: "Collect more than one signal",
+        body: "No single observation should determine readiness. Combine prior experience, retrieval, scenario performance, coach notes, and repeated behavior.",
+        bullets: ["Compare confidence with first-attempt accuracy.", "Look for patterns across more than one condition.", "Notice whether the learner can explain why the action works."],
+      },
+      {
+        title: "Classify the gap before coaching",
+        body: "A missed behavior can come from missing knowledge, insufficient practice, environmental friction, unclear process, or unclear ownership.",
+        bullets: ["Knowledge gap: the learner cannot describe the correct action.", "Performance gap: the learner knows the action but cannot execute it reliably.", "System gap: the expected action is unclear, unsupported, or contradicted by the environment."],
+      },
+      {
+        title: "Match support to the cause",
+        body: "The intervention should be as specific as the diagnosis. More explanation will not fix an access problem, and more repetition will not fix a broken process.",
+        bullets: ["Clarify knowledge with a concise model or worked example.", "Build performance with coached practice and another attempt.", "Route system gaps to the owner and give the team an approved interim action."],
+      },
+    ],
+    language: { label: "DIAGNOSTIC QUESTION", text: "Show me where the process became unclear, then tell me what information or condition would have helped you choose the next action." },
+    quickCheck: ["Am I responding to a pattern or one isolated moment?", "Have I classified the gap before choosing an intervention?", "Does the next action test the original gap?"],
+  },
+  adjust: {
+    category: "DAILY FACILITATION",
+    title: "Adapting without losing the standard",
+    lead: "Strong facilitation responds to the room while protecting the objective, evidence requirement, and readiness bar.",
+    useWhen: "When time compresses, equipment is unavailable, learners progress at different speeds, or an unexpected operational condition changes the day.",
+    outcome: "The day remains productive and traceable, with every changed block tied to a recovery action and evidence plan.",
+    principle: "Flex the route, not the destination. A schedule change is acceptable only when the required performance remains visible and owned.",
+    sections: [
+      {
+        title: "Protect the nonnegotiables",
+        body: "Identify which outcomes are launch-critical before deciding what can move, shrink, combine, or repeat.",
+        bullets: ["Keep safety, guest-impact, and independent-performance objectives intact.", "Do not replace performance practice with discussion alone.", "Preserve the final evidence check even when teaching time changes."],
+      },
+      {
+        title: "Use productive substitutions",
+        body: "When the planned environment is unavailable, choose a substitute that rehearses the same decision, sequence, or communication behavior.",
+        bullets: ["Use tabletop sequencing when physical access is delayed.", "Use role-play when live-system practice is unavailable.", "Use peer observation to increase repetitions without adding coach bottlenecks."],
+      },
+      {
+        title: "Document the variance",
+        body: "A changed plan becomes manageable when the decision, impact, and recovery path are visible to the next coach and stakeholder.",
+        bullets: ["Record what changed and why.", "Name the affected objective and evidence still required.", "Assign the recovery action, owner, and deadline."],
+      },
+    ],
+    language: { label: "COACH LANGUAGE", text: "The environment changed, so we are changing the practice format. The objective and evidence standard remain the same." },
+    quickCheck: ["Which objective is at risk?", "Does the substitute practice the same behavior?", "Who owns the missing evidence and by when?"],
   },
   scenarios: {
     category: "COACHING PRACTICE",
     title: "Running scenario practice",
     lead: "Scenario practice should reveal whether a learner can recognize the situation, select the process, and execute it under realistic pressure.",
+    useWhen: "After learners understand the underlying process and before independent sign-off, especially for judgment, recovery, escalation, and handoff behaviors.",
+    outcome: "The coach produces observable evidence of transfer and gives learners a focused opportunity to improve on the next attempt.",
     principle: "Score only observable behavior. Confidence and familiarity are useful signals, but they are not readiness evidence.",
     sections: [
-      ["Brief", "State the conditions, learner role, success criteria, and any boundaries before the scenario begins."],
-      ["Observe", "Let the learner work. Capture specific actions, sequence errors, unnecessary escalations, and moments of hesitation."],
-      ["Debrief and repeat", "Ask the learner to diagnose the result first. Give one priority correction, then run another repetition."],
+      {
+        title: "Brief without giving away the answer",
+        body: "State the conditions, learner role, available tools, success criteria, and safety boundaries. Do not preview the exact decision the learner must make.",
+        bullets: ["Use one primary challenge per early scenario.", "Clarify what the coach will and will not answer.", "Tell observers which behaviors to capture."],
+      },
+      {
+        title: "Observe the decision path",
+        body: "Let the learner work long enough to reveal recognition, sequence, communication, and judgment. Intervene only at the defined boundary.",
+        bullets: ["Record actions and language, not personality labels.", "Note the first point where the response diverges from the standard.", "Capture unnecessary escalation, delay, or repeated work."],
+      },
+      {
+        title: "Debrief, correct, and repeat",
+        body: "Ask the learner to diagnose the attempt first. Reinforce one effective behavior, choose one priority correction, and create another attempt quickly.",
+        bullets: ["Start with the learner's own diagnosis.", "Explain the impact of the priority behavior.", "Change one surface condition on the repeat to test transfer."],
+      },
     ],
+    language: { label: "DEBRIEF PROMPT", text: "What did you notice, where did your decision change, and what will you do differently in the next attempt?" },
+    quickCheck: ["Did the scenario test the intended behavior?", "Did I capture observable evidence?", "Did the learner receive another attempt after feedback?"],
   },
   feedback: {
     category: "COACHING PRACTICE",
     title: "Giving observable feedback",
     lead: "Feedback should make the next attempt better, not simply describe the previous attempt.",
+    useWhen: "Immediately after observed practice, during a safe pause in live work, or when a repeated behavior needs a specific correction.",
+    outcome: "The learner understands the action, its impact, and the change required, then demonstrates the correction in another attempt.",
     principle: "Use action, impact, and next attempt: what happened, why it mattered, and what the learner will do differently.",
     sections: [
-      ["Be specific", "Name the action and moment. Avoid labels such as good, weak, or not confident."],
-      ["Prioritize", "Choose the correction with the greatest effect on safety, guest experience, or independent performance."],
-      ["Verify", "Feedback is complete only after the learner demonstrates the corrected behavior."],
+      {
+        title: "Describe the observable moment",
+        body: "Name the action, language, sequence, or decision you observed and where it occurred.",
+        bullets: ["Say what happened without judging the learner.", "Use the same performance language as the rubric.", "Avoid vague labels such as good, weak, or unconfident."],
+      },
+      {
+        title: "Connect action to impact",
+        body: "Explain why the behavior matters to the guest, team, safety, operational flow, or readiness decision.",
+        bullets: ["Prioritize the highest-impact correction.", "Limit feedback to what the learner can apply in the next attempt.", "Check that the learner can restate the expected change."],
+      },
+      {
+        title: "Verify in another attempt",
+        body: "Feedback is not complete when the conversation ends. It is complete when the learner demonstrates the changed behavior.",
+        bullets: ["Create the next attempt quickly.", "Reduce prompting so the learner owns the correction.", "Record whether the behavior improved, remained inconsistent, or revealed a different gap."],
+      },
     ],
+    language: { label: "FEEDBACK MODEL", text: "When the handoff happened, the issue context was missing. That forced the next person to restart the diagnosis. On the next run, include the condition, actions taken, and current guest impact." },
+    quickCheck: ["Did I name an action rather than a trait?", "Did I explain the impact?", "Did the learner demonstrate the correction?"],
+  },
+  differentiation: {
+    category: "COACHING PRACTICE",
+    title: "Coaching mixed readiness levels",
+    lead: "A shared standard does not require identical practice. Learners may need different support, repetition, complexity, or roles to reach the same performance.",
+    useWhen: "When some learners finish quickly, confidence varies widely, or the team includes different levels of prior experience.",
+    outcome: "Every learner remains challenged at the right level while the coach protects a consistent final readiness standard.",
+    principle: "Differentiate the path and support. Keep the final behavior and evidence requirement consistent.",
+    sections: [
+      {
+        title: "Group with purpose",
+        body: "Use evidence to choose pairs and roles rather than allowing convenience or confidence to determine who practices what.",
+        bullets: ["Pair a fluent performer with a developing observer only when both have defined roles.", "Rotate the doer, checker, and explainer roles.", "Regroup when one learner begins carrying the performance for another."],
+      },
+      {
+        title: "Adjust support and complexity",
+        body: "Give developing learners clearer structure and more repetitions. Give stronger learners changed conditions that require transfer and judgment.",
+        bullets: ["Use prompts early, then deliberately remove them.", "Repeat the same core behavior before adding complexity.", "Add ambiguity, time pressure, or competing demands for learners who are ready."],
+      },
+      {
+        title: "Prevent invisible learners",
+        body: "Group success can conceal an individual gap. Every learner needs an observable opportunity to perform the required behavior.",
+        bullets: ["Track who has performed, observed, and explained.", "Require individual completion before final sign-off.", "Use targeted follow-up instead of repeating the full block for everyone."],
+      },
+    ],
+    language: { label: "COACH LANGUAGE", text: "You are working toward the same standard. Your next practice is different because it targets the evidence you still need." },
+    quickCheck: ["Has every learner performed individually?", "Is support decreasing as performance improves?", "Are stronger learners practicing transfer rather than waiting?"],
+  },
+  evidence: {
+    category: "EVIDENCE AND DECISIONS",
+    title: "Capturing usable performance evidence",
+    lead: "Useful evidence is specific enough to support coaching now, a readiness decision later, and a better opening process next time.",
+    useWhen: "During scenarios, independent runs, competency sign-offs, daily recaps, and any event that changes the readiness recommendation.",
+    outcome: "The record shows the condition, observed behavior, result, support level, and next action without requiring the original coach to interpret it.",
+    principle: "Document what another person would need to understand the performance and act on it.",
+    sections: [
+      {
+        title: "Capture condition and behavior",
+        body: "Describe what the learner faced and what they did. The same behavior can mean something different with full prompting than under independent pressure.",
+        bullets: ["Name the scenario or operating condition.", "Record the observable action and sequence.", "Include the level of prompting or support."],
+      },
+      {
+        title: "Record result and impact",
+        body: "Connect the behavior to the outcome so the evidence supports a risk and readiness conversation.",
+        bullets: ["State whether the standard was met.", "Describe guest, safety, team, or operational impact.", "Note consistency across attempts when available."],
+      },
+      {
+        title: "Make the next action executable",
+        body: "Every open gap should lead to a specific action that tests the same underlying capability.",
+        bullets: ["Name the gap classification.", "Assign the practice, clarification, or system correction.", "Include the owner, deadline, and recheck evidence."],
+      },
+    ],
+    language: { label: "EVIDENCE EXAMPLE", text: "During the timed recovery scenario, the learner identified the issue and used the correct first check without prompting, but escalated before documenting guest impact. Repeat with a changed issue condition before final sign-off." },
+    quickCheck: ["Could another coach understand what happened?", "Does the evidence distinguish prompted from independent performance?", "Is the next action specific and owned?"],
   },
   readiness: {
-    category: "READINESS DECISIONS",
+    category: "EVIDENCE AND DECISIONS",
     title: "Making a readiness decision",
     lead: "Readiness is a body of evidence across competencies, scenarios, attendance, judgment, and independent performance.",
+    useWhen: "At daily checkpoints, the partner review, final sign-off, and whenever a launch-critical gap changes status.",
+    outcome: "The recommendation is transparent, evidence-based, risk-aware, and paired with ownership for every exception.",
     principle: "A percentage is a signal, not the decision. Review which competencies remain open and the risk attached to each.",
     sections: [
-      ["Review evidence", "Look across sign-offs, scenario scores, recap notes, and repeated process-confusion patterns."],
-      ["Separate gaps", "Distinguish a knowledge gap from a performance gap, an environmental blocker, or unclear process ownership."],
-      ["Name the next action", "Every unresolved gap needs an owner, next practice, decision date, and escalation boundary."],
+      {
+        title: "Review the full body of evidence",
+        body: "Look across competency sign-offs, scenario results, independent runs, recap patterns, process confusion, and operating conditions.",
+        bullets: ["Weight launch-critical competencies more heavily than low-risk gaps.", "Look for consistency and transfer, not one successful attempt.", "Review both individual and team-system performance."],
+      },
+      {
+        title: "Separate gap from risk",
+        body: "Not every open item has the same launch impact. State what remains open, the cause, and the consequence if it persists.",
+        bullets: ["Critical: affects safety, core guest experience, or essential operation.", "Controlled: has an owner, support path, and acceptable temporary control.", "Developmental: can continue after launch without compromising the readiness bar."],
+      },
+      {
+        title: "Make the recommendation transparent",
+        body: "Explain the decision, supporting evidence, limitations, exceptions, and next review so stakeholders can confirm the same reality.",
+        bullets: ["State ready, ready with conditions, or not ready.", "List every exception and named owner.", "Record what evidence would change the decision."],
+      },
     ],
+    language: { label: "DECISION LANGUAGE", text: "The team meets the launch standard in the core guest journey and opening sequence. Technical recovery remains controlled through a named support path and a scheduled recheck before launch." },
+    quickCheck: ["Does the recommendation match the evidence?", "Are critical gaps separated from developmental ones?", "Is every exception owned and time-bound?"],
   },
   confusion: {
     category: "ESCALATION",
     title: "Handling process confusion",
     lead: "Repeated questions are product data. They can reveal a knowledge gap, unclear process, or missing ownership.",
+    useWhen: "When multiple learners ask the same question, approved sources conflict, a step depends on undocumented expertise, or coaches repeatedly invent workarounds.",
+    outcome: "The immediate need is stabilized while the underlying process issue is captured, owned, corrected, and measured in the next opening.",
     principle: "Do not coach around a broken process. Capture the confusion, resolve the immediate need, and route the system issue to its owner.",
     sections: [
-      ["Stabilize", "Give the learner the approved next action and prevent an improvised workaround."],
-      ["Classify", "Record whether the issue came from missing knowledge, unclear guidance, conflicting sources, or incomplete ownership."],
-      ["Improve", "Use recurring patterns to update the agenda, coach guide, competency, or operating process before the next opening."],
+      {
+        title: "Stabilize the immediate need",
+        body: "Give the team the safest approved next action and prevent an improvised workaround from becoming the unofficial process.",
+        bullets: ["Confirm whether the issue affects safety or launch-critical work.", "Name the temporary action and its limits.", "Tell the team who owns the final answer."],
+      },
+      {
+        title: "Classify the source of confusion",
+        body: "Determine whether the issue came from missing knowledge, unclear guidance, conflicting sources, environmental mismatch, or incomplete ownership.",
+        bullets: ["Capture the exact question and condition.", "Identify which sources or roles conflict.", "Separate a one-person misunderstanding from a repeatable system signal."],
+      },
+      {
+        title: "Close the system loop",
+        body: "Update the correct part of the operating system and verify that the change reduces confusion in the next use.",
+        bullets: ["Assign an owner and resolution date.", "Update the agenda, guide, competency, tool, or process.", "Measure whether the same escalation repeats in the next opening."],
+      },
     ],
+    language: { label: "ESCALATION LANGUAGE", text: "The immediate action is clear, but the approved sources conflict. I am recording the exact condition and routing the process decision to its owner before this becomes a local workaround." },
+    quickCheck: ["Did I stabilize the immediate need?", "Did I capture the exact source of confusion?", "Is there an owner and a way to verify the fix?"],
+  },
+  intervene: {
+    category: "ESCALATION",
+    title: "Knowing when to intervene",
+    lead: "Coaches need enough restraint to reveal independent performance and enough judgment to protect people, guests, and the validity of the practice.",
+    useWhen: "During scenario practice, simulations, reverse shadowing, or live operations when the coach must decide whether to observe, prompt, pause, or take over.",
+    outcome: "The coach preserves authentic evidence without allowing avoidable harm, compounding error, or an invalid practice condition.",
+    principle: "Intervene at the boundary you defined before practice, not at the first sign of learner discomfort.",
+    sections: [
+      {
+        title: "Observe when learning is still productive",
+        body: "Hesitation, self-correction, and noncritical error can produce valuable evidence and learning when the environment remains safe.",
+        bullets: ["Allow time for recognition and recovery.", "Capture the behavior before coaching.", "Avoid rescuing the learner because silence feels uncomfortable."],
+      },
+      {
+        title: "Prompt when the practice can continue",
+        body: "Use the smallest prompt that restores productive practice without supplying the complete solution.",
+        bullets: ["Prompt attention before prompting action.", "Name the decision point, not the answer.", "Record the level of support because prompted performance is not independent evidence."],
+      },
+      {
+        title: "Pause or take over at the boundary",
+        body: "Stop the attempt when safety, guest impact, operational integrity, or the validity of the scenario is at risk.",
+        bullets: ["Pause when an error begins compounding.", "Take over when immediate protection is required.", "Debrief the boundary and create a safe repeat attempt when possible."],
+      },
+    ],
+    language: { label: "MINIMAL PROMPT", text: "Pause. What condition are you seeing, and which decision point does that condition trigger?" },
+    quickCheck: ["Was the intervention boundary defined before practice?", "Did I use the least support necessary?", "Did I record that the performance was prompted?"],
   },
 };
 
@@ -446,11 +661,40 @@ function toggleAgendaBlock(button) {
 function renderGuide(key) {
   const guide = guides[key];
   document.getElementById("guideArticle").innerHTML = `
-    <span>${guide.category}</span>
+    <span class="guide-category">${guide.category}</span>
     <h2>${guide.title}</h2>
     <p class="lead">${guide.lead}</p>
+    <div class="guide-context">
+      <article>
+        <span>USE THIS WHEN</span>
+        <p>${guide.useWhen}</p>
+      </article>
+      <article>
+        <span>COACH OUTCOME</span>
+        <p>${guide.outcome}</p>
+      </article>
+    </div>
     <div class="principle"><strong>COACH PRINCIPLE</strong>${guide.principle}</div>
-    ${guide.sections.map(([title, text]) => `<h3>${title}</h3><p>${text}</p>`).join("")}
+    <div class="guide-sections">
+      ${guide.sections.map((section, index) => `
+        <section class="guide-section">
+          <span class="guide-step">${String(index + 1).padStart(2, "0")}</span>
+          <div>
+            <h3>${section.title}</h3>
+            <p>${section.body}</p>
+            <ul>${section.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}</ul>
+          </div>
+        </section>
+      `).join("")}
+    </div>
+    <div class="guide-language">
+      <span>${guide.language.label}</span>
+      <p>“${guide.language.text}”</p>
+    </div>
+    <aside class="guide-check">
+      <span>QUICK EVIDENCE CHECK</span>
+      <ul>${guide.quickCheck.map((item) => `<li>${item}</li>`).join("")}</ul>
+    </aside>
   `;
 }
 
@@ -606,8 +850,14 @@ document.querySelectorAll(".guide-link").forEach((button) => {
 document.getElementById("guideSearch").addEventListener("input", (event) => {
   const query = event.target.value.toLowerCase();
   document.querySelectorAll(".guide-link").forEach((button) => {
-    button.hidden = query && !button.textContent.toLowerCase().includes(query);
+    const searchable = `${button.textContent} ${JSON.stringify(guides[button.dataset.guide])}`.toLowerCase();
+    button.hidden = Boolean(query && !searchable.includes(query));
   });
+  document.querySelectorAll(".guide-group").forEach((group) => {
+    group.hidden = ![...group.querySelectorAll(".guide-link")].some((button) => !button.hidden);
+  });
+  document.getElementById("guideEmpty").hidden =
+    [...document.querySelectorAll(".guide-link")].some((button) => !button.hidden);
 });
 
 document.querySelectorAll("#recap textarea").forEach((input) => input.addEventListener("input", updateRecap));
