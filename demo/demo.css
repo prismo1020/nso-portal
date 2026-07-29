@@ -190,6 +190,35 @@ main { padding: 31px 36px 60px; }
 .coach-callout span { color: var(--blue); display: block; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
 .coach-callout strong { display: block; font-size: 15px; margin-top: 4px; }
 .coach-callout p { color: #3c6485; font-size: 12px; margin: 0; }
+.learning-system {
+  background: #172738;
+  border: 1px solid #263c50;
+  border-radius: 12px;
+  color: white;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.learning-system-head { align-items: end; display: grid; gap: 6px 28px; grid-template-columns: 1fr 1fr; padding: 20px 22px 18px; }
+.learning-system-head .eyebrow { color: #69b3ff; grid-column: 1 / -1; }
+.learning-system-head h2 { font-size: 18px; margin: 0; }
+.learning-system-head p { color: #b9ccda; font-size: 11px; line-height: 1.55; margin: 0; }
+.learning-system ol { border-top: 1px solid #2b4053; display: grid; grid-template-columns: repeat(5, 1fr); list-style: none; margin: 0; padding: 0; }
+.learning-system li { border-right: 1px solid #2b4053; min-height: 122px; padding: 17px; position: relative; }
+.learning-system li:last-child { border-right: 0; }
+.learning-system li::after {
+  border-bottom: 5px solid transparent;
+  border-left: 6px solid #3a546a;
+  border-top: 5px solid transparent;
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 54px;
+  z-index: 1;
+}
+.learning-system li:last-child::after { display: none; }
+.learning-system li > span { color: #69b3ff; display: block; font-size: 9px; font-weight: 900; letter-spacing: .1em; }
+.learning-system li strong { display: block; font-size: 13px; margin: 6px 0; }
+.learning-system li small { color: #a9bdcc; font-size: 10px; line-height: 1.45; }
 .stat-grid { display: grid; gap: 17px; grid-template-columns: repeat(4, 1fr); margin-bottom: 20px; }
 .stat-grid article, .card, .progress-card {
   background: var(--card);
@@ -298,21 +327,122 @@ input[type="checkbox"] { accent-color: var(--blue); height: 17px; width: 17px; }
 .agenda-intro small { color: var(--blue); font-size: 9px; font-weight: 800; letter-spacing: .1em; }
 .agenda-intro h2 { font-size: 18px; margin: 4px 0; }
 .agenda-intro p { color: var(--muted); margin: 0; }
+.agenda-logic { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); margin-bottom: 14px; }
+.agenda-logic article {
+  background: #172738;
+  border: 1px solid #263c50;
+  border-radius: 11px;
+  color: white;
+  padding: 17px 19px;
+}
+.agenda-logic span, .agenda-section-label {
+  color: #64aeff;
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  margin-bottom: 7px;
+}
+.agenda-logic p { color: #d5e2ed; font-size: 12px; line-height: 1.55; margin: 0; }
+.agenda-instruction {
+  align-items: center;
+  background: #eef6ff;
+  border: 1px solid #c9e2ff;
+  border-radius: 9px;
+  color: #41647f;
+  display: flex;
+  font-size: 11px;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 11px 14px;
+}
+.agenda-instruction strong { color: var(--blue); }
 .agenda-list { display: grid; gap: 10px; }
-.agenda-row {
+.agenda-block {
+  background: white;
+  border: 1px solid #dfe7ed;
+  border-radius: 11px;
+  box-shadow: 0 2px 7px rgba(24, 43, 58, .03);
+  overflow: hidden;
+}
+.agenda-block-toggle {
   align-items: center;
   background: white;
-  border: 1px solid #e3eaf0;
-  border-radius: 10px;
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
   display: grid;
   gap: 14px;
-  grid-template-columns: 64px 1fr auto;
-  padding: 14px 17px;
+  grid-template-columns: 68px minmax(0, 1fr) auto 18px;
+  padding: 15px 17px;
+  text-align: left;
+  width: 100%;
 }
-.agenda-row > span { background: #f0f5f8; border-radius: 999px; color: #537086; font-size: 10px; font-weight: 800; padding: 6px 8px; text-align: center; }
-.agenda-row strong { display: block; }
-.agenda-row small { color: var(--muted); }
-.agenda-row b { color: var(--blue); font-size: 10px; }
+.agenda-block-toggle:hover { background: #f7fafc; }
+.agenda-block.open .agenda-block-toggle { background: #172738; color: white; }
+.agenda-time {
+  background: #eef4f8;
+  border-radius: 999px;
+  color: #527087;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 6px 8px;
+  text-align: center;
+}
+.agenda-block.open .agenda-time { background: rgba(255,255,255,.1); color: #a8d2ff; }
+.agenda-block-name strong { display: block; font-size: 13px; }
+.agenda-block-name small { color: var(--muted); display: block; font-size: 10px; margin-top: 3px; }
+.agenda-block.open .agenda-block-name small { color: #abc2d5; }
+.agenda-expand-label { color: var(--blue); font-size: 10px; font-weight: 800; }
+.agenda-chevron { color: #7891a4; font-size: 18px; transition: transform .2s ease; }
+.agenda-block.open .agenda-chevron { color: #6eb4ff; transform: rotate(180deg); }
+.agenda-block-body { background: #f5f8fa; border-top: 1px solid #dfe7ed; padding: 20px; }
+.agenda-block-body[hidden] { display: none; }
+.agenda-objectives { margin-bottom: 16px; }
+.agenda-objectives ul { display: grid; gap: 7px; list-style: none; margin: 0; padding: 0; }
+.agenda-objectives li { color: #38556b; font-size: 12px; padding-left: 14px; position: relative; }
+.agenda-objectives li::before {
+  background: var(--blue);
+  border-radius: 50%;
+  content: "";
+  height: 5px;
+  left: 0;
+  position: absolute;
+  top: 7px;
+  width: 5px;
+}
+.agenda-coach-note {
+  background: linear-gradient(135deg, #eaf4ff, #f5f9fc);
+  border: 1px solid #cce2fa;
+  border-radius: 9px;
+  margin-bottom: 14px;
+  padding: 15px;
+}
+.agenda-coach-note p, .agenda-evidence p { color: #294b65; font-size: 12px; line-height: 1.55; margin: 0; }
+.say-see-do { display: grid; gap: 10px; grid-template-columns: repeat(3, 1fr); }
+.ssd-card { background: white; border: 1px solid #dfe7ed; border-radius: 9px; padding: 14px; }
+.ssd-card span {
+  display: block;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  margin-bottom: 7px;
+}
+.ssd-card.say { border-top: 3px solid var(--blue); }
+.ssd-card.say span { color: var(--blue); }
+.ssd-card.see { border-top: 3px solid var(--green); }
+.ssd-card.see span { color: #07865d; }
+.ssd-card.do { border-top: 3px solid #f59e0b; }
+.ssd-card.do span { color: #b66d00; }
+.ssd-card p { color: #405f77; font-size: 11px; line-height: 1.55; margin: 0; }
+.agenda-evidence {
+  background: #172738;
+  border-radius: 9px;
+  margin-top: 12px;
+  padding: 13px 15px;
+}
+.agenda-evidence .agenda-section-label { color: #69b3ff; }
+.agenda-evidence p { color: #dbe7f0; }
 .knowledge-layout { display: grid; gap: 20px; grid-template-columns: 280px 1fr; }
 .article-nav {
   background: white;
@@ -478,11 +608,18 @@ input[type="checkbox"] { accent-color: var(--blue); height: 17px; width: 17px; }
   .demo-notice { padding: 9px 18px; }
   main { padding: 24px 18px 50px; }
   .dashboard-grid, .check-groups, .knowledge-layout, .recap-layout, .partner-grid, .report-grid, .insight-grid { grid-template-columns: 1fr; }
+  .learning-system-head { align-items: start; grid-template-columns: 1fr; }
+  .learning-system-head .eyebrow { grid-column: auto; }
+  .learning-system ol { grid-template-columns: 1fr; }
+  .learning-system li { border-bottom: 1px solid #2b4053; border-right: 0; min-height: auto; }
+  .learning-system li:last-child { border-bottom: 0; }
+  .learning-system li::after { display: none; }
   .day-tabs { grid-template-columns: 1fr; }
   .day-tabs button { min-height: 50px; }
   .dashboard-head, .page-head.split { display: block; }
   .day-control, .head-actions { margin-top: 18px; }
   .guide-article { min-height: auto; }
+  .agenda-logic, .say-see-do { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 540px) {
@@ -491,8 +628,11 @@ input[type="checkbox"] { accent-color: var(--blue); height: 17px; width: 17px; }
   .page-head h1 { font-size: 28px; }
   .impact-hero, .rating-grid { grid-template-columns: 1fr; }
   .impact-hero aside { grid-column: auto; }
-  .agenda-row { grid-template-columns: 56px 1fr; }
-  .agenda-row b { grid-column: 2; }
+  .agenda-intro { align-items: flex-start; display: grid; gap: 12px; }
+  .agenda-instruction { align-items: flex-start; display: grid; gap: 3px; }
+  .agenda-block-toggle { grid-template-columns: 62px minmax(0, 1fr) 16px; padding: 13px; }
+  .agenda-expand-label { display: none; }
+  .agenda-block-body { padding: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
