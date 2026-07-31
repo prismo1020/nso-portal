@@ -34,7 +34,7 @@ let state = {
 // ============================================================
 // CONTENT EDITING
 // ============================================================
-const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'danielle.beram@sandboxvr.com', 'tyler.franz-grunwald@sandboxvr.com', 'lex.snyder@sandboxvr.com'];
+const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'danielle.beram@sandboxvr.com', 'tyler.franz-grunwald@sandboxvr.com', 'lex.snyder@sandboxvr.com', 'benedict.bunyan@sandboxvr.com'];
 
 function canEdit() {
   return EDIT_EMAILS.includes(state.userEmail);
@@ -2231,6 +2231,11 @@ function switchAddTab(tab) {
 }
 
 function openAddTraineeModal() {
+  if (!state.openingId) {
+    showToast('Set up an opening first before adding trainees.', 'info');
+    openSetupModal(true);
+    return;
+  }
   document.getElementById('addTraineeModal').classList.add('open');
   document.getElementById('trainee-name').value = '';
   document.getElementById('bulk-names').value = '';
