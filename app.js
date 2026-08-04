@@ -34,7 +34,7 @@ let state = {
 // ============================================================
 // CONTENT EDITING
 // ============================================================
-const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'danielle.beram@sandboxvr.com', 'tyler.franz-grunwald@sandboxvr.com', 'lex.snyder@sandboxvr.com', 'ben.bunyan@sandboxvr.com'];
+const EDIT_EMAILS = ['danielle.beram1@gmail.com', 'danielle.beram@sandboxvr.com', 'tyler.franz-grunwald@sandboxvr.com', 'lex.snyder@sandboxvr.com', 'ben.bunyan@sandboxvr.com', 'benedict.bunyan@sandboxvr.com'];
 
 function canEdit() {
   return EDIT_EMAILS.includes(state.userEmail);
